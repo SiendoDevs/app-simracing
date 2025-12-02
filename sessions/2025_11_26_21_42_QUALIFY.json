@@ -1,0 +1,4767 @@
+{
+  "Version": 7,
+  "Cars": [
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "Driver": {
+        "Guid": "76561199812903601",
+        "GuidsList": [
+          "76561199812903601"
+        ],
+        "Name": "Lautaro Natalini",
+        "Nation": "ARG",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "L_NATALINI_#2_Kart_republic",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 21,
+      "MaxPing": 199
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "L_NATALINI_#2_Kart_republic",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 19,
+      "MaxPing": 50
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "Driver": {
+        "Guid": "76561198194725750",
+        "GuidsList": [
+          "76561198194725750"
+        ],
+        "Name": "Tomás Morguen",
+        "Nation": "ARG",
+        "Team": "Jotracks Crew",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#88_KZ_ZN_PRO_JOTA_MOSSOTTO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 24,
+      "MaxPing": 50
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "Driver": {
+        "Guid": "76561199180015223",
+        "GuidsList": [
+          "76561199180015223"
+        ],
+        "Name": "Joaquín Battaglino ",
+        "Nation": "ARG",
+        "Team": "Lincoln P1 Competición",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "279_Joaco",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 33,
+      "MaxPing": 201
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "89_Catriel_Sanchez",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 32,
+      "MaxPing": 1054
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "Driver": {
+        "Guid": "76561199778180071",
+        "GuidsList": [
+          "76561199778180071"
+        ],
+        "Name": "Sebastian Sanchez",
+        "Nation": "ARG",
+        "Team": "Jotracks",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#10_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 36,
+      "MaxPing": 1055
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 6,
+      "Driver": {
+        "Guid": "76561198894862571",
+        "GuidsList": [
+          "76561198894862571"
+        ],
+        "Name": "Alejo Pagani",
+        "Nation": "ITA",
+        "Team": "JMV",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#1_KZ_ZN_PRO",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "MinPing": 23,
+      "MaxPing": 404
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 7,
+      "Driver": {
+        "Guid": "76561198126119926",
+        "GuidsList": [
+          "76561198126119926"
+        ],
+        "Name": "Joaquín Masquere",
+        "Nation": "",
+        "Team": "Prana Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "89_Catriel_Sanchez - copia",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "MinPing": 0,
+      "MaxPing": 0
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "Driver": {
+        "Guid": "76561199789793086",
+        "GuidsList": [
+          "76561199789793086"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "Picante Motorsport",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#10_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 24,
+      "MaxPing": 2325
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#1_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 21,
+      "MaxPing": 186
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "Driver": {
+        "Guid": "76561197960267366",
+        "GuidsList": [
+          "76561197960267366"
+        ],
+        "Name": "pablo godoy",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#4_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 30,
+      "MaxPing": 193
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 11,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#4_KZ_ZN_PRO",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "MinPing": 0,
+      "MaxPing": 0
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "Driver": {
+        "Guid": "76561199813894953",
+        "GuidsList": [
+          "76561199813894953"
+        ],
+        "Name": "Ignacio Zaracho",
+        "Nation": "ITA",
+        "Team": "Racing Public Kart",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#9_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 23,
+      "MaxPing": 205
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 13,
+      "Driver": {
+        "Guid": "76561199629167327",
+        "GuidsList": [
+          "76561199629167327"
+        ],
+        "Name": "Benjamin Gimenez",
+        "Nation": "ARG",
+        "Team": "CRG",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#2_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 24,
+      "MaxPing": 284
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "Driver": {
+        "Guid": "76561199442962536",
+        "GuidsList": [
+          "76561199442962536"
+        ],
+        "Name": "Alejandro Martin",
+        "Nation": "ARG",
+        "Team": "Pesi Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#2_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 27,
+      "MaxPing": 188
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "Driver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561199234809675",
+          "76561198061777925"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "#3_KZ_ZN_PRO",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 26,
+      "MaxPing": 881
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "Model": "reg_parolin_kz",
+      "Restrictor": 0,
+      "Skin": "Nico_Santa_Cruz",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "MinPing": 37,
+      "MaxPing": 1262
+    }
+  ],
+  "Events": [
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 18.238953,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.6456245,
+        "Y": 0.47616783,
+        "Z": -0.45730475
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -21.01616,
+        "Y": 0.50821435,
+        "Z": 56.363316
+      },
+      "Timestamp": 1764203738,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 30.606659,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.60514796,
+        "Y": 0.2901286,
+        "Z": 0.81094056
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -12.294212,
+        "Y": 0.2992786,
+        "Z": 49.204594
+      },
+      "Timestamp": 1764203738,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 18.369871,
+      "OtherCarId": 4,
+      "OtherDriver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.60607004,
+        "Y": 0.46504816,
+        "Z": 0.9044121
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -21.055698,
+        "Y": 0.50852245,
+        "Z": 56.39793
+      },
+      "Timestamp": 1764203740,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 39.183224,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.3939973,
+        "Y": 0.27805242,
+        "Z": 1.209999
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -14.9695015,
+        "Y": 0.32481638,
+        "Z": 49.110054
+      },
+      "Timestamp": 1764203740,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 7.9816,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.39492065,
+        "Y": 0.46824446,
+        "Z": 1.2129295
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -13.197148,
+        "Y": 0.49182913,
+        "Z": 50.66573
+      },
+      "Timestamp": 1764203743,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 8,
+      "Driver": {
+        "Guid": "76561199789793086",
+        "GuidsList": [
+          "76561199789793086"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "Picante Motorsport",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 58.658436,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.45695758,
+        "Y": 0.14416832,
+        "Z": 1.1261857
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -10.257486,
+        "Y": 0.19198783,
+        "Z": 55.55905
+      },
+      "Timestamp": 1764203744,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 0.050818175,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.2771908,
+        "Y": 0.2779601,
+        "Z": 1.2541741
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -14.847635,
+        "Y": 0.3206727,
+        "Z": 49.090324
+      },
+      "Timestamp": 1764203745,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 57.069183,
+      "OtherCarId": 8,
+      "OtherDriver": {
+        "Guid": "76561199789793086",
+        "GuidsList": [
+          "76561199789793086"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "Picante Motorsport",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.61230576,
+        "Y": 0.28706363,
+        "Z": 0.013093462
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -10.240727,
+        "Y": 0.3312492,
+        "Z": 55.92622
+      },
+      "Timestamp": 1764203745,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 18.550348,
+      "OtherCarId": 1,
+      "OtherDriver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.6028687,
+        "Y": 0.47253177,
+        "Z": 0.90424526
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 10.279906,
+        "Y": 0.51529235,
+        "Z": 60.040897
+      },
+      "Timestamp": 1764203755,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 16.707796,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.68387884,
+        "Y": 0.008685847,
+        "Z": -0.5888786
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 10.360746,
+        "Y": 0.05364537,
+        "Z": 59.94921
+      },
+      "Timestamp": 1764203756,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 26.824398,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.60184085,
+        "Y": 0.3258951,
+        "Z": 0.9015702
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 76.225,
+        "Y": 0.33145878,
+        "Z": 76.80886
+      },
+      "Timestamp": 1764203765,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 15,
+      "Driver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561198061777925",
+          "76561199234809675"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "ImpactSpeed": 1.684357,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.63854825,
+        "Y": 0.008686233,
+        "Z": 0.27267906
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -23.450094,
+        "Y": 0.032014217,
+        "Z": 68.28381
+      },
+      "Timestamp": 1764203782,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 9.414137,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.60607374,
+        "Y": 0.07575179,
+        "Z": 0.90441185
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -6.099992,
+        "Y": 0.12261511,
+        "Z": 79.34344
+      },
+      "Timestamp": 1764203798,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 22.902946,
+      "OtherCarId": 16,
+      "OtherDriver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.6629885,
+        "Y": 0.012129544,
+        "Z": -0.1941219
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -27.81942,
+        "Y": 0.04228209,
+        "Z": 70.49362
+      },
+      "Timestamp": 1764203800,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 10,
+      "Driver": {
+        "Guid": "76561197960267366",
+        "GuidsList": [
+          "76561197960267366"
+        ],
+        "Name": "pablo godoy",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "ImpactSpeed": 14.194374,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.3951706,
+        "Y": 0.32359442,
+        "Z": 1.2137196
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 103.941345,
+        "Y": 0.3536282,
+        "Z": 34.827126
+      },
+      "Timestamp": 1764203800,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 5,
+      "Driver": {
+        "Guid": "76561199778180071",
+        "GuidsList": [
+          "76561199778180071"
+        ],
+        "Name": "Sebastian Sanchez",
+        "Nation": "ARG",
+        "Team": "Jotracks",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 25.586782,
+      "OtherCarId": 16,
+      "OtherDriver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.49222675,
+        "Y": 0.47616836,
+        "Z": 1.0737333
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -29.043781,
+        "Y": 0.49956232,
+        "Z": 66.640686
+      },
+      "Timestamp": 1764203800,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 11.588286,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.57946545,
+        "Y": 0.009879774,
+        "Z": 0.93492913
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -27.791817,
+        "Y": 0.035405528,
+        "Z": 70.51564
+      },
+      "Timestamp": 1764203803,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 48.313927,
+      "OtherCarId": 5,
+      "OtherDriver": {
+        "Guid": "76561199778180071",
+        "GuidsList": [
+          "76561199778180071"
+        ],
+        "Name": "Sebastian Sanchez",
+        "Nation": "ARG",
+        "Team": "Jotracks",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.6060698,
+        "Y": 0.008686522,
+        "Z": 0.9044128
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -29.046932,
+        "Y": 0.039493375,
+        "Z": 66.983315
+      },
+      "Timestamp": 1764203803,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 27.366087,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.0381401,
+        "Y": 0.32460955,
+        "Z": 1.3146343
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -37.004208,
+        "Y": 0.3055514,
+        "Z": 59.671795
+      },
+      "Timestamp": 1764203803,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 25.3417,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.5625112,
+        "Y": 0.24921829,
+        "Z": 0.96107703
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 86.784935,
+        "Y": 0.30250683,
+        "Z": 15.554171
+      },
+      "Timestamp": 1764203851,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 8,
+      "Driver": {
+        "Guid": "76561199789793086",
+        "GuidsList": [
+          "76561199789793086"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "Picante Motorsport",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 50.299725,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.60607386,
+        "Y": 0.30928853,
+        "Z": 0.90441245
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -18.824106,
+        "Y": 0.35857025,
+        "Z": 123.573906
+      },
+      "Timestamp": 1764203869,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 27.814615,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.58898634,
+        "Y": 0.32762587,
+        "Z": 0.8929264
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -12.808109,
+        "Y": 0.34041023,
+        "Z": -126.937225
+      },
+      "Timestamp": 1764203885,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 12,
+      "Driver": {
+        "Guid": "76561199813894953",
+        "GuidsList": [
+          "76561199813894953"
+        ],
+        "Name": "Ignacio Zaracho",
+        "Nation": "ITA",
+        "Team": "Racing Public Kart",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 7.229575,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.617989,
+        "Y": 0.008686383,
+        "Z": 0.6027086
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -63.21978,
+        "Y": 0.0055222046,
+        "Z": 53.32478
+      },
+      "Timestamp": 1764203887,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 15,
+      "Driver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561199234809675",
+          "76561198061777925"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "ImpactSpeed": 21.313944,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.38563684,
+        "Y": 0.46612036,
+        "Z": 1.2103174
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 44.023922,
+        "Y": 0.5153116,
+        "Z": 7.8764467
+      },
+      "Timestamp": 1764203898,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 19.550686,
+      "OtherCarId": 15,
+      "OtherDriver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561199234809675"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "RelPosition": {
+        "X": 0.12896924,
+        "Y": 0.4761676,
+        "Z": -0.76528585
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 44.207672,
+        "Y": 0.5156166,
+        "Z": 7.7477264
+      },
+      "Timestamp": 1764203900,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 15,
+      "Driver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561198061777925",
+          "76561199234809675"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "ImpactSpeed": 5.6935635,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.606072,
+        "Y": 0.46064815,
+        "Z": 0.9044143
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -38.64703,
+        "Y": 0.46494156,
+        "Z": 41.55663
+      },
+      "Timestamp": 1764203908,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 34.603683,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.51941156,
+        "Y": 0.28322098,
+        "Z": 1.0332996
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -26.575338,
+        "Y": 0.31142008,
+        "Z": 51.413273
+      },
+      "Timestamp": 1764203908,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 15,
+      "Driver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561199234809675",
+          "76561198061777925"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "ImpactSpeed": 35.004723,
+      "OtherCarId": 16,
+      "OtherDriver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.39610842,
+        "Y": 0.47616833,
+        "Z": 1.2166872
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -65.50392,
+        "Y": 0.4533394,
+        "Z": 72.96448
+      },
+      "Timestamp": 1764203923,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 43.97917,
+      "OtherCarId": 15,
+      "OtherDriver": {
+        "Guid": "76561199234809675",
+        "GuidsList": [
+          "76561199234809675"
+        ],
+        "Name": "Ian Maisonnave",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "RelPosition": {
+        "X": -0.35006908,
+        "Y": 0.47609356,
+        "Z": -0.71349627
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -65.29574,
+        "Y": 0.45249838,
+        "Z": 72.826866
+      },
+      "Timestamp": 1764203923,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 5.362763,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.6060709,
+        "Y": 0.008686494,
+        "Z": 0.90441257
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 73.254684,
+        "Y": 0.05166519,
+        "Z": 62.85887
+      },
+      "Timestamp": 1764203928,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 13,
+      "Driver": {
+        "Guid": "76561199629167327",
+        "GuidsList": [
+          "76561199629167327"
+        ],
+        "Name": "Benjamin Gimenez",
+        "Nation": "ARG",
+        "Team": "CRG",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 29.194649,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.039340932,
+        "Y": 0.008686786,
+        "Z": 1.3268638
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 20.026184,
+        "Y": 0.038788937,
+        "Z": -114.65733
+      },
+      "Timestamp": 1764203935,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 68.492905,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.020756971,
+        "Y": 0.008686813,
+        "Z": 1.3279829
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 69.27079,
+        "Y": 0.018182905,
+        "Z": 26.14656
+      },
+      "Timestamp": 1764203936,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 5.9465237,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.6323281,
+        "Y": 0.008686289,
+        "Z": 0.40047857
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 86.0926,
+        "Y": 0.034693513,
+        "Z": 15.041244
+      },
+      "Timestamp": 1764203948,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 16,
+      "Driver": {
+        "Guid": "76561199819154955",
+        "GuidsList": [
+          "76561199819154955"
+        ],
+        "Name": "Nicolás Santa Cruz",
+        "Nation": "ITA",
+        "Team": "Custom Chicken \u0026 Pig",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 15.26528,
+      "OtherCarId": 10,
+      "OtherDriver": {
+        "Guid": "76561197960267366",
+        "GuidsList": [
+          "76561197960267366"
+        ],
+        "Name": "pablo godoy",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "00000000-0000-0000-0000-000000000000"
+      },
+      "RelPosition": {
+        "X": -0.6838794,
+        "Y": 0.008685849,
+        "Z": -0.588879
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 89.435875,
+        "Y": 0.0520257,
+        "Z": 17.412554
+      },
+      "Timestamp": 1764203948,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 37.106205,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.39572775,
+        "Y": 0.3194051,
+        "Z": 1.2154766
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 23.090712,
+        "Y": 0.36280677,
+        "Z": 105.69954
+      },
+      "Timestamp": 1764203956,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 28.193918,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.5190412,
+        "Y": 0.008686594,
+        "Z": 1.0338491
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 86.0912,
+        "Y": 0.05849483,
+        "Z": 15.046609
+      },
+      "Timestamp": 1764203968,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 4,
+      "Driver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 36.883785,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.14542307,
+        "Y": 0.47616774,
+        "Z": -0.76152706
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 97.60596,
+        "Y": 0.51248825,
+        "Z": 23.417992
+      },
+      "Timestamp": 1764203968,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 32.37664,
+      "OtherCarId": 4,
+      "OtherDriver": {
+        "Guid": "76561199094389654",
+        "GuidsList": [
+          "76561199094389654"
+        ],
+        "Name": "Gaston Esperanza",
+        "Nation": "ARG",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.38712436,
+        "Y": 0.46788633,
+        "Z": 1.188215
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 97.467545,
+        "Y": 0.51720256,
+        "Z": 23.460754
+      },
+      "Timestamp": 1764203970,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 5,
+      "Driver": {
+        "Guid": "76561199778180071",
+        "GuidsList": [
+          "76561199778180071"
+        ],
+        "Name": "Sebastian Sanchez",
+        "Nation": "ARG",
+        "Team": "Jotracks",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 83.72456,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.016978128,
+        "Y": 0.2726696,
+        "Z": 1.262601
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -12.912659,
+        "Y": 0.32373658,
+        "Z": 28.096014
+      },
+      "Timestamp": 1764203970,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 13.666815,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.3947199,
+        "Y": 0.30088732,
+        "Z": 1.2122899
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 104.27852,
+        "Y": 0.35219368,
+        "Z": 34.233326
+      },
+      "Timestamp": 1764203971,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "Guid": "76561199104556645",
+        "GuidsList": [
+          "76561199104556645"
+        ],
+        "Name": "Martino Dinice",
+        "Nation": "ITA",
+        "Team": "Kart Republic",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 0.93047994,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.68181425,
+        "Y": 0.32135624,
+        "Z": -0.55237025
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 105.37791,
+        "Y": 0.36184356,
+        "Z": 32.423767
+      },
+      "Timestamp": 1764203976,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 20.525011,
+      "OtherCarId": 2,
+      "OtherDriver": {
+        "Guid": "76561198194725750",
+        "GuidsList": [
+          "76561198194725750"
+        ],
+        "Name": "Tomás Morguen",
+        "Nation": "ARG",
+        "Team": "Jotracks Crew",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.14817293,
+        "Y": 0.47616753,
+        "Z": -0.75117993
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 85.15802,
+        "Y": 0.5155991,
+        "Z": -45.52272
+      },
+      "Timestamp": 1764203985,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 9,
+      "Driver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 63.73344,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.46133274,
+        "Y": 0.3309411,
+        "Z": 1.1196752
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 73.0121,
+        "Y": 0.37186053,
+        "Z": -77.30741
+      },
+      "Timestamp": 1764203985,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 2,
+      "Driver": {
+        "Guid": "76561198194725750",
+        "GuidsList": [
+          "76561198194725750"
+        ],
+        "Name": "Tomás Morguen",
+        "Nation": "ARG",
+        "Team": "Jotracks Crew",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 21.4638,
+      "OtherCarId": 9,
+      "OtherDriver": {
+        "Guid": "76561199138910995",
+        "GuidsList": [
+          "76561199138910995"
+        ],
+        "Name": "Gabriel Rosas",
+        "Nation": "ARG",
+        "Team": "Verstappen Racing",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": -0.03616154,
+        "Y": 0.46403593,
+        "Z": 1.3296578
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": 84.89314,
+        "Y": 0.5111471,
+        "Z": -45.301197
+      },
+      "Timestamp": 1764203985,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    },
+    {
+      "CarId": 2,
+      "Driver": {
+        "Guid": "76561198194725750",
+        "GuidsList": [
+          "76561198194725750"
+        ],
+        "Name": "Tomás Morguen",
+        "Nation": "ARG",
+        "Team": "Jotracks Crew",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "ImpactSpeed": 51.16783,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": "",
+        "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654"
+      },
+      "RelPosition": {
+        "X": 0.38134134,
+        "Y": 0.31377056,
+        "Z": 1.1698935
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": 59.43996,
+        "Y": 0.34679922,
+        "Z": -60.91747
+      },
+      "Timestamp": 1764203985,
+      "AfterSessionEnd": false,
+      "ReplayURL": ""
+    }
+  ],
+  "Laps": [
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 46401,
+      "Restrictor": 0,
+      "Sectors": [
+        9892,
+        19579,
+        16930
+      ],
+      "Timestamp": 1764203722,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199234809675",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 46841,
+      "Restrictor": 0,
+      "Sectors": [
+        11854,
+        18931,
+        16056
+      ],
+      "Timestamp": 1764203724,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 47798,
+      "Restrictor": 0,
+      "Sectors": [
+        12311,
+        19530,
+        15957
+      ],
+      "Timestamp": 1764203725,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 51525,
+      "Restrictor": 0,
+      "Sectors": [
+        14579,
+        20476,
+        16470
+      ],
+      "Timestamp": 1764203727,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 52739,
+      "Restrictor": 0,
+      "Sectors": [
+        16955,
+        19256,
+        16528
+      ],
+      "Timestamp": 1764203729,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 53609,
+      "Restrictor": 0,
+      "Sectors": [
+        11674,
+        22959,
+        18976
+      ],
+      "Timestamp": 1764203732,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 61645,
+      "Restrictor": 0,
+      "Sectors": [
+        22031,
+        22672,
+        16942
+      ],
+      "Timestamp": 1764203738,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 62874,
+      "Restrictor": 0,
+      "Sectors": [
+        23103,
+        22027,
+        17744
+      ],
+      "Timestamp": 1764203740,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 66389,
+      "Restrictor": 0,
+      "Sectors": [
+        25705,
+        24286,
+        16398
+      ],
+      "Timestamp": 1764203742,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "LapTime": 66609,
+      "Restrictor": 0,
+      "Sectors": [
+        26918,
+        23032,
+        16659
+      ],
+      "Timestamp": 1764203744,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 73728,
+      "Restrictor": 0,
+      "Sectors": [
+        33867,
+        21194,
+        18667
+      ],
+      "Timestamp": 1764203750,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 76566,
+      "Restrictor": 0,
+      "Sectors": [
+        37892,
+        22262,
+        16412
+      ],
+      "Timestamp": 1764203752,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 40832,
+      "Restrictor": 0,
+      "Sectors": [
+        5804,
+        18986,
+        16042
+      ],
+      "Timestamp": 1764203763,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199234809675",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 40709,
+      "Restrictor": 0,
+      "Sectors": [
+        5816,
+        18954,
+        15939
+      ],
+      "Timestamp": 1764203765,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 41922,
+      "Restrictor": 0,
+      "Sectors": [
+        5895,
+        19561,
+        16466
+      ],
+      "Timestamp": 1764203769,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 42005,
+      "Restrictor": 0,
+      "Sectors": [
+        6204,
+        19340,
+        16461
+      ],
+      "Timestamp": 1764203771,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 48301,
+      "Restrictor": 0,
+      "Sectors": [
+        5915,
+        26353,
+        16033
+      ],
+      "Timestamp": 1764203774,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 45281,
+      "Restrictor": 0,
+      "Sectors": [
+        5830,
+        22559,
+        16892
+      ],
+      "Timestamp": 1764203777,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 42316,
+      "Restrictor": 0,
+      "Sectors": [
+        6100,
+        20038,
+        16178
+      ],
+      "Timestamp": 1764203785,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 49483,
+      "Restrictor": 0,
+      "Sectors": [
+        6036,
+        26189,
+        17258
+      ],
+      "Timestamp": 1764203787,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 3,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 82383,
+      "Restrictor": 0,
+      "Sectors": [
+        24702,
+        39190,
+        18491
+      ],
+      "Timestamp": 1764203787,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 47097,
+      "Restrictor": 0,
+      "Sectors": [
+        6255,
+        22450,
+        18392
+      ],
+      "Timestamp": 1764203788,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "LapTime": 43897,
+      "Restrictor": 0,
+      "Sectors": [
+        6129,
+        20123,
+        17645
+      ],
+      "Timestamp": 1764203788,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 41958,
+      "Restrictor": 0,
+      "Sectors": [
+        6007,
+        19516,
+        16435
+      ],
+      "Timestamp": 1764203792,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 40175,
+      "Restrictor": 0,
+      "Sectors": [
+        5737,
+        18486,
+        15952
+      ],
+      "Timestamp": 1764203793,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 40759,
+      "Restrictor": 0,
+      "Sectors": [
+        5799,
+        18935,
+        16025
+      ],
+      "Timestamp": 1764203804,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 13,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199629167327",
+      "DriverName": "Benjamin Gimenez",
+      "LapTime": 109855,
+      "Restrictor": 0,
+      "Sectors": [
+        73432,
+        19930,
+        16493
+      ],
+      "Timestamp": 1764203810,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": null,
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 41533,
+      "Restrictor": 0,
+      "Sectors": [
+        5947,
+        19264,
+        16322
+      ],
+      "Timestamp": 1764203812,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 41050,
+      "Restrictor": 0,
+      "Sectors": [
+        5914,
+        19152,
+        15984
+      ],
+      "Timestamp": 1764203815,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199234809675",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 50906,
+      "Restrictor": 0,
+      "Sectors": [
+        5857,
+        29142,
+        15907
+      ],
+      "Timestamp": 1764203816,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 40530,
+      "Restrictor": 0,
+      "Sectors": [
+        5879,
+        18738,
+        15913
+      ],
+      "Timestamp": 1764203818,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 41752,
+      "Restrictor": 0,
+      "Sectors": [
+        5982,
+        19340,
+        16430
+      ],
+      "Timestamp": 1764203826,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 43543,
+      "Restrictor": 0,
+      "Sectors": [
+        6166,
+        20169,
+        17208
+      ],
+      "Timestamp": 1764203831,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 40170,
+      "Restrictor": 0,
+      "Sectors": [
+        5799,
+        18458,
+        15913
+      ],
+      "Timestamp": 1764203833,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 43114,
+      "Restrictor": 0,
+      "Sectors": [
+        6052,
+        20777,
+        16285
+      ],
+      "Timestamp": 1764203835,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 54071,
+      "Restrictor": 0,
+      "Sectors": [
+        6795,
+        29236,
+        18040
+      ],
+      "Timestamp": 1764203842,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 3,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 55831,
+      "Restrictor": 0,
+      "Sectors": [
+        6497,
+        27010,
+        22324
+      ],
+      "Timestamp": 1764203843,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 13,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199629167327",
+      "DriverName": "Benjamin Gimenez",
+      "LapTime": 43061,
+      "Restrictor": 0,
+      "Sectors": [
+        5815,
+        20209,
+        17037
+      ],
+      "Timestamp": 1764203853,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 41892,
+      "Restrictor": 0,
+      "Sectors": [
+        5810,
+        19647,
+        16435
+      ],
+      "Timestamp": 1764203854,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 41059,
+      "Restrictor": 0,
+      "Sectors": [
+        5918,
+        19108,
+        16033
+      ],
+      "Timestamp": 1764203856,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199234809675",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 40768,
+      "Restrictor": 0,
+      "Sectors": [
+        5807,
+        18811,
+        16150
+      ],
+      "Timestamp": 1764203857,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 41094,
+      "Restrictor": 0,
+      "Sectors": [
+        5949,
+        19079,
+        16066
+      ],
+      "Timestamp": 1764203859,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 92686,
+      "Restrictor": 0,
+      "Sectors": [
+        56654,
+        19458,
+        16574
+      ],
+      "Timestamp": 1764203862,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 41689,
+      "Restrictor": 0,
+      "Sectors": [
+        5968,
+        19328,
+        16393
+      ],
+      "Timestamp": 1764203868,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 2,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 66943,
+      "Restrictor": 0,
+      "Sectors": [
+        27186,
+        21780,
+        17977
+      ],
+      "Timestamp": 1764203871,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 45500,
+      "Restrictor": 0,
+      "Sectors": [
+        6144,
+        22405,
+        16951
+      ],
+      "Timestamp": 1764203876,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 41626,
+      "Restrictor": 0,
+      "Sectors": [
+        5977,
+        19390,
+        16259
+      ],
+      "Timestamp": 1764203876,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 2,
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "LapTime": 90883,
+      "Restrictor": 0,
+      "Sectors": [
+        53438,
+        20799,
+        16646
+      ],
+      "Timestamp": 1764203879,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 49018,
+      "Restrictor": 0,
+      "Sectors": [
+        5958,
+        19772,
+        23288
+      ],
+      "Timestamp": 1764203882,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 48071,
+      "Restrictor": 0,
+      "Sectors": [
+        6141,
+        21230,
+        20700
+      ],
+      "Timestamp": 1764203890,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 13,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199629167327",
+      "DriverName": "Benjamin Gimenez",
+      "LapTime": 41781,
+      "Restrictor": 0,
+      "Sectors": [
+        5825,
+        19522,
+        16434
+      ],
+      "Timestamp": 1764203895,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 41108,
+      "Restrictor": 0,
+      "Sectors": [
+        5828,
+        19170,
+        16110
+      ],
+      "Timestamp": 1764203897,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 3,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 54708,
+      "Restrictor": 0,
+      "Sectors": [
+        6486,
+        23044,
+        25178
+      ],
+      "Timestamp": 1764203898,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 15,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199234809675",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 41127,
+      "Restrictor": 0,
+      "Sectors": [
+        5802,
+        18949,
+        16376
+      ],
+      "Timestamp": 1764203898,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 43161,
+      "Restrictor": 0,
+      "Sectors": [
+        5873,
+        19540,
+        17748
+      ],
+      "Timestamp": 1764203905,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 3,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 48167,
+      "Restrictor": 0,
+      "Sectors": [
+        9890,
+        21362,
+        16915
+      ],
+      "Timestamp": 1764203907,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 41298,
+      "Restrictor": 0,
+      "Sectors": [
+        5999,
+        19139,
+        16160
+      ],
+      "Timestamp": 1764203909,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 40821,
+      "Restrictor": 0,
+      "Sectors": [
+        5847,
+        18981,
+        15993
+      ],
+      "Timestamp": 1764203912,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 42564,
+      "Restrictor": 0,
+      "Sectors": [
+        6033,
+        20106,
+        16425
+      ],
+      "Timestamp": 1764203919,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 67837,
+      "Restrictor": 0,
+      "Sectors": [
+        32328,
+        19304,
+        16205
+      ],
+      "Timestamp": 1764203922,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 40393,
+      "Restrictor": 0,
+      "Sectors": [
+        5779,
+        18572,
+        16042
+      ],
+      "Timestamp": 1764203922,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "LapTime": 44403,
+      "Restrictor": 0,
+      "Sectors": [
+        6108,
+        21982,
+        16313
+      ],
+      "Timestamp": 1764203924,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 47519,
+      "Restrictor": 0,
+      "Sectors": [
+        7083,
+        22297,
+        18139
+      ],
+      "Timestamp": 1764203945,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "LapTime": 49606,
+      "Restrictor": 0,
+      "Sectors": [
+        8683,
+        23616,
+        17307
+      ],
+      "Timestamp": 1764203946,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 40889,
+      "Restrictor": 0,
+      "Sectors": [
+        5920,
+        18742,
+        16227
+      ],
+      "Timestamp": 1764203948,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "LapTime": 41850,
+      "Restrictor": 0,
+      "Sectors": [
+        6012,
+        19088,
+        16750
+      ],
+      "Timestamp": 1764203951,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 40400,
+      "Restrictor": 0,
+      "Sectors": [
+        5831,
+        18666,
+        15903
+      ],
+      "Timestamp": 1764203952,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 78738,
+      "Restrictor": 0,
+      "Sectors": [
+        43156,
+        19323,
+        16259
+      ],
+      "Timestamp": 1764203955,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 41433,
+      "Restrictor": 0,
+      "Sectors": [
+        6166,
+        19309,
+        15958
+      ],
+      "Timestamp": 1764203964,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "LapTime": 42094,
+      "Restrictor": 0,
+      "Sectors": [
+        5999,
+        19656,
+        16439
+      ],
+      "Timestamp": 1764203964,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "LapTime": 43451,
+      "Restrictor": 0,
+      "Sectors": [
+        5998,
+        20588,
+        16865
+      ],
+      "Timestamp": 1764203967,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 3,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 79040,
+      "Restrictor": 0,
+      "Sectors": [
+        40309,
+        21992,
+        16739
+      ],
+      "Timestamp": 1764203969,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 2,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 63706,
+      "Restrictor": 0,
+      "Sectors": [
+        25794,
+        21474,
+        16438
+      ],
+      "Timestamp": 1764203969,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "LapTime": 40989,
+      "Restrictor": 0,
+      "Sectors": [
+        5857,
+        19003,
+        16129
+      ],
+      "Timestamp": 1764203989,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 57467,
+      "Restrictor": 0,
+      "Sectors": [
+        6869,
+        27936,
+        22662
+      ],
+      "Timestamp": 1764204003,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "LapTime": 40540,
+      "Restrictor": 0,
+      "Sectors": [
+        5813,
+        18648,
+        16079
+      ],
+      "Timestamp": 1764204004,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "LapTime": 56261,
+      "Restrictor": 0,
+      "Sectors": [
+        5807,
+        19427,
+        31027
+      ],
+      "Timestamp": 1764204008,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 2,
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "LapTime": 56780,
+      "Restrictor": 0,
+      "Sectors": [
+        6048,
+        19242,
+        31490
+      ],
+      "Timestamp": 1764204012,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "LapTime": 44651,
+      "Restrictor": 0,
+      "Sectors": [
+        6590,
+        21119,
+        16942
+      ],
+      "Timestamp": 1764204013,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "LapTime": 96088,
+      "Restrictor": 0,
+      "Sectors": [
+        71613,
+        7083,
+        17392
+      ],
+      "Timestamp": 1764204015,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 1,
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "LapTime": 53740,
+      "Restrictor": 0,
+      "Sectors": [
+        6143,
+        30807,
+        16790
+      ],
+      "Timestamp": 1764204023,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": false,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "Cuts": 0,
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "LapTime": 46992,
+      "Restrictor": 0,
+      "Sectors": [
+        7373,
+        21488,
+        18131
+      ],
+      "Timestamp": 1764204050,
+      "Tyre": "MG Y",
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "ContributedToFastestLap": true,
+      "SpeedTrapHits": [],
+      "Conditions": {
+        "Ambient": 26,
+        "Road": 36,
+        "Grip": 1,
+        "WindSpeed": 14,
+        "WindDirection": 17,
+        "RainIntensity": 0,
+        "RainWetness": 0,
+        "RainWater": 0
+      }
+    }
+  ],
+  "Result": [
+    {
+      "BallastKG": 0,
+      "BestLap": 40170,
+      "CarId": 3,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199180015223",
+      "DriverName": "Joaquín Battaglino ",
+      "Restrictor": 0,
+      "TotalTime": 328298,
+      "NumLaps": 7,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 1
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 40400,
+      "CarId": 0,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199812903601",
+      "DriverName": "Lautaro Natalini",
+      "Restrictor": 0,
+      "TotalTime": 332423,
+      "NumLaps": 7,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 4
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 40530,
+      "CarId": 8,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199789793086",
+      "DriverName": "Ian Maisonnave",
+      "Restrictor": 0,
+      "TotalTime": 313014,
+      "NumLaps": 7,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 2
+    },
+    
+    {
+      "BallastKG": 0,
+      "BestLap": 41050,
+      "CarId": 4,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199094389654",
+      "DriverName": "Gaston Esperanza",
+      "Restrictor": 0,
+      "TotalTime": 270470,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 5
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 41298,
+      "CarId": 14,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199442962536",
+      "DriverName": "Alejandro Martin",
+      "Restrictor": 0,
+      "TotalTime": 275308,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 6
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 41533,
+      "CarId": 12,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199813894953",
+      "DriverName": "Ignacio Zaracho",
+      "Restrictor": 0,
+      "TotalTime": 288372,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 9
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 41626,
+      "CarId": 2,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561198194725750",
+      "DriverName": "Tomás Morguen",
+      "Restrictor": 0,
+      "TotalTime": 335943,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 15
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 41781,
+      "CarId": 13,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199629167327",
+      "DriverName": "Benjamin Gimenez",
+      "Restrictor": 0,
+      "TotalTime": 219197,
+      "NumLaps": 3,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 7
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 41922,
+      "CarId": 10,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561197960267366",
+      "DriverName": "pablo godoy",
+      "Restrictor": 0,
+      "TotalTime": 346753,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 8
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 42564,
+      "CarId": 1,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199104556645",
+      "DriverName": "Martino Dinice",
+      "Restrictor": 0,
+      "TotalTime": 338835,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 13
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 43897,
+      "CarId": 5,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199778180071",
+      "DriverName": "Sebastian Sanchez",
+      "Restrictor": 0,
+      "TotalTime": 291220,
+      "NumLaps": 5,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 10
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 44651,
+      "CarId": 16,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199819154955",
+      "DriverName": "Nicolás Santa Cruz",
+      "Restrictor": 0,
+      "TotalTime": 337477,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 12
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 46992,
+      "CarId": 9,
+      "CarModel": "reg_parolin_kz",
+      "DriverGuid": "76561199138910995",
+      "DriverName": "Gabriel Rosas",
+      "Restrictor": 0,
+      "TotalTime": 373749,
+      "NumLaps": 6,
+      "HasPenalty": false,
+      "PenaltyTime": 0,
+      "LapPenalty": 0,
+      "Disqualified": false,
+      "ClassID": "d29a0d10-b879-4827-98d6-c14985d39654",
+      "GridPosition": 14
+    }
+  ],
+  "Penalties": null,
+  "TrackConfig": "nro1",
+  "TrackName": "jotracks_kartodromo-zarate",
+  "Type": "QUALIFY",
+  "Date": "2025-11-26T21:42:00-03:00",
+  "SessionFile": "2025_11_26_21_42_QUALIFY",
+  "SessionConfig": {
+    "session_type": 2,
+    "name": "Qualify",
+    "time": 5,
+    "laps": 0,
+    "is_open": 0,
+    "wait_time": 0,
+    "visibility_mode": 0,
+    "qualifying_type": 0,
+    "qualifying_number_of_laps_to_average": 0,
+    "count_out_lap": false,
+    "disable_push_to_pass": false
+  },
+  "ChampionshipID": "f2fb3cbf-1db0-4d54-811b-e1e8ea2ae54b",
+  "RaceWeekendID": "",
+  "EventName": "Fecha 1 | ZN SimRacing | Edición #02 | Zárate 1"
+}
