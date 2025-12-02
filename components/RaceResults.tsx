@@ -149,9 +149,11 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                 <TableCell>
                   {(() => {
                     const secs = penaltiesMap.get(r.driverId) ?? 0
+                    const addMs = Math.max(0, Math.floor(secs * 1000))
+                    const displayMs = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) + addMs : undefined
                     return (
                       <span className="inline-flex items-center gap-1">
-                        {r.totalTimeMs != null ? formatTotalTime(r.totalTimeMs) : '-'}
+                        {displayMs != null ? formatTotalTime(displayMs) : (r.totalTimeMs != null ? formatTotalTime(r.totalTimeMs) : '-')}
                         {secs > 0 ? (
                           <span className="inline-flex items-center gap-1 text-[#d8552b] font-semibold">
                             +{secs}s
