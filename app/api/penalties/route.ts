@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
 import { loadPenalties } from '@/lib/penalties'
 
 export const runtime = 'nodejs'
@@ -8,13 +9,23 @@ function kvConfigured() {
   return !!(process.env.KV_URL && process.env.KV_REST_TOKEN)
 }
 
+function upstashConfigured() {
+  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+}
+
 export async function GET() {
   try {
-    if (!kvConfigured()) {
+    if (!kvConfigured() && !upstashConfigured()) {
       return NextResponse.json(loadPenalties())
     }
-    const data = await kv.get('penalties')
-    if (Array.isArray(data)) return NextResponse.json(data)
+    if (kvConfigured()) {
+      const data = await kv.get('penalties')
+      if (Array.isArray(data)) return NextResponse.json(data)
+    } else {
+      const redis = Redis.fromEnv()
+      const data = await redis.get('penalties')
+      if (Array.isArray(data)) return NextResponse.json(data)
+    }
     return NextResponse.json([])
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
@@ -23,7 +34,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    if (!kvConfigured()) return NextResponse.json({ error: 'kv_not_configured' }, { status: 500 })
+    if (!kvConfigured() && !upstashConfigured()) return NextResponse.json({ error: 'kv_not_configured' }, { status: 500 })
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
     if (!adminToken || adminToken.length === 0 || adminToken !== headerToken) {
@@ -33,10 +44,15 @@ export async function POST(req: Request) {
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, seconds } = body
     if (!driverId || !sessionId || typeof seconds !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
-    const curr = await kv.get('penalties')
-    const list: Array<{ driverId: string; sessionId: string; seconds: number }> = Array.isArray(curr)
-      ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>)
-      : []
+    let list: Array<{ driverId: string; sessionId: string; seconds: number }>
+    if (kvConfigured()) {
+      const curr = await kv.get('penalties')
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
+    } else {
+      const redis = Redis.fromEnv()
+      const curr = await redis.get('penalties')
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
+    }
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
     if (seconds <= 0) {
       if (idx >= 0) list.splice(idx, 1)
@@ -44,7 +60,12 @@ export async function POST(req: Request) {
       if (idx >= 0) list[idx] = { driverId, sessionId, seconds }
       else list.push({ driverId, sessionId, seconds })
     }
-    await kv.set('penalties', list)
+    if (kvConfigured()) {
+      await kv.set('penalties', list)
+    } else {
+      const redis = Redis.fromEnv()
+      await redis.set('penalties', list)
+    }
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
