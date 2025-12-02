@@ -10,8 +10,33 @@ function kvConfigured() {
   return !!(process.env.KV_URL && process.env.KV_REST_TOKEN)
 }
 
+function resolveUpstashEnv() {
+  const url = (
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.UPSTASH_REDIS_REST_REDIS_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL ||
+    ''
+  )
+  const token = (
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+    ''
+  )
+  return { url, token }
+}
+
 function upstashConfigured() {
-  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  const { url, token } = resolveUpstashEnv()
+  return !!(url && token)
+}
+
+function createRedis() {
+  const { url, token } = resolveUpstashEnv()
+  if (url && token) return new Redis({ url, token })
+  return Redis.fromEnv()
 }
 
 export async function GET() {
@@ -23,7 +48,7 @@ export async function GET() {
       const data = await kv.get('ballast')
       if (Array.isArray(data)) return NextResponse.json(data)
     } else {
-      const redis = Redis.fromEnv()
+      const redis = createRedis()
       try {
         const data = await redis.json.get('ballast')
         if (Array.isArray(data)) return NextResponse.json(data)
@@ -76,7 +101,7 @@ export async function POST(req: Request) {
       const curr = await kv.get('ballast')
       list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number }>) : []
     } else {
-      const redis = Redis.fromEnv()
+      const redis = createRedis()
       let curr: unknown = null
       try {
         curr = await redis.json.get('ballast')
@@ -99,7 +124,7 @@ export async function POST(req: Request) {
     if (kvConfigured()) {
       await kv.set('ballast', list)
     } else {
-      const redis = Redis.fromEnv()
+      const redis = createRedis()
       let writeOk = false
       let lastError: unknown = null
       try {
