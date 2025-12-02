@@ -24,7 +24,7 @@ export async function GET() {
       if (Array.isArray(data)) return NextResponse.json(data)
     } else {
       const redis = Redis.fromEnv()
-      const data = await redis.get('penalties')
+      const data = await redis.json.get('penalties')
       if (Array.isArray(data)) return NextResponse.json(data)
     }
     return NextResponse.json([])
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
     } else {
       const redis = Redis.fromEnv()
-      const curr = await redis.get('penalties')
+      const curr = await redis.json.get('penalties')
       list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
     }
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
       await kv.set('penalties', list)
     } else {
       const redis = Redis.fromEnv()
-      await redis.set('penalties', list)
+      await redis.json.set('penalties', '$', list)
     }
     return NextResponse.json({ ok: true })
   } catch (e) {
