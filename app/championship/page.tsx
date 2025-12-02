@@ -91,11 +91,9 @@ export default async function Page() {
       groups.set(k, arr)
     }
     const order = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b))
-    let pendingReset = new Set<string>()
-    const pendingMinus = new Map<string, number>()
-    const pendingPlus = new Map<string, number>()
     for (const key of order) {
       const list = (groups.get(key) ?? []).sort((a, b) => a.id.localeCompare(b.id))
+      const winners = new Set<string>()
       for (const s of list) {
         const set = new Set<string>(exclusions.filter((e) => e.sessionId === s.id && e.exclude).map((e) => e.driverId))
         const nonExcluded = s.results.filter((r) => !set.has(r.driverId))
@@ -111,20 +109,8 @@ export default async function Page() {
             if (tb != null) return 1
             return (a.position ?? 0) - (b.position ?? 0)
           })
-          .map((r, idx) => ({ ...r, position: idx + 1 }))
-        const dnfs = nonExcluded.filter((r) => r.dnf)
-        for (const r of finishers) {
-          if (r.position === 1) {
-            const prev = pendingPlus.get(r.driverId) ?? 0
-            pendingPlus.set(r.driverId, prev + 5)
-          } else if (r.position >= 4) {
-            pendingReset.add(r.driverId)
-          }
-        }
-        for (const r of dnfs) {
-          const prev = pendingMinus.get(r.driverId) ?? 0
-          pendingMinus.set(r.driverId, prev + 5)
-        }
+        const winner = finishers[0]
+        if (winner) winners.add(winner.driverId)
         for (const b of manual) {
           if (b.sessionId === s.id) {
             const curr = map.get(b.driverId) ?? 0
@@ -132,21 +118,10 @@ export default async function Page() {
           }
         }
       }
-      for (const d of pendingReset) {
-        map.set(d, 0)
-      }
-      for (const [d, mval] of pendingMinus) {
+      for (const d of winners) {
         const curr = map.get(d) ?? 0
-        map.set(d, Math.max(0, curr - mval))
+        map.set(d, curr + 5)
       }
-      for (const [d, pval] of pendingPlus) {
-        const curr = map.get(d) ?? 0
-        // Si hubo reset en esta fecha, ya está en 0 para la próxima, no sumamos
-        if (!pendingReset.has(d)) map.set(d, curr + pval)
-      }
-      pendingReset = new Set<string>()
-      pendingMinus.clear()
-      pendingPlus.clear()
     }
     return map
   })()

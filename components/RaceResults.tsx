@@ -519,20 +519,46 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
 function computeBallastWithExclusions(allSessions: Session[] | undefined, targetId: string, exclusions?: { driverId: string; sessionId: string; exclude: boolean }[], includeTarget?: boolean) {
   const map = new Map<string, number>()
   if (!allSessions) return map
+  const seenPerDate = new Set<string>()
+  const dateKey = (s: { id: string; date?: string }) => {
+    if (typeof s.date === 'string') {
+      const d = new Date(s.date)
+      if (!isNaN(d.getTime())) {
+        const yy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yy}-${mm}-${dd}`
+      }
+    }
+    const m = s.id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`
+    return 'Sin-fecha'
+  }
   for (const s of allSessions) {
     if (!includeTarget && s.id === targetId) break
     const set = new Set<string>((exclusions ?? []).filter((e) => e.sessionId === s.id && e.exclude).map((e) => e.driverId))
-    const nonExcluded = s.results.filter((r) => !set.has(r.driverId))
-    const adjustedPositions = nonExcluded.map((r, idx) => ({ ...r, position: idx + 1 }))
-    if (s.type === 'RACE') {
-      for (const r of adjustedPositions) {
-        const curr = map.get(r.driverId) ?? 0
-        if (r.dnf) {
-          map.set(r.driverId, Math.max(0, curr - 5))
-        } else if (r.position === 1) {
-          map.set(r.driverId, curr + 5)
-        } else if (r.position >= 4) {
-          map.set(r.driverId, 0)
+    if (s.type.toUpperCase() === 'RACE') {
+      const nonExcluded = s.results.filter((r) => !set.has(r.driverId))
+      const finishers = nonExcluded
+        .filter((r) => !r.dnf)
+        .sort((a, b) => {
+          const la = a.lapsCompleted ?? 0
+          const lb = b.lapsCompleted ?? 0
+          if (la !== lb) return lb - la
+          const ta = a.totalTimeMs
+          const tb = b.totalTimeMs
+          if (ta != null && tb != null) return ta - tb
+          if (ta != null) return -1
+          if (tb != null) return 1
+          return (a.position ?? 0) - (b.position ?? 0)
+        })
+      const winner = finishers[0]
+      if (winner) {
+        const dk = `${dateKey(s)}:${winner.driverId}`
+        if (!seenPerDate.has(dk)) {
+          seenPerDate.add(dk)
+          const curr = map.get(winner.driverId) ?? 0
+          map.set(winner.driverId, curr + 5)
         }
       }
     }
