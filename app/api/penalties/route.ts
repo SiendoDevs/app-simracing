@@ -41,30 +41,28 @@ function createRedis() {
 
 export async function GET() {
   try {
-    if (!kvConfigured() && !upstashConfigured()) {
-      return NextResponse.json(loadPenalties())
-    }
     if (kvConfigured()) {
       const data = await kv.get('penalties')
       if (Array.isArray(data)) return NextResponse.json(data)
+      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
     } else {
       const redis = createRedis()
       try {
         const data = await redis.json.get('penalties')
         if (Array.isArray(data)) return NextResponse.json(data)
+        if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
       } catch {}
       try {
         const s = await redis.get('penalties')
         if (typeof s === 'string') {
           const parsed = JSON.parse(s)
           if (Array.isArray(parsed)) return NextResponse.json(parsed)
+          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
         }
       } catch {}
     }
-    return NextResponse.json([])
-  } catch (e) {
-    return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
-  }
+  } catch {}
+  return NextResponse.json([])
 }
 
 export async function POST(req: Request) {

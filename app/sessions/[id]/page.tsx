@@ -33,6 +33,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       if (res.ok) {
         const j = await res.json()
         if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
       }
     } catch {}
     return null
