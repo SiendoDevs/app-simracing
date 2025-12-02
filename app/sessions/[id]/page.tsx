@@ -14,12 +14,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const sessions = await loadLocalSessions()
   const raw = sessions.find((s) => s.id === id)
   if (!raw) return <div className="p-6">Sesión no encontrada</div>
-  const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
-    ? process.env.NEXT_PUBLIC_BASE_URL
-    : 'http://localhost:3000'
   const exclusionsRemote = await (async () => {
     try {
-      const res = await fetch(`${origin}/api/exclusions`, { cache: 'no-store' })
+      const res = await fetch('/api/exclusions', { cache: 'no-store' })
       if (res.ok) {
         const j = await res.json()
         if (Array.isArray(j)) return j
@@ -32,7 +29,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const excluded = applyExclusionsToSession(withDnf, exclusions)
   const penaltiesRemote = await (async () => {
     try {
-      const res = await fetch(`${origin}/api/penalties`, { cache: 'no-store' })
+      const res = await fetch('/api/penalties', { cache: 'no-store' })
       if (res.ok) {
         const j = await res.json()
         if (Array.isArray(j)) return j
