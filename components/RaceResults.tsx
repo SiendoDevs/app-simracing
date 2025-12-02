@@ -38,7 +38,13 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
   const [penaltiesMap, setPenaltiesMap] = useState<Map<string, number>>(new Map())
   const [ballastAdjMap, setBallastAdjMap] = useState<Map<string, number>>(new Map())
   useEffect(() => {
-    setLocalExclusions(exclusions ?? [])
+    setLocalExclusions((prev) => {
+      const incoming = exclusions ?? []
+      const map = new Map<string, { driverId: string; sessionId: string; exclude: boolean }>()
+      for (const e of incoming) map.set(`${e.driverId}:${e.sessionId}`, e)
+      for (const e of prev) map.set(`${e.driverId}:${e.sessionId}`, e)
+      return Array.from(map.values())
+    })
   }, [exclusions, session.id])
   useEffect(() => {
     let active = true
@@ -353,16 +359,16 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                   })
                                   if (!res.ok) throw new Error('error')
                                   toast.success('Piloto reincorporado', { description: d?.name ?? r.driverId })
-                                  setOpenReincFor(null)
-                                  setLocalExclusions((prev) => {
-                                    const next = [...prev]
-                                    const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
-                                    const entry = { driverId: r.driverId, sessionId: session.id, exclude: false }
-                                    if (idx >= 0) next[idx] = entry
-                                    else next.push(entry)
-                                    return next
-                                  })
-                                  router.refresh()
+                                    setOpenReincFor(null)
+                                    setLocalExclusions((prev) => {
+                                      const next = [...prev]
+                                      const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
+                                      const entry = { driverId: r.driverId, sessionId: session.id, exclude: false }
+                                      if (idx >= 0) next[idx] = entry
+                                      else next.push(entry)
+                                      return next
+                                    })
+                                    
                                   } catch {
                                     toast.error('No se pudo reincorporar', { description: d?.name ?? r.driverId })
                                     setLoading(false)
@@ -405,16 +411,16 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                   })
                                   if (!res.ok) throw new Error('error')
                                   toast.success('Piloto excluido', { description: d?.name ?? r.driverId })
-                                  setOpenExcludeFor(null)
-                                  setLocalExclusions((prev) => {
-                                    const next = [...prev]
-                                    const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
-                                    const entry = { driverId: r.driverId, sessionId: session.id, exclude: true }
-                                    if (idx >= 0) next[idx] = entry
-                                    else next.push(entry)
-                                    return next
-                                  })
-                                  router.refresh()
+                                    setOpenExcludeFor(null)
+                                    setLocalExclusions((prev) => {
+                                      const next = [...prev]
+                                      const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
+                                      const entry = { driverId: r.driverId, sessionId: session.id, exclude: true }
+                                      if (idx >= 0) next[idx] = entry
+                                      else next.push(entry)
+                                      return next
+                                    })
+                                    
                                   } catch {
                                     toast.error('No se pudo excluir', { description: d?.name ?? r.driverId })
                                     setLoading(false)
