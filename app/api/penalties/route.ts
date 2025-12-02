@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
 import { loadPenalties } from '@/lib/penalties'
+import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'
 
@@ -37,9 +38,26 @@ export async function POST(req: Request) {
     if (!kvConfigured() && !upstashConfigured()) return NextResponse.json({ error: 'kv_not_configured' }, { status: 500 })
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
-    if (!adminToken || adminToken.length === 0 || adminToken !== headerToken) {
-      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    let isAllowed = false
+    const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
+    if (devBypass) isAllowed = true
+    if (adminToken && adminToken.length > 0 && adminToken === headerToken) {
+      isAllowed = true
+    } else {
+      try {
+        const user = await currentUser()
+        const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
+          .split(',')
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean)
+        const isAdmin = !!user && (
+          (user.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
+          user.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
+        )
+        if (isAdmin) isAllowed = true
+      } catch {}
     }
+    if (!isAllowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const body = await req.json().catch(() => null) as { driverId?: string; sessionId?: string; seconds?: number } | null
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, seconds } = body
