@@ -8,6 +8,7 @@ import { ArrowUp, ArrowDown, UserCheck, UserX, Weight, Loader2, Timer } from 'lu
 import { useUser } from "@clerk/nextjs"
 import { toast } from 'sonner'
 import type { Session } from '@/types/Session'
+import type { Exclusion } from '@/lib/exclusions'
 import { applySessionPoints, pointsForPosition } from '@/lib/calculatePoints'
  
 
@@ -22,11 +23,11 @@ function formatTotalTime(ms: number): string {
 
  
 
-export default function RaceResults({ session, allSessions, exclusions }: { session: Session; allSessions?: Session[]; exclusions?: { driverId: string; sessionId: string; exclude: boolean }[] }) {
+export default function RaceResults({ session, allSessions, exclusions }: { session: Session; allSessions?: Session[]; exclusions?: Exclusion[] }) {
   const { user } = useUser()
   const isAdmin = ((user?.publicMetadata as Record<string, unknown>)?.role === 'admin')
   const router = useRouter()
-  const [localExclusions, setLocalExclusions] = useState<Array<{ driverId: string; sessionId: string; exclude: boolean }>>(exclusions ?? [])
+  const [localExclusions, setLocalExclusions] = useState<Exclusion[]>(exclusions ?? [])
   const sWithPoints = applySessionPoints(session)
   const ballastAfter = computeBallastWithExclusions(allSessions, session.id, localExclusions, true)
   const ballastBefore = computeBallastWithExclusions(allSessions, session.id, localExclusions, false)
@@ -41,6 +42,31 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
     const incoming = exclusions ?? []
     console.log('[RaceResults] incoming exclusions', session.id, incoming.length)
     setLocalExclusions(incoming)
+    if (incoming.length === 0) {
+      ;(async () => {
+        let list: Exclusion[] = []
+        try {
+          const r1 = await fetch('/api/exclusions', { cache: 'no-store' })
+          if (r1.ok) {
+            const j = await r1.json()
+            if (Array.isArray(j)) list = j as Exclusion[]
+            else if (j && typeof j === 'object') list = Object.values(j as Record<string, unknown>) as Exclusion[]
+          }
+        } catch {}
+        if (list.length === 0 && typeof window !== 'undefined') {
+          try {
+            const r2 = await fetch(`${location.origin}/api/exclusions`, { cache: 'no-store' })
+            if (r2.ok) {
+              const j = await r2.json()
+              if (Array.isArray(j)) list = j as Exclusion[]
+              else if (j && typeof j === 'object') list = Object.values(j as Record<string, unknown>) as Exclusion[]
+            }
+          } catch {}
+        }
+        console.log('[RaceResults] fallback fetched exclusions', session.id, list.length)
+        setLocalExclusions(list)
+      })()
+    }
   }, [exclusions, session.id])
   useEffect(() => {
     let active = true
