@@ -303,9 +303,10 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                 onClick={async () => {
                                   try {
                                     setLoading(true)
+                                    const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
                                     const res = await fetch('/api/exclusions', {
                                       method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
+                                      headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
                                       body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: false }),
                                     })
                                     if (!res.ok) throw new Error('error')
@@ -346,9 +347,10 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                 onClick={async () => {
                                   try {
                                     setLoading(true)
+                                    const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
                                     const res = await fetch('/api/exclusions', {
                                       method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
+                                      headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
                                       body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: true }),
                                     })
                                     if (!res.ok) throw new Error('error')

@@ -24,8 +24,17 @@ export async function GET() {
       if (Array.isArray(data)) return NextResponse.json(data)
     } else {
       const redis = Redis.fromEnv()
-      const data = await redis.json.get('penalties')
-      if (Array.isArray(data)) return NextResponse.json(data)
+      try {
+        const data = await redis.json.get('penalties')
+        if (Array.isArray(data)) return NextResponse.json(data)
+      } catch {}
+      try {
+        const s = await redis.get('penalties')
+        if (typeof s === 'string') {
+          const parsed = JSON.parse(s)
+          if (Array.isArray(parsed)) return NextResponse.json(parsed)
+        }
+      } catch {}
     }
     return NextResponse.json([])
   } catch (e) {
@@ -68,7 +77,16 @@ export async function POST(req: Request) {
       list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
     } else {
       const redis = Redis.fromEnv()
-      const curr = await redis.json.get('penalties')
+      let curr: unknown = null
+      try {
+        curr = await redis.json.get('penalties')
+      } catch {}
+      if (!Array.isArray(curr)) {
+        try {
+          const s = await redis.get('penalties')
+          if (typeof s === 'string') curr = JSON.parse(s)
+        } catch {}
+      }
       list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
     }
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
@@ -82,7 +100,13 @@ export async function POST(req: Request) {
       await kv.set('penalties', list)
     } else {
       const redis = Redis.fromEnv()
-      await redis.json.set('penalties', '$', list)
+      try {
+        await redis.json.set('penalties', '$', list)
+      } catch {
+        try {
+          await redis.set('penalties', JSON.stringify(list))
+        } catch {}
+      }
     }
     return NextResponse.json({ ok: true })
   } catch (e) {
