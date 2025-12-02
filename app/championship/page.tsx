@@ -10,10 +10,20 @@ import { loadPenalties, applyPenaltiesToSession } from '@/lib/penalties'
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
-  const exclusions = loadExclusions()
   const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
     ? process.env.NEXT_PUBLIC_BASE_URL
     : 'http://localhost:3000'
+  const exclusionsRemote = await (async () => {
+    try {
+      const res = await fetch(`${origin}/api/exclusions`, { cache: 'no-store' })
+      if (res.ok) {
+        const j = await res.json()
+        if (Array.isArray(j)) return j
+      }
+    } catch {}
+    return null
+  })()
+  const exclusions = exclusionsRemote ?? loadExclusions()
   const penaltiesRemote = await (async () => {
     try {
       const res = await fetch(`${origin}/api/penalties`, { cache: 'no-store' })
