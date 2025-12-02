@@ -274,6 +274,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                 {isAdmin && (
                 <TableCell className="text-right">
                   <div className="inline-flex items-center justify-end gap-2">
+                    {session.type.toUpperCase() === 'RACE' && (
                     <Dialog open={openPenaltyFor === r.driverId} onOpenChange={(v) => { if (v) setLoading(false); setOpenPenaltyFor(v ? r.driverId : null); if (!v) setLoading(false) }}>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="icon-sm" aria-label="Penalizar" onClick={() => { setLoading(false); setPenaltySeconds(0); setOpenPenaltyFor(r.driverId) }}>
@@ -326,6 +327,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+                    )}
                     <Dialog open={openPenaltyFor === r.driverId + ':ballast'} onOpenChange={(v) => { if (v) setLoading(false); setOpenPenaltyFor(v ? r.driverId + ':ballast' : null); if (!v) setLoading(false) }}>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="icon-sm" aria-label="Lastre" onClick={() => { setLoading(false); setOpenPenaltyFor(r.driverId + ':ballast') }}>
@@ -381,7 +383,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    {isExcluded ? (
+                    {session.type.toUpperCase() === 'RACE' && isExcluded ? (
                       <Dialog open={openReincFor === r.driverId} onOpenChange={(v) => { if (v) setLoading(false); setOpenReincFor(v ? r.driverId : null); if (!v) setLoading(false) }}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="icon-sm" aria-label="Reincorporar" onClick={() => { setLoading(false); setOpenReincFor(r.driverId) }}>
@@ -441,7 +443,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                    ) : (
+                    ) : session.type.toUpperCase() === 'RACE' ? (
                       <Dialog open={openExcludeFor === r.driverId} onOpenChange={(v) => { if (v) setLoading(false); setOpenExcludeFor(v ? r.driverId : null); if (!v) setLoading(false) }}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="icon-sm" aria-label="Excluir" onClick={() => { setLoading(false); setOpenExcludeFor(r.driverId) }}>
@@ -501,7 +503,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                    )}
+                    ) : null}
                   </div>
                 </TableCell>
                 )}

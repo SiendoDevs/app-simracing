@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
+import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'
@@ -93,6 +94,13 @@ export async function POST(req: Request) {
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, seconds } = body
     if (!driverId || !sessionId || typeof seconds !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
+    try {
+      const sessions = await loadLocalSessions()
+      const target = sessions.find((s) => s.id === sessionId)
+      if (target && (target.type || '').toUpperCase() === 'QUALIFY') {
+        return NextResponse.json({ error: 'qualify_penalties_not_allowed' }, { status: 400 })
+      }
+    } catch {}
     let list: Array<{ driverId: string; sessionId: string; seconds: number }>
     if (kvConfigured()) {
       const curr = await kv.get('penalties')

@@ -32,6 +32,7 @@ export function saveExclusion(e: Exclusion): void {
 }
 
 export function applyExclusionsToSession(session: Session, exclusions: Exclusion[]): Session {
+  if ((session.type || '').toUpperCase() === 'QUALIFY') return session
   const sid = session.id
   const set = new Set<string>(
     exclusions
@@ -47,6 +48,7 @@ export function applyExclusionsToSession(session: Session, exclusions: Exclusion
 }
 
 export function stripExcluded(session: Session, exclusions: Exclusion[]): Session {
+  if ((session.type || '').toUpperCase() === 'QUALIFY') return session
   const sid = session.id
   const set = new Set<string>(
     exclusions

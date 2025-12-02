@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 // no local fallback
 import { Redis } from '@upstash/redis'
+import { loadLocalSessions } from '@/lib/loadLocalSessions'
 
 export const runtime = 'nodejs'
 
@@ -83,6 +84,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'driverId y sessionId requeridos' }, { status: 400 })
     }
     const exclude = !!body.exclude
+    try {
+      const sessions = await loadLocalSessions()
+      const target = sessions.find((s) => s.id === body.sessionId)
+      if (target && (target.type || '').toUpperCase() === 'QUALIFY') {
+        return NextResponse.json({ error: 'qualify_exclusions_not_allowed' }, { status: 400 })
+      }
+    } catch {}
     try {
       const redis = createRedis()
       let curr: unknown = null
