@@ -100,13 +100,23 @@ export async function POST(req: Request) {
       await kv.set('penalties', list)
     } else {
       const redis = Redis.fromEnv()
+      let writeOk = false
+      let lastError: unknown = null
       try {
         await redis.json.set('penalties', '$', list)
-      } catch {
+        writeOk = true
+      } catch (e) {
+        lastError = e
+      }
+      if (!writeOk) {
         try {
           await redis.set('penalties', JSON.stringify(list))
-        } catch {}
+          writeOk = true
+        } catch (e) {
+          lastError = e
+        }
       }
+      if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
     }
     return NextResponse.json({ ok: true })
   } catch (e) {
