@@ -6,13 +6,13 @@ import { Redis } from '@upstash/redis'
 export const runtime = 'nodejs'
 
 function resolveUpstashEnv() {
-  const url = (
-    process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_REDIS_URL ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
-    process.env.UPSTASH_REDIS_REST_KV_URL ||
-    ''
-  )
+  const candidates = [
+    process.env.UPSTASH_REDIS_REST_URL,
+    process.env.UPSTASH_REDIS_REST_REDIS_URL,
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    process.env.UPSTASH_REDIS_REST_KV_URL,
+  ].filter(Boolean) as string[]
+  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
   const token = (
     process.env.UPSTASH_REDIS_REST_TOKEN ||
     process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
