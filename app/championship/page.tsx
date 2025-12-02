@@ -4,16 +4,32 @@ import ChampionshipTable from '@/components/ChampionshipTable'
 import { Progress } from '@/components/ui/progress'
 import { loadExclusions, stripExcluded } from '@/lib/exclusions'
 import { loadBallast } from '@/lib/ballast'
+import { applyDnfByLaps } from '@/lib/utils'
+import { loadPenalties, applyPenaltiesToSession } from '@/lib/penalties'
  
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
   const exclusions = loadExclusions()
-  const adjusted = sessions.map((s) => stripExcluded(s, exclusions))
-  const table = calculateChampionship(adjusted)
   const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
     ? process.env.NEXT_PUBLIC_BASE_URL
     : 'http://localhost:3000'
+  const penaltiesRemote = await (async () => {
+    try {
+      const res = await fetch(`${origin}/api/penalties`, { cache: 'no-store' })
+      if (res.ok) {
+        const j = await res.json()
+        if (Array.isArray(j)) return j
+      }
+    } catch {}
+    return null
+  })()
+  const penalties = penaltiesRemote ?? loadPenalties()
+  const adjusted = sessions
+    .map((s) => applyDnfByLaps(s))
+    .map((s) => applyPenaltiesToSession(s, penalties))
+    .map((s) => stripExcluded(s, exclusions))
+  const table = calculateChampionship(adjusted)
   const manualRemote = await (async () => {
     try {
       const res = await fetch(`${origin}/api/ballast`, { cache: 'no-store' })
