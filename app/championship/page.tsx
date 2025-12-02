@@ -2,10 +2,9 @@ import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { calculateChampionship } from '@/lib/calculatePoints'
 import ChampionshipTable from '@/components/ChampionshipTable'
 import { Progress } from '@/components/ui/progress'
-import { loadExclusions, stripExcluded } from '@/lib/exclusions'
-import { loadBallast } from '@/lib/ballast'
+import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
-import { loadPenalties, applyPenaltiesToSession } from '@/lib/penalties'
+import { applyPenaltiesToSession } from '@/lib/penalties'
  
 
 export default async function Page() {
@@ -20,7 +19,7 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const exclusions = exclusionsRemote ?? loadExclusions()
+  const exclusions = exclusionsRemote ?? []
   const penaltiesRemote = await (async () => {
     try {
       const res = await fetch('/api/penalties', { cache: 'no-store' })
@@ -32,7 +31,7 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const penalties = penaltiesRemote ?? loadPenalties()
+  const penalties = penaltiesRemote ?? []
   const adjusted = sessions
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
@@ -43,12 +42,12 @@ export default async function Page() {
       const res = await fetch('/api/ballast', { cache: 'no-store' })
       if (res.ok) {
         const j = await res.json()
-        if (Array.isArray(j)) return j as ReturnType<typeof loadBallast>
+        if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
       }
     } catch {}
     return null
   })()
-  const manual = manualRemote ?? loadBallast()
+  const manual = manualRemote ?? []
   const ballastMap = (() => {
     const map = new Map<string, number>()
     const relevant = sessions.filter((s) => s.type.toUpperCase() === 'RACE')

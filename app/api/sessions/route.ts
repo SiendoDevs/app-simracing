@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { list, put } from '@vercel/blob'
-import { loadLocalSessions } from '@/lib/loadLocalSessions'
+// no local fallback
 import { parseSession } from '@/lib/parseSession'
 import path from 'node:path'
-import fs from 'node:fs'
+// import fs from 'node:fs'
 
 export const runtime = 'nodejs'
 
@@ -12,8 +12,7 @@ export async function GET() {
   try {
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token) {
-      const local = await loadLocalSessions()
-      return NextResponse.json(local)
+      return NextResponse.json([])
     }
     const res = await list({ prefix: 'sessions/' })
     const files = res.blobs || []
@@ -72,18 +71,7 @@ export async function POST(req: Request) {
       const blob = await put(key, JSON.stringify(body, null, 2), { access: 'public' })
       return NextResponse.json({ ok: true, url: blob.url, pathname: blob.pathname })
     }
-    const SESSIONS_DIR = path.resolve(process.cwd(), 'sessions')
-    try {
-      if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR)
-    } catch {}
-    const target = path.join(SESSIONS_DIR, baseName)
-    if (fs.existsSync(target)) return NextResponse.json({ error: 'duplicate', detail: baseName }, { status: 409 })
-    try {
-      fs.writeFileSync(target, JSON.stringify(body, null, 2), 'utf-8')
-    } catch (e) {
-      return NextResponse.json({ error: 'write_failed', detail: String(e) }, { status: 500 })
-    }
-    return NextResponse.json({ ok: true, pathname: `sessions/${baseName}` })
+    return NextResponse.json({ error: 'blob_not_configured' }, { status: 500 })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
   }

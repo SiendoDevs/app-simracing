@@ -2,9 +2,9 @@ import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { calculateChampionship } from '@/lib/calculatePoints'
 import DriversTable from '@/components/DriversTable'
 import DriverCompare from '@/components/DriverCompare'
-import { loadExclusions, stripExcluded } from '@/lib/exclusions'
+import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
-import { loadPenalties, applyPenaltiesToSession } from '@/lib/penalties'
+import { applyPenaltiesToSession } from '@/lib/penalties'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -33,7 +33,7 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const exclusions = exclusionsRemote ?? loadExclusions()
+  const exclusions = exclusionsRemote ?? []
   const penaltiesRemote = await (async () => {
     try {
       const r1 = await fetch('/api/penalties', { cache: 'no-store' })
@@ -53,7 +53,7 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const penalties = penaltiesRemote ?? loadPenalties()
+  const penalties = penaltiesRemote ?? []
   const adjusted = sessions
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))

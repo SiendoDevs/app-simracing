@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
-import { loadExclusions, applyExclusionsToSession } from '@/lib/exclusions'
+import { applyExclusionsToSession } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
-import { loadPenalties, applyPenaltiesToSession } from '@/lib/penalties'
+import { applyPenaltiesToSession } from '@/lib/penalties'
 import BestLapCard from '@/components/BestLapCard'
 import MostOvertakesCard from '@/components/MostOvertakesCard'
 import RaceResults from '@/components/RaceResults'
@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     } catch {}
     return null
   })()
-  const exclusions = exclusionsRemote ?? loadExclusions()
+  const exclusions = exclusionsRemote ?? []
   const withDnf = applyDnfByLaps(raw)
   const excluded = applyExclusionsToSession(withDnf, exclusions)
   const penaltiesRemote = await (async () => {
@@ -52,7 +52,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     } catch {}
     return null
   })()
-  const penalties = penaltiesRemote ?? loadPenalties()
+  const penalties = penaltiesRemote ?? []
   const session = applyPenaltiesToSession(excluded, penalties)
   const labelType = (t: string) => {
     const up = t.toUpperCase()

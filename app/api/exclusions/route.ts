@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
-import { loadExclusions } from '@/lib/exclusions'
+// no local fallback
 import { Redis } from '@upstash/redis'
 
 export const runtime = 'nodejs'
@@ -58,8 +58,7 @@ export async function GET() {
       return NextResponse.json([])
     }
   } catch {}
-  const data = loadExclusions()
-  return NextResponse.json(data)
+  return NextResponse.json([])
 }
 
 export async function POST(req: Request) {
@@ -119,12 +118,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
       }
     }
-    // Fallback a archivo local
-    try {
-      const { saveExclusion } = await import('@/lib/exclusions')
-      saveExclusion({ driverId: body.driverId, sessionId: body.sessionId, exclude })
-    } catch {}
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ error: 'redis_not_configured' }, { status: 500 })
   } catch {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 })
   }
