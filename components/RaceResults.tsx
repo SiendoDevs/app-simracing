@@ -198,9 +198,10 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                             onClick={async () => {
                               try {
                                 setLoading(true)
+                                const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
                                 const res = await fetch('/api/penalties', {
                                   method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, seconds: penaltySeconds }),
                                 })
                                 if (!res.ok) throw new Error('error')
@@ -258,9 +259,10 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                               try {
                                 setLoading(true)
                                 const kg = ballastAdjMap.get(r.driverId) ?? 0
+                                const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
                                 const res = await fetch('/api/ballast', {
                                   method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, kg }),
                                 })
                                 if (!res.ok) throw new Error('error')
