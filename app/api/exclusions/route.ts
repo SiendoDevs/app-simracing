@@ -38,8 +38,23 @@ export async function GET() {
   try {
     if (upstashConfigured()) {
       const redis = createRedis()
-      const data = await redis.json.get('exclusions')
+      let data: unknown = null
+      try {
+        data = await redis.json.get('exclusions')
+      } catch {}
       if (Array.isArray(data)) return NextResponse.json(data)
+      if (data && typeof data === 'object') {
+        const values = Object.values(data as Record<string, unknown>)
+        if (values.length > 0) return NextResponse.json(values)
+      }
+      try {
+        const s = await redis.get('exclusions')
+        if (typeof s === 'string') {
+          const parsed = JSON.parse(s)
+          if (Array.isArray(parsed)) return NextResponse.json(parsed)
+          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
+        }
+      } catch {}
       return NextResponse.json([])
     }
   } catch {}
