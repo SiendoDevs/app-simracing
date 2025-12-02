@@ -10,9 +10,13 @@ export default async function Home() {
   const sessions = await loadLocalSessions();
   let playersOnline: number | null = null
   try {
-    const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
+    const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
       ? process.env.NEXT_PUBLIC_BASE_URL
-      : 'http://localhost:3000'
+      : undefined
+    const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
+      ? `https://${process.env.VERCEL_URL}`
+      : undefined
+    const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
     const res = await fetch(`${origin}/api/live-timing?server=2`, { cache: 'no-store' })
     if (res.ok) {
       const j = await res.json()
