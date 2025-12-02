@@ -10,13 +10,13 @@ export default async function Home() {
   const sessions = await loadLocalSessions();
   let playersOnline: number | null = null
   try {
-    const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : undefined
     const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
       ? `https://${process.env.VERCEL_URL}`
       : undefined
-    const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
+    const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : undefined
+    const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
     const tryServers = async (): Promise<number | null> => {
       for (const s of [1, 2]) {
         try {
@@ -68,6 +68,24 @@ export default async function Home() {
     { idx: 7, label: 'Mar del Plata', extra: 'Especial – 40 vueltas', nuevo: true },
     { idx: 8, label: 'Zárate 9', extra: 'Especial – 40 vueltas', nuevo: true },
   ]
+  const plannedCounts = [3, 3, 3, 2, 3, 3, 2, 2]
+  const relevant = sessions.filter((s) => {
+    const t = s.type.toUpperCase()
+    return t === 'RACE' || t === 'QUALIFY'
+  })
+  const byDate = new Map<string, typeof relevant>()
+  for (const s of relevant) {
+    const k = sessionDateKey(s)
+    const arr = byDate.get(k) ?? []
+    arr.push(s)
+    byDate.set(k, arr)
+  }
+  const sortedKeys = Array.from(byDate.keys()).sort((a, b) => a.localeCompare(b))
+  const statusByIdx = new Map<number, boolean>()
+  for (let i = 0; i < plannedCounts.length; i++) {
+    const list = byDate.get(sortedKeys[i]) ?? []
+    statusByIdx.set(i + 1, list.length >= plannedCounts[i])
+  }
   const formatId = (id: string) => {
     const m = id.match(/^(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})/);
     if (!m) return id;
@@ -196,20 +214,17 @@ export default async function Home() {
           <div className="px-3 md:px-4 py-2 text-sm md:text-base font-semibold border-b">Fechas del campeonato</div>
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
             {schedule.map((f) => (
-              <li key={f.idx} className="flex items-center justify-between rounded-md border bg-muted/10 hover:bg-muted/30 transition-colors p-2">
+              <li key={f.idx} className="flex items-center justify-start rounded-md border p-2 shadow-sm bg-[#d8552b]/10 hover:bg-[#d8552b]/20 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center justify-center h-9 w-12 rounded-md font-bold shrink-0 bg-[#d8552b] text-white">{String(f.idx).padStart(2, '0')}</span>
                   <div className="space-y-0.5">
                     <div className="text-sm font-medium inline-flex items-center gap-2">
                       <span>{f.label}</span>
-                      {f.nuevo ? <span className="px-2 py-0.5 rounded-full border text-[#d8552b] border-[#d8552b] text-sm">Nuevo</span> : null}
+                      {statusByIdx.get(f.idx) ? <span className="px-2 py-0.5 rounded-full border text-[#9ca3af] border-[#9ca3af] text-xs">Completada</span> : null}
                     </div>
                     {f.extra ? <div className="text-xs text-muted-foreground">{f.extra}</div> : null}
                   </div>
                 </div>
-                <Link href="/sessions" className="text-muted-foreground hover:text-foreground shrink-0" aria-label="Ver sesiones">
-                  <Eye className="h-5 w-5" />
-                </Link>
               </li>
             ))}
           </ul>

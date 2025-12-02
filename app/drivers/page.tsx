@@ -11,9 +11,13 @@ export const revalidate = 0
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
-  const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
+  const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
+    ? `https://${process.env.VERCEL_URL}`
+    : undefined
+  const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
     ? process.env.NEXT_PUBLIC_BASE_URL
-    : 'http://localhost:3000'
+    : undefined
+  const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })

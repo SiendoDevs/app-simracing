@@ -16,9 +16,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const sessions = await loadLocalSessions()
   const raw = sessions.find((s) => s.id === id)
   if (!raw) return <div className="p-6">Sesión no encontrada</div>
-  const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
+  const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
+    ? `https://${process.env.VERCEL_URL}`
+    : undefined
+  const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
     ? process.env.NEXT_PUBLIC_BASE_URL
-    : 'http://localhost:3000'
+    : undefined
+  const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
   const exclusionsRemote = await (async () => {
     try {
       const r1 = await fetch('/api/exclusions', { cache: 'no-store' })
