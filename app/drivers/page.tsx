@@ -34,6 +34,7 @@ export default async function Page() {
     return null
   })()
   const exclusions = exclusionsRemote ?? []
+  console.log('[drivers/page] exclusions count', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const penaltiesRemote = await (async () => {
     try {
       const r1 = await fetch('/api/penalties', { cache: 'no-store' })
@@ -58,6 +59,11 @@ export default async function Page() {
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
     .map((s) => stripExcluded(s, exclusions))
+  try {
+    const qual = adjusted.filter((s) => s.type.toUpperCase() === 'QUALIFY')
+    const sample = qual.slice(0, 2).map((s) => ({ id: s.id, top: s.results.slice(0, 3).map((r) => ({ driverId: r.driverId, pos: r.position })) }))
+    console.log('[drivers/page] sample qual sessions', sample)
+  } catch {}
   const table = calculateChampionship(adjusted)
   return (
     <div className="py-6 space-y-4">
