@@ -16,12 +16,24 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const sessions = await loadLocalSessions()
   const raw = sessions.find((s) => s.id === id)
   if (!raw) return <div className="p-6">Sesión no encontrada</div>
+  const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
+    ? process.env.NEXT_PUBLIC_BASE_URL
+    : 'http://localhost:3000'
   const exclusionsRemote = await (async () => {
     try {
-      const res = await fetch('/api/exclusions', { cache: 'no-store' })
-      if (res.ok) {
-        const j = await res.json()
+      const r1 = await fetch('/api/exclusions', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
         if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/exclusions`, { cache: 'no-store' })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
       }
     } catch {}
     return null

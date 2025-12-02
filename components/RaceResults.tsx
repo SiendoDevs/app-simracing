@@ -367,6 +367,14 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                       else next.push(entry)
                                       return next
                                     })
+                                    try {
+                                      const sync = await fetch('/api/exclusions', { cache: 'no-store' })
+                                      if (sync.ok) {
+                                        const j = await sync.json()
+                                        const list = Array.isArray(j) ? j : (j && typeof j === 'object' ? Object.values(j as Record<string, unknown>) : [])
+                                        setLocalExclusions(list as Array<{ driverId: string; sessionId: string; exclude: boolean }>)
+                                      }
+                                    } catch {}
                                     
                                   } catch {
                                     toast.error('No se pudo reincorporar', { description: d?.name ?? r.driverId })
@@ -419,6 +427,14 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                       else next.push(entry)
                                       return next
                                     })
+                                    try {
+                                      const sync = await fetch('/api/exclusions', { cache: 'no-store' })
+                                      if (sync.ok) {
+                                        const j = await sync.json()
+                                        const list = Array.isArray(j) ? j : (j && typeof j === 'object' ? Object.values(j as Record<string, unknown>) : [])
+                                        setLocalExclusions(list as Array<{ driverId: string; sessionId: string; exclude: boolean }>)
+                                      }
+                                    } catch {}
                                     
                                   } catch {
                                     toast.error('No se pudo excluir', { description: d?.name ?? r.driverId })
