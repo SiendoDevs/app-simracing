@@ -35,7 +35,7 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
         }
         const res = await fetch('/api/sessions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-filename': f.name },
           body: JSON.stringify(json),
         })
         if (!res.ok) {
