@@ -7,7 +7,9 @@ import BestLapCard from '@/components/BestLapCard'
 import MostOvertakesCard from '@/components/MostOvertakesCard'
 import RaceResults from '@/components/RaceResults'
 import IncidentsList from '@/components/IncidentsList'
- 
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
