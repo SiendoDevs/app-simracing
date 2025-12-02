@@ -32,7 +32,17 @@ export function saveExclusion(e: Exclusion): void {
 }
 
 export function applyExclusionsToSession(session: Session, exclusions: Exclusion[]): Session {
-  const set = new Set<string>(exclusions.filter((e) => e.sessionId === session.id && e.exclude).map((e) => e.driverId))
+  const dateKey = (id: string) => {
+    const m = id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+    return m ? `${m[1]}_${m[2]}_${m[3]}` : id
+  }
+  const sid = session.id
+  const key = dateKey(sid)
+  const set = new Set<string>(
+    exclusions
+      .filter((e) => e.exclude && (e.sessionId === sid || dateKey(e.sessionId) === key))
+      .map((e) => e.driverId)
+  )
   if (set.size === 0) return session
   const nonExcluded = session.results.filter((r) => !set.has(r.driverId))
   const excluded = session.results.filter((r) => set.has(r.driverId))
@@ -42,7 +52,17 @@ export function applyExclusionsToSession(session: Session, exclusions: Exclusion
 }
 
 export function stripExcluded(session: Session, exclusions: Exclusion[]): Session {
-  const set = new Set<string>(exclusions.filter((e) => e.sessionId === session.id && e.exclude).map((e) => e.driverId))
+  const dateKey = (id: string) => {
+    const m = id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+    return m ? `${m[1]}_${m[2]}_${m[3]}` : id
+  }
+  const sid = session.id
+  const key = dateKey(sid)
+  const set = new Set<string>(
+    exclusions
+      .filter((e) => e.exclude && (e.sessionId === sid || dateKey(e.sessionId) === key))
+      .map((e) => e.driverId)
+  )
   if (set.size === 0) return session
   const nonExcluded = session.results.filter((r) => !set.has(r.driverId))
   const reassigned = nonExcluded.map((r, idx) => ({ ...r, position: idx + 1 }))
