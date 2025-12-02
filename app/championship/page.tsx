@@ -83,6 +83,11 @@ export default async function Page() {
       if (m) return `${m[1]}-${m[2]}-${m[3]}`
       return 'Sin-fecha'
     }
+    const sessionIdToDate = (() => {
+      const mapDate = new Map<string, string>()
+      for (const s of sessions) mapDate.set(s.id, sessionDateKey(s))
+      return mapDate
+    })()
     const groups = new Map<string, typeof relevant>()
     for (const s of relevant) {
       const k = sessionDateKey(s)
@@ -111,11 +116,12 @@ export default async function Page() {
           })
         const winner = finishers[0]
         if (winner) winners.add(winner.driverId)
-        for (const b of manual) {
-          if (b.sessionId === s.id) {
-            const curr = map.get(b.driverId) ?? 0
-            map.set(b.driverId, curr + Math.max(0, Math.floor(b.kg)))
-          }
+      }
+      for (const b of manual) {
+        const dk = sessionIdToDate.get(b.sessionId)
+        if (dk === key) {
+          const curr = map.get(b.driverId) ?? 0
+          map.set(b.driverId, curr + Math.max(0, Math.floor(b.kg)))
         }
       }
       for (const d of winners) {
