@@ -29,16 +29,25 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
       for (const f of files) {
         const text = await f.text()
         let json: Record<string, unknown> | null = null
-        try { json = JSON.parse(text) } catch { json = null }
-        if (!json) continue
+        try { json = JSON.parse(text) } catch {
+          setErrorMsg(`El archivo "${f.name}" no es JSON válido.`)
+          throw new Error('invalid_json')
+        }
         const res = await fetch('/api/sessions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(json),
         })
         if (!res.ok) {
-          const t = await res.text().catch(() => '')
-          setErrorMsg(t || `Error ${res.status}`)
+          let detail = ''
+          try {
+            const j = await res.json()
+            detail = typeof j?.error === 'string' ? j.error : ''
+            if (typeof j?.detail === 'string') detail = `${detail} ${j.detail}`.trim()
+          } catch {
+            detail = await res.text().catch(() => '')
+          }
+          setErrorMsg(detail || `Error ${res.status}`)
           throw new Error('upload_failed')
         }
       }
