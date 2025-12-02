@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
-import { loadPenalties } from '@/lib/penalties'
 import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'

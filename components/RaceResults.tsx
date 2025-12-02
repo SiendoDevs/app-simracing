@@ -80,6 +80,33 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
     })()
     return () => { active = false }
   }, [session.id])
+  const excludedSet = new Set<string>((exclusions ?? []).filter((e) => e.sessionId === session.id && e.exclude).map((e) => e.driverId))
+  const displayResults = (() => {
+    const finishers = sWithPoints.results.filter((r) => !r.dnf && !excludedSet.has(r.driverId))
+    const dnfs = sWithPoints.results.filter((r) => r.dnf || excludedSet.has(r.driverId))
+    const adjusted = finishers
+      .map((r) => {
+        const secs = penaltiesMap.get(r.driverId) ?? 0
+        const addMs = Math.max(0, Math.floor(secs * 1000))
+        const total = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
+        const totalAdj = total != null ? total + addMs : undefined
+        return { ...r, totalTimeMs: totalAdj }
+      })
+      .sort((a, b) => {
+        const la = a.lapsCompleted ?? 0
+        const lb = b.lapsCompleted ?? 0
+        if (la !== lb) return lb - la
+        const ta = a.totalTimeMs
+        const tb = b.totalTimeMs
+        if (ta != null && tb != null) return ta - tb
+        if (ta != null) return -1
+        if (tb != null) return 1
+        return a.position - b.position
+      })
+      .map((r, idx) => ({ ...r, position: idx + 1 }))
+    const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1 }))
+    return [...adjusted, ...appended]
+  })()
   return (
     <div className="rounded-md border p-3 md:p-4">
       <h2 className="text-base md:text-lg font-semibold">Resultados</h2>
@@ -100,9 +127,9 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sWithPoints.results.map((r) => {
+          {displayResults.map((r) => {
             const d = session.drivers.find((x) => x.id === r.driverId)
-            const isExcluded = exclusions?.some((e) => e.driverId === r.driverId && e.sessionId === session.id && e.exclude === true) ?? false
+            const isExcluded = excludedSet.has(r.driverId)
             return (
               <TableRow
                 key={r.driverId + r.position}
