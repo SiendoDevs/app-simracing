@@ -5,9 +5,13 @@ import type { Session } from '@/types/Session'
 
 async function loadRemoteSessions(): Promise<Session[] | null> {
   try {
-    const origin = (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0)
+    const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
       ? process.env.NEXT_PUBLIC_BASE_URL
-      : 'http://localhost:3000'
+      : undefined
+    const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
+      ? `https://${process.env.VERCEL_URL}`
+      : undefined
+    const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
     const res = await fetch(`${origin}/api/sessions`, { cache: 'no-store' })
     if (!res.ok) return null
     const data = await res.json()

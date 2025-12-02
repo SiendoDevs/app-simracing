@@ -4,6 +4,7 @@ import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/compon
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 export default function UploadSessionsDialog({ existing }: { existing: string[] }) {
   const [selectedNames, setSelectedNames] = React.useState<string[]>([])
@@ -51,6 +52,7 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
           throw new Error('upload_failed')
         }
       }
+      toast.success('Sesiones subidas correctamente')
       window.location.href = '/sessions'
     } catch {
       setUploading(false)
