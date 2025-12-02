@@ -96,30 +96,54 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
       .map((e) => e.driverId))
   })()
   const displayResults = (() => {
-    const finishers = sWithPoints.results.filter((r) => !r.dnf && !excludedSet.has(r.driverId))
-    const dnfs = sWithPoints.results.filter((r) => r.dnf || excludedSet.has(r.driverId))
-    const adjusted = finishers
-      .map((r) => {
-        const secs = penaltiesMap.get(r.driverId) ?? 0
-        const addMs = Math.max(0, Math.floor(secs * 1000))
-        const total = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
-        const totalAdj = total != null ? total + addMs : undefined
-        return { ...r, totalTimeMs: totalAdj }
-      })
-      .sort((a, b) => {
-        const la = a.lapsCompleted ?? 0
-        const lb = b.lapsCompleted ?? 0
-        if (la !== lb) return lb - la
-        const ta = a.totalTimeMs
-        const tb = b.totalTimeMs
-        if (ta != null && tb != null) return ta - tb
-        if (ta != null) return -1
-        if (tb != null) return 1
-        return a.position - b.position
-      })
-      .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
-    const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1, points: 0 }))
-    return [...adjusted, ...appended]
+    if (session.type.toUpperCase() === 'RACE') {
+      const finishers = sWithPoints.results.filter((r) => !r.dnf && !excludedSet.has(r.driverId))
+      const dnfs = sWithPoints.results.filter((r) => r.dnf || excludedSet.has(r.driverId))
+      const adjusted = finishers
+        .map((r) => {
+          const secs = penaltiesMap.get(r.driverId) ?? 0
+          const addMs = Math.max(0, Math.floor(secs * 1000))
+          const total = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
+          const totalAdj = total != null ? total + addMs : undefined
+          return { ...r, totalTimeMs: totalAdj }
+        })
+        .sort((a, b) => {
+          const la = a.lapsCompleted ?? 0
+          const lb = b.lapsCompleted ?? 0
+          if (la !== lb) return lb - la
+          const ta = a.totalTimeMs
+          const tb = b.totalTimeMs
+          if (ta != null && tb != null) return ta - tb
+          if (ta != null) return -1
+          if (tb != null) return 1
+          return a.position - b.position
+        })
+        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
+      const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1, points: 0 }))
+      return [...adjusted, ...appended]
+    } else {
+      const nonExcluded = sWithPoints.results.filter((r) => !excludedSet.has(r.driverId))
+      const excluded = sWithPoints.results.filter((r) => excludedSet.has(r.driverId))
+      const adjusted = nonExcluded
+        .map((r) => {
+          const secs = penaltiesMap.get(r.driverId) ?? 0
+          const addMs = Math.max(0, Math.floor(secs * 1000))
+          const best = typeof r.bestLapMs === 'number' ? (r.bestLapMs as number) : undefined
+          const bestAdj = best != null ? best + addMs : undefined
+          return { ...r, bestLapMs: bestAdj }
+        })
+        .sort((a, b) => {
+          const ba = a.bestLapMs
+          const bb = b.bestLapMs
+          if (ba != null && bb != null) return ba - bb
+          if (ba != null) return -1
+          if (bb != null) return 1
+          return a.position - b.position
+        })
+        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
+      const appended = excluded.map((r, idx) => ({ ...r, dnf: true, position: adjusted.length + idx + 1, points: 0 }))
+      return [...adjusted, ...appended]
+    }
   })()
   return (
     <div className="rounded-md border p-3 md:p-4">
@@ -182,7 +206,13 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                     )}
                   </TableCell>
                 ) : null}
-                <TableCell>{r.bestLapMs != null ? (r.bestLapMs / 1000).toFixed(3) + 's' : '-'}</TableCell>
+                <TableCell>{(() => {
+                  const secs = penaltiesMap.get(r.driverId) ?? 0
+                  const base = r.bestLapMs
+                  const adj = (session.type.toUpperCase() === 'RACE') ? base : (base != null ? base + secs * 1000 : undefined)
+                  const show = adj ?? base
+                  return show != null ? (show / 1000).toFixed(3) + 's' : '-'
+                })()}</TableCell>
                 <TableCell>{(() => {
                   const lc = typeof r.lapsCompleted === 'number' ? r.lapsCompleted : session.laps.filter((l) => l.driverId === r.driverId).length
                   return lc > 0 ? lc : '-'
@@ -194,7 +224,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                     return (
                       <span className="inline-flex items-center gap-1">
                         {displayMs != null ? formatTotalTime(displayMs) : (r.totalTimeMs != null ? formatTotalTime(r.totalTimeMs) : '-')}
-                        {secs > 0 ? (
+                        {(secs > 0 && session.type.toUpperCase() === 'RACE') ? (
                           <span className="inline-flex items-center gap-1 text-[#d8552b] font-semibold">
                             +{secs}s
                           </span>

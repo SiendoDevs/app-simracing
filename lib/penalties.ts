@@ -44,28 +44,49 @@ export function applyPenaltiesToSession(session: Session, penalties: Penalty[]):
     }
   }
   if (byDriver.size === 0) return session
-  const finishers = session.results.filter((r) => !r.dnf)
-  const dnfs = session.results.filter((r) => r.dnf)
-  const adjusted = finishers
-    .map((r) => {
-      const sec = byDriver.get(r.driverId) ?? 0
-      const addMs = Math.max(0, Math.floor(sec * 1000))
-      const total = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
-      const totalAdj = total != null ? total + addMs : undefined
-      return { ...r, totalTimeMs: totalAdj }
-    })
-    .sort((a, b) => {
-      const la = a.lapsCompleted ?? 0
-      const lb = b.lapsCompleted ?? 0
-      if (la !== lb) return lb - la
-      const ta = a.totalTimeMs
-      const tb = b.totalTimeMs
-      if (ta != null && tb != null) return ta - tb
-      if (ta != null) return -1
-      if (tb != null) return 1
-      return a.position - b.position
-    })
-    .map((r, idx) => ({ ...r, position: idx + 1 }))
-  const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1 }))
-  return { ...session, results: [...adjusted, ...appended] }
+  if (session.type.toUpperCase() === 'RACE') {
+    const finishers = session.results.filter((r) => !r.dnf)
+    const dnfs = session.results.filter((r) => r.dnf)
+    const adjusted = finishers
+      .map((r) => {
+        const sec = byDriver.get(r.driverId) ?? 0
+        const addMs = Math.max(0, Math.floor(sec * 1000))
+        const total = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
+        const totalAdj = total != null ? total + addMs : undefined
+        return { ...r, totalTimeMs: totalAdj }
+      })
+      .sort((a, b) => {
+        const la = a.lapsCompleted ?? 0
+        const lb = b.lapsCompleted ?? 0
+        if (la !== lb) return lb - la
+        const ta = a.totalTimeMs
+        const tb = b.totalTimeMs
+        if (ta != null && tb != null) return ta - tb
+        if (ta != null) return -1
+        if (tb != null) return 1
+        return a.position - b.position
+      })
+      .map((r, idx) => ({ ...r, position: idx + 1 }))
+    const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1 }))
+    return { ...session, results: [...adjusted, ...appended] }
+  } else {
+    const adjusted = session.results
+      .map((r) => {
+        const sec = byDriver.get(r.driverId) ?? 0
+        const addMs = Math.max(0, Math.floor(sec * 1000))
+        const best = typeof r.bestLapMs === 'number' ? (r.bestLapMs as number) : undefined
+        const bestAdj = best != null ? best + addMs : undefined
+        return { ...r, bestLapMs: bestAdj }
+      })
+      .sort((a, b) => {
+        const ba = a.bestLapMs
+        const bb = b.bestLapMs
+        if (ba != null && bb != null) return ba - bb
+        if (ba != null) return -1
+        if (bb != null) return 1
+        return a.position - b.position
+      })
+      .map((r, idx) => ({ ...r, position: idx + 1 }))
+    return { ...session, results: adjusted }
+  }
 }
