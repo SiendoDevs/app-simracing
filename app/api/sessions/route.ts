@@ -62,16 +62,13 @@ export async function POST(req: Request) {
     const headerName = (req.headers.get('x-filename') || '').trim()
     const baseNameRaw = headerName ? path.basename(headerName) : 'session.json'
     const baseName = baseNameRaw.toLowerCase().endsWith('.json') ? baseNameRaw : `${baseNameRaw}.json`
-    const now = new Date()
-    const yyyy = now.getFullYear()
-    const mm = String(now.getMonth() + 1).padStart(2, '0')
-    const dd = String(now.getDate()).padStart(2, '0')
-    const hh = String(now.getHours()).padStart(2, '0')
-    const mi = String(now.getMinutes()).padStart(2, '0')
-    const ss = String(now.getSeconds()).padStart(2, '0')
-    const filename = `${yyyy}_${mm}_${dd}_${hh}_${mi}_${ss}__${baseName}`
     if (token) {
-      const key = `sessions/${filename}`
+      const key = `sessions/${baseName}`
+      try {
+        const existing = await list({ prefix: 'sessions/' })
+        const found = (existing.blobs || []).some((b) => b.pathname === key)
+        if (found) return NextResponse.json({ error: 'duplicate', detail: baseName }, { status: 409 })
+      } catch {}
       const blob = await put(key, JSON.stringify(body, null, 2), { access: 'public' })
       return NextResponse.json({ ok: true, url: blob.url, pathname: blob.pathname })
     }
@@ -79,13 +76,14 @@ export async function POST(req: Request) {
     try {
       if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR)
     } catch {}
-    const target = path.join(SESSIONS_DIR, filename)
+    const target = path.join(SESSIONS_DIR, baseName)
+    if (fs.existsSync(target)) return NextResponse.json({ error: 'duplicate', detail: baseName }, { status: 409 })
     try {
       fs.writeFileSync(target, JSON.stringify(body, null, 2), 'utf-8')
     } catch (e) {
       return NextResponse.json({ error: 'write_failed', detail: String(e) }, { status: 500 })
     }
-    return NextResponse.json({ ok: true, pathname: `sessions/${filename}` })
+    return NextResponse.json({ ok: true, pathname: `sessions/${baseName}` })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
   }
