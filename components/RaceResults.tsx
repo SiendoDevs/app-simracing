@@ -80,7 +80,16 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
     })()
     return () => { active = false }
   }, [session.id])
-  const excludedSet = new Set<string>((exclusions ?? []).filter((e) => e.sessionId === session.id && e.exclude).map((e) => e.driverId))
+  const excludedSet = (() => {
+    const dateKey = (id: string) => {
+      const m = id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+      return m ? `${m[1]}_${m[2]}_${m[3]}` : id
+    }
+    const key = dateKey(session.id)
+    return new Set<string>((exclusions ?? [])
+      .filter((e) => e.exclude && (e.sessionId === session.id || dateKey(e.sessionId) === key))
+      .map((e) => e.driverId))
+  })()
   const displayResults = (() => {
     const finishers = sWithPoints.results.filter((r) => !r.dnf && !excludedSet.has(r.driverId))
     const dnfs = sWithPoints.results.filter((r) => r.dnf || excludedSet.has(r.driverId))
