@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { list } from '@vercel/blob'
 import { parseSession } from '@/lib/parseSession'
 import type { Session } from '@/types/Session'
 
@@ -53,7 +54,24 @@ function findJsonFiles(): string[] {
 }
 
 export async function loadLocalSessions(): Promise<Session[]> {
-  // Prefer remote sessions in production; fallback to local files
+  // Prefer Blob store directly if token is configured
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const res = await list({ prefix: 'sessions/' })
+      const files = res.blobs || []
+      const sessions: Session[] = []
+      for (const f of files) {
+        try {
+          const j = await fetch(f.url, { cache: 'no-store' }).then((r) => r.json())
+          const s = parseSession(j as Record<string, unknown>, f.pathname)
+          sessions.push(s)
+        } catch {}
+      }
+      sessions.sort((a, b) => a.id.localeCompare(b.id))
+      return sessions
+    } catch {}
+  }
+  // Else, in production try remote via HTTP; fallback to local files
   if (process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_USE_REMOTE === '1') {
     const remote = await loadRemoteSessions()
     if (remote) return remote
