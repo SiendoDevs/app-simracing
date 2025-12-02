@@ -10,6 +10,7 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
   const [files, setFiles] = React.useState<File[]>([])
   const [hasDuplicates, setHasDuplicates] = React.useState(false)
   const [uploading, setUploading] = React.useState(false)
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   const onFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const list = Array.from(e.target.files ?? [])
@@ -24,6 +25,7 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
     if (hasDuplicates || files.length === 0) return
     try {
       setUploading(true)
+      setErrorMsg(null)
       for (const f of files) {
         const text = await f.text()
         let json: Record<string, unknown> | null = null
@@ -34,7 +36,11 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(json),
         })
-        if (!res.ok) throw new Error('upload_failed')
+        if (!res.ok) {
+          const t = await res.text().catch(() => '')
+          setErrorMsg(t || `Error ${res.status}`)
+          throw new Error('upload_failed')
+        }
       }
       window.location.href = '/sessions'
     } catch {
@@ -69,6 +75,11 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
         ) : (
           <div className="text-xs text-muted-foreground">Se suben al almacenamiento remoto de sesiones.</div>
         )}
+        {errorMsg ? (
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 text-destructive text-xs p-2">
+            {errorMsg}
+          </div>
+        ) : null}
         <DialogFooter>
           <Button type="button" onClick={onUpload} className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" disabled={uploading || hasDuplicates || selectedNames.length === 0}>
             {uploading ? 'Subiendo…' : 'Subir'}

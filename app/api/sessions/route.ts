@@ -37,6 +37,8 @@ export async function POST(req: Request) {
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
     let isAllowed = false
+    const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
+    if (devBypass) isAllowed = true
     if (adminToken && adminToken.length > 0 && adminToken === headerToken) {
       isAllowed = true
     } else {
