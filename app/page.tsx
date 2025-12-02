@@ -122,10 +122,12 @@ export default async function Home() {
           width={160}
           className="absolute top-6 right-6 h-10 w-auto md:h-12 opacity-90"
         />
-        <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-background/80 px-2 py-1 text-xs">
-          <Users className="h-4 w-4" />
-          {playersOnline !== null ? `${playersOnline} piloto/s en linea` : 'piloto/s en linea N/D'}
-        </div>
+        {playersOnline !== null && playersOnline > 0 ? (
+          <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-background/80 px-2 py-1 text-xs">
+            <Users className="h-4 w-4" />
+            {`${playersOnline} piloto/s en linea`}
+          </div>
+        ) : null}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <h1 className="text-2xl md:text-4xl font-bold">Liga de Karting | Asseto Corsa</h1>
           <p className="mt-3 mb-3 text-md md:text-base">Noticias, resultados, sesiones y campeonatos.</p>
