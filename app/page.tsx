@@ -122,7 +122,7 @@ export default async function Home() {
           width={160}
           className="absolute top-6 right-6 h-10 w-auto md:h-12 opacity-90"
         />
-        {playersOnline !== null && playersOnline > 0 ? (
+        {playersOnline !== null ? (
           <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-background/80 px-2 py-1 text-xs">
             <Users className="h-4 w-4" />
             {`${playersOnline} piloto/s en linea`}
