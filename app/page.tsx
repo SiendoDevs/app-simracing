@@ -17,11 +17,18 @@ export default async function Home() {
       ? `https://${process.env.VERCEL_URL}`
       : undefined
     const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
-    const res = await fetch(`${origin}/api/live-timing?server=2`, { cache: 'no-store' })
-    if (res.ok) {
-      const j = await res.json()
-      if (typeof j?.playersOnline === 'number') playersOnline = j.playersOnline
+    const tryServers = async (): Promise<number | null> => {
+      for (const s of [1, 2]) {
+        try {
+          const r = await fetch(`${origin}/api/live-timing?server=${s}`, { cache: 'no-store' })
+          if (!r.ok) continue
+          const j = await r.json()
+          if (typeof j?.playersOnline === 'number') return j.playersOnline as number
+        } catch {}
+      }
+      return null
     }
+    playersOnline = await tryServers()
   } catch {}
   const sessionDateKey = (s: { id: string; date?: string }) => {
     if (typeof s.date === 'string') {
