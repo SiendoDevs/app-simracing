@@ -47,17 +47,20 @@ export async function GET() {
     if (kvConfigured()) {
       const data = await kv.get('ballast')
       if (Array.isArray(data)) return NextResponse.json(data)
+      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
     } else {
       const redis = createRedis()
       try {
         const data = await redis.json.get('ballast')
         if (Array.isArray(data)) return NextResponse.json(data)
+        if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
       } catch {}
       try {
         const s = await redis.get('ballast')
         if (typeof s === 'string') {
           const parsed = JSON.parse(s)
           if (Array.isArray(parsed)) return NextResponse.json(parsed)
+          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>))
         }
       } catch {}
     }

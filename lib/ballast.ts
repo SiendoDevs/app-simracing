@@ -15,6 +15,10 @@ export function loadBallast(): BallastAdj[] {
       const raw = fs.readFileSync(FILE, 'utf-8')
       const data = JSON.parse(raw)
       if (Array.isArray(data)) return data as BallastAdj[]
+      if (data && typeof data === 'object') {
+        const arr = Object.values(data as Record<string, unknown>)
+        return arr.filter((x) => x && typeof x === 'object') as BallastAdj[]
+      }
     }
   } catch {}
   return []
@@ -33,4 +37,3 @@ export function saveBallast(b: BallastAdj): void {
     fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf-8')
   } catch {}
 }
-
