@@ -8,7 +8,7 @@ import { ArrowUp, ArrowDown, UserCheck, UserX, Weight, Loader2, Timer } from 'lu
 import { useUser } from "@clerk/nextjs"
 import { toast } from 'sonner'
 import type { Session } from '@/types/Session'
-import { applySessionPoints } from '@/lib/calculatePoints'
+import { applySessionPoints, pointsForPosition } from '@/lib/calculatePoints'
  
 
 function formatTotalTime(ms: number): string {
@@ -122,8 +122,8 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
         if (tb != null) return 1
         return a.position - b.position
       })
-      .map((r, idx) => ({ ...r, position: idx + 1 }))
-    const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1 }))
+      .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
+    const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1, points: 0 }))
     return [...adjusted, ...appended]
   })()
   return (
@@ -195,8 +195,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                 <TableCell>
                   {(() => {
                     const secs = penaltiesMap.get(r.driverId) ?? 0
-                    const addMs = Math.max(0, Math.floor(secs * 1000))
-                    const displayMs = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) + addMs : undefined
+                    const displayMs = typeof r.totalTimeMs === 'number' ? (r.totalTimeMs as number) : undefined
                     return (
                       <span className="inline-flex items-center gap-1">
                         {displayMs != null ? formatTotalTime(displayMs) : (r.totalTimeMs != null ? formatTotalTime(r.totalTimeMs) : '-')}
