@@ -39,6 +39,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     return null
   })()
   const exclusions = exclusionsRemote ?? []
+  console.log('[sessions/page] sessionId', id)
+  console.log('[sessions/page] exclusions fetched', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const withDnf = applyDnfByLaps(raw)
   const excluded = applyExclusionsToSession(withDnf, exclusions)
   const penaltiesRemote = await (async () => {
@@ -53,7 +55,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     return null
   })()
   const penalties = penaltiesRemote ?? []
+  console.log('[sessions/page] penalties fetched', Array.isArray(penaltiesRemote) ? penaltiesRemote.length : (penaltiesRemote ? Object.keys(penaltiesRemote as Record<string, unknown>).length : 0))
   const session = applyPenaltiesToSession(excluded, penalties)
+  console.log('[sessions/page] results size after apply', session.results.length)
   const labelType = (t: string) => {
     const up = t.toUpperCase()
     if (up === 'RACE') return 'Carrera'

@@ -38,7 +38,9 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
   const [penaltiesMap, setPenaltiesMap] = useState<Map<string, number>>(new Map())
   const [ballastAdjMap, setBallastAdjMap] = useState<Map<string, number>>(new Map())
   useEffect(() => {
-    setLocalExclusions(exclusions ?? [])
+    const incoming = exclusions ?? []
+    console.log('[RaceResults] incoming exclusions', session.id, incoming.length)
+    setLocalExclusions(incoming)
   }, [exclusions, session.id])
   useEffect(() => {
     let active = true
@@ -85,9 +87,11 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
     return () => { active = false }
   }, [session.id])
   const excludedSet = (() => {
-    return new Set<string>((localExclusions ?? [])
+    const set = new Set<string>((localExclusions ?? [])
       .filter((e) => e.exclude && e.sessionId === session.id)
       .map((e) => e.driverId))
+    if (typeof window !== 'undefined') console.log('[RaceResults] excludedSet', session.id, Array.from(set))
+    return set
   })()
   const displayResults = (() => {
     if (session.type.toUpperCase() === 'RACE') {
@@ -114,7 +118,9 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
         })
         .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
       const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1, points: 0 }))
-      return [...adjusted, ...appended]
+      const out = [...adjusted, ...appended]
+      if (typeof window !== 'undefined') console.log('[RaceResults] displayResults RACE positions', out.map((r) => [r.driverId, r.position]))
+      return out
     } else {
       const nonExcluded = sWithPoints.results.filter((r) => !excludedSet.has(r.driverId))
       const excluded = sWithPoints.results.filter((r) => excludedSet.has(r.driverId))
@@ -136,7 +142,9 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
         })
         .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
       const appended = excluded.map((r, idx) => ({ ...r, dnf: true, position: adjusted.length + idx + 1, points: 0 }))
-      return [...adjusted, ...appended]
+      const out = [...adjusted, ...appended]
+      if (typeof window !== 'undefined') console.log('[RaceResults] displayResults QUAL positions', out.map((r) => [r.driverId, r.position]))
+      return out
     }
   })()
   return (
