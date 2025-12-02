@@ -38,13 +38,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
   const [penaltiesMap, setPenaltiesMap] = useState<Map<string, number>>(new Map())
   const [ballastAdjMap, setBallastAdjMap] = useState<Map<string, number>>(new Map())
   useEffect(() => {
-    setLocalExclusions((prev) => {
-      const incoming = exclusions ?? []
-      const map = new Map<string, { driverId: string; sessionId: string; exclude: boolean }>()
-      for (const e of incoming) map.set(`${e.driverId}:${e.sessionId}`, e)
-      for (const e of prev) map.set(`${e.driverId}:${e.sessionId}`, e)
-      return Array.from(map.values())
-    })
+    setLocalExclusions(exclusions ?? [])
   }, [exclusions, session.id])
   useEffect(() => {
     let active = true
