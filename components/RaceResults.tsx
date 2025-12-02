@@ -25,10 +25,11 @@ function formatTotalTime(ms: number): string {
 export default function RaceResults({ session, allSessions, exclusions }: { session: Session; allSessions?: Session[]; exclusions?: { driverId: string; sessionId: string; exclude: boolean }[] }) {
   const { user } = useUser()
   const isAdmin = ((user?.publicMetadata as Record<string, unknown>)?.role === 'admin')
-  const sWithPoints = applySessionPoints(session)
-  const ballastAfter = computeBallastWithExclusions(allSessions, session.id, exclusions, true)
-  const ballastBefore = computeBallastWithExclusions(allSessions, session.id, exclusions, false)
   const router = useRouter()
+  const [localExclusions, setLocalExclusions] = useState<Array<{ driverId: string; sessionId: string; exclude: boolean }>>(exclusions ?? [])
+  const sWithPoints = applySessionPoints(session)
+  const ballastAfter = computeBallastWithExclusions(allSessions, session.id, localExclusions, true)
+  const ballastBefore = computeBallastWithExclusions(allSessions, session.id, localExclusions, false)
   const [loading, setLoading] = useState(false)
   const [openExcludeFor, setOpenExcludeFor] = useState<string | null>(null)
   const [openReincFor, setOpenReincFor] = useState<string | null>(null)
@@ -36,6 +37,9 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
   const [penaltySeconds, setPenaltySeconds] = useState<number>(0)
   const [penaltiesMap, setPenaltiesMap] = useState<Map<string, number>>(new Map())
   const [ballastAdjMap, setBallastAdjMap] = useState<Map<string, number>>(new Map())
+  useEffect(() => {
+    setLocalExclusions(exclusions ?? [])
+  }, [exclusions, session.id])
   useEffect(() => {
     let active = true
     ;(async () => {
@@ -86,7 +90,7 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
       return m ? `${m[1]}_${m[2]}_${m[3]}` : id
     }
     const key = dateKey(session.id)
-    return new Set<string>((exclusions ?? [])
+    return new Set<string>((localExclusions ?? [])
       .filter((e) => e.exclude && (e.sessionId === session.id || dateKey(e.sessionId) === key))
       .map((e) => e.driverId))
   })()
@@ -342,15 +346,23 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                   try {
                                     setLoading(true)
                                     const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
-                                    const res = await fetch('/api/exclusions', {
-                                      method: 'POST',
-                                      headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: false }),
-                                    })
-                                    if (!res.ok) throw new Error('error')
-                                    toast.success('Piloto reincorporado', { description: d?.name ?? r.driverId })
-                                    setOpenReincFor(null)
-                                    router.refresh()
+                                  const res = await fetch('/api/exclusions', {
+                                    method: 'POST',
+                                    headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: false }),
+                                  })
+                                  if (!res.ok) throw new Error('error')
+                                  toast.success('Piloto reincorporado', { description: d?.name ?? r.driverId })
+                                  setOpenReincFor(null)
+                                  setLocalExclusions((prev) => {
+                                    const next = [...prev]
+                                    const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
+                                    const entry = { driverId: r.driverId, sessionId: session.id, exclude: false }
+                                    if (idx >= 0) next[idx] = entry
+                                    else next.push(entry)
+                                    return next
+                                  })
+                                  router.refresh()
                                   } catch {
                                     toast.error('No se pudo reincorporar', { description: d?.name ?? r.driverId })
                                     setLoading(false)
@@ -386,15 +398,23 @@ export default function RaceResults({ session, allSessions, exclusions }: { sess
                                   try {
                                     setLoading(true)
                                     const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
-                                    const res = await fetch('/api/exclusions', {
-                                      method: 'POST',
-                                      headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: true }),
-                                    })
-                                    if (!res.ok) throw new Error('error')
-                                    toast.success('Piloto excluido', { description: d?.name ?? r.driverId })
-                                    setOpenExcludeFor(null)
-                                    router.refresh()
+                                  const res = await fetch('/api/exclusions', {
+                                    method: 'POST',
+                                    headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: true }),
+                                  })
+                                  if (!res.ok) throw new Error('error')
+                                  toast.success('Piloto excluido', { description: d?.name ?? r.driverId })
+                                  setOpenExcludeFor(null)
+                                  setLocalExclusions((prev) => {
+                                    const next = [...prev]
+                                    const idx = next.findIndex((e) => e.driverId === r.driverId && e.sessionId === session.id)
+                                    const entry = { driverId: r.driverId, sessionId: session.id, exclude: true }
+                                    if (idx >= 0) next[idx] = entry
+                                    else next.push(entry)
+                                    return next
+                                  })
+                                  router.refresh()
                                   } catch {
                                     toast.error('No se pudo excluir', { description: d?.name ?? r.driverId })
                                     setLoading(false)
