@@ -66,6 +66,7 @@ export default async function Page() {
     return null
   })()
   const manual = manualRemote ?? []
+  try { console.log('[championship/page] ballast manual count', manual.length) } catch {}
   const ballastMap = (() => {
     const map = new Map<string, number>()
     const relevant = sessions.filter((s) => s.type.toUpperCase() === 'RACE')
@@ -118,16 +119,18 @@ export default async function Page() {
         if (winner) winners.add(winner.driverId)
       }
       for (const b of manual) {
-        const dk = sessionIdToDate.get(b.sessionId)
+        const dk = sessionIdToDate.get(b.sessionId) ?? sessionDateKey({ id: b.sessionId })
         if (dk === key) {
           const curr = map.get(b.driverId) ?? 0
-          map.set(b.driverId, curr + Math.max(0, Math.floor(b.kg)))
+          const add = Math.max(0, Math.floor(b.kg))
+          map.set(b.driverId, curr + add)
         }
       }
       for (const d of winners) {
         const curr = map.get(d) ?? 0
         map.set(d, curr + 5)
       }
+      try { console.log('[championship/page] ballast key', key, 'winners', Array.from(winners), 'manualApplied', manual.filter((b) => (sessionIdToDate.get(b.sessionId) ?? sessionDateKey({ id: b.sessionId })) === key).length) } catch {}
     }
     return map
   })()
