@@ -47,7 +47,7 @@ export function applyExclusionsToSession(session: Session, exclusions: Exclusion
   const nonExcluded = session.results.filter((r) => !set.has(r.driverId))
   const excluded = session.results.filter((r) => set.has(r.driverId))
   const reassigned = nonExcluded.map((r, idx) => ({ ...r, position: idx + 1 }))
-  const appended = excluded.map((r, idx) => ({ ...r, position: reassigned.length + idx + 1 }))
+  const appended = excluded.map((r, idx) => ({ ...r, dnf: true, position: reassigned.length + idx + 1 }))
   return { ...session, results: [...reassigned, ...appended] }
 }
 
