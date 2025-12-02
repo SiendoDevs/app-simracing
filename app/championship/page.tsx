@@ -5,7 +5,11 @@ import { Progress } from '@/components/ui/progress'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
- 
+import { Redis } from '@upstash/redis'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
@@ -57,16 +61,68 @@ export default async function Page() {
   const table = calculateChampionship(adjusted)
   const manualRemote = await (async () => {
     try {
-      const res = await fetch('/api/ballast', { cache: 'no-store' })
-      if (res.ok) {
-        const j = await res.json()
-        if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
+      // intento 1: ruta interna
+      const r1 = await fetch('/api/ballast', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j) && j.length > 0) return j as Array<{ driverId: string; sessionId: string; kg: number }>
+        if (j && typeof j === 'object') {
+          const vals = Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
+          if (vals.length > 0) return vals
+        }
+      }
+      // intento 2: origen absoluto (útil en ciertos entornos dev)
+      if (origin) {
+        const r2 = await fetch(`${origin}/api/ballast`, { cache: 'no-store' })
+          if (r2.ok) {
+            const j = await r2.json()
+            if (Array.isArray(j) && j.length > 0) return j as Array<{ driverId: string; sessionId: string; kg: number }>
+            if (j && typeof j === 'object') {
+              const vals = Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
+              if (vals.length > 0) return vals
+            }
+          }
+        }
+      // intento 3: leer directo de Redis SDK
+      const candidates = [
+        process.env.UPSTASH_REDIS_REST_URL,
+        process.env.UPSTASH_REDIS_REST_REDIS_URL,
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+        process.env.UPSTASH_REDIS_REST_KV_URL,
+        process.env.UPSTASH_REDIS_URL,
+      ].filter(Boolean) as string[]
+      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+      const token = (
+        process.env.UPSTASH_REDIS_REST_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+        process.env.UPSTASH_REDIS_TOKEN ||
+        ''
+      )
+      if (url && token) {
+        const redis = new Redis({ url, token })
+        let curr: unknown = null
+        try { curr = await redis.json.get('ballast') } catch {}
+        if (!Array.isArray(curr) && (!curr || typeof curr !== 'object')) {
+          try {
+            const s = await redis.get('ballast')
+            if (typeof s === 'string') curr = JSON.parse(s)
+          } catch {}
+        }
+        const isValid = (x: unknown): x is { driverId: string; sessionId: string; kg: number } => {
+          if (!x || typeof x !== 'object') return false
+          const obj = x as Record<string, unknown>
+          return (typeof obj.driverId === 'string' && typeof obj.sessionId === 'string' && typeof obj.kg === 'number')
+        }
+        if (Array.isArray(curr)) return (curr as unknown[]).filter(isValid) as Array<{ driverId: string; sessionId: string; kg: number }>
+        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>).filter(isValid) as Array<{ driverId: string; sessionId: string; kg: number }>
       }
     } catch {}
     return null
   })()
   const manual = manualRemote ?? []
-  try { console.log('[championship/page] ballast manual count', manual.length) } catch {}
+  try { console.log('[championship/page] ballast manual count', manual.length, manual.slice(0, 3)) } catch {}
   const ballastMap = (() => {
     const map = new Map<string, number>()
     const relevant = sessions.filter((s) => s.type.toUpperCase() === 'RACE')
