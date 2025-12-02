@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
-import { loadBallast } from '@/lib/ballast'
 import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'
@@ -39,28 +38,34 @@ function createRedis() {
   return Redis.fromEnv()
 }
 
+function isValidBallast(x: unknown): x is { driverId: string; sessionId: string; kg: number } {
+  if (!x || typeof x !== 'object') return false
+  const obj = x as Record<string, unknown>
+  return (typeof obj.driverId === 'string' && typeof obj.sessionId === 'string' && typeof obj.kg === 'number')
+}
+
 export async function GET() {
   try {
     if (!kvConfigured() && !upstashConfigured()) {
-      return NextResponse.json(loadBallast())
+      return NextResponse.json([])
     }
     if (kvConfigured()) {
       const data = await kv.get('ballast')
-      if (Array.isArray(data)) return NextResponse.json(data)
-      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
+      if (Array.isArray(data)) return NextResponse.json(data.filter(isValidBallast))
+      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>).filter(isValidBallast))
     } else {
       const redis = createRedis()
       try {
         const data = await redis.json.get('ballast')
-        if (Array.isArray(data)) return NextResponse.json(data)
-        if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
+        if (Array.isArray(data)) return NextResponse.json(data.filter(isValidBallast))
+        if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>).filter(isValidBallast))
       } catch {}
       try {
         const s = await redis.get('ballast')
         if (typeof s === 'string') {
           const parsed = JSON.parse(s)
-          if (Array.isArray(parsed)) return NextResponse.json(parsed)
-          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>))
+          if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isValidBallast))
+          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isValidBallast))
         }
       } catch {}
     }
