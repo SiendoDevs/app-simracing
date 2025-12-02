@@ -7,14 +7,39 @@ import { Badge } from '@/components/ui/badge'
 
 export default function UploadSessionsDialog({ existing }: { existing: string[] }) {
   const [selectedNames, setSelectedNames] = React.useState<string[]>([])
+  const [files, setFiles] = React.useState<File[]>([])
   const [hasDuplicates, setHasDuplicates] = React.useState(false)
+  const [uploading, setUploading] = React.useState(false)
 
   const onFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? [])
-    const names = files.map((f) => f.name)
+    const list = Array.from(e.target.files ?? [])
+    setFiles(list)
+    const names = list.map((f) => f.name)
     setSelectedNames(names)
     const dup = names.filter((n) => existing.includes(n))
     setHasDuplicates(dup.length > 0)
+  }
+
+  const onUpload = async () => {
+    if (hasDuplicates || files.length === 0) return
+    try {
+      setUploading(true)
+      for (const f of files) {
+        const text = await f.text()
+        let json: Record<string, unknown> | null = null
+        try { json = JSON.parse(text) } catch { json = null }
+        if (!json) continue
+        const res = await fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(json),
+        })
+        if (!res.ok) throw new Error('upload_failed')
+      }
+      window.location.href = '/sessions'
+    } catch {
+      setUploading(false)
+    }
   }
 
   return (
@@ -22,8 +47,8 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
       <DialogHeader>
         <DialogTitle>Subir archivos de sesión (.json)</DialogTitle>
       </DialogHeader>
-      <form action="/api/upload-sessions" method="post" encType="multipart/form-data" className="space-y-3">
-        <Input type="file" name="files" multiple accept=".json" onChange={onFilesChange} />
+      <div className="space-y-3">
+        <Input type="file" multiple accept=".json" onChange={onFilesChange} />
         {selectedNames.length > 0 ? (
           <div className="rounded-md border divide-y">
             {selectedNames.map((n) => {
@@ -42,14 +67,14 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
             ¡Estos archivos ya existen y no se pueden subir!
           </div>
         ) : (
-          <div className="text-xs text-muted-foreground">Los archivos se guardan en la carpeta <code>sessions</code> dentro de la app.</div>
+          <div className="text-xs text-muted-foreground">Se suben al almacenamiento remoto de sesiones.</div>
         )}
         <DialogFooter>
-          <Button type="submit" className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" disabled={hasDuplicates || selectedNames.length === 0}>
-            Subir
+          <Button type="button" onClick={onUpload} className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" disabled={uploading || hasDuplicates || selectedNames.length === 0}>
+            {uploading ? 'Subiendo…' : 'Subir'}
           </Button>
         </DialogFooter>
-      </form>
+      </div>
     </DialogContent>
   )
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { currentUser } from '@clerk/nextjs/server'
 import { list, put } from '@vercel/blob'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { parseSession } from '@/lib/parseSession'
@@ -35,9 +36,24 @@ export async function POST(req: Request) {
     if (!token) return NextResponse.json({ error: 'blob_not_configured' }, { status: 500 })
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
-    if (!adminToken || adminToken.length === 0 || adminToken !== headerToken) {
-      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    let isAllowed = false
+    if (adminToken && adminToken.length > 0 && adminToken === headerToken) {
+      isAllowed = true
+    } else {
+      try {
+        const user = await currentUser()
+        const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
+          .split(',')
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean)
+        const isAdmin = !!user && (
+          (user.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
+          user.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
+        )
+        if (isAdmin) isAllowed = true
+      } catch {}
     }
+    if (!isAllowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const body = await req.json().catch(() => null) as Record<string, unknown> | null
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const now = new Date()
