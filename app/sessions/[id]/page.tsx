@@ -15,8 +15,9 @@ export const revalidate = 0
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const normalizedId = id.includes(':') ? id.split(':').pop() as string : id
   const sessions = await loadLocalSessions()
-  const raw = sessions.find((s) => s.id === id)
+  const raw = sessions.find((s) => s.id === normalizedId)
   if (!raw) return <div className="p-6">Sesión no encontrada</div>
   const user = await currentUser().catch(() => null)
   const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
@@ -60,7 +61,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const hasPublishConfig = pubEntries.length > 0
   const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => (p as { sessionId: string }).sessionId))
-  const isPublished = publishedSet.has(id)
+  const isPublished = publishedSet.has(normalizedId)
   if (hasPublishConfig && !isPublished && !isAdmin) {
     return (
       <div className="p-6 space-y-2">
@@ -89,7 +90,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     return null
   })()
   const exclusions = exclusionsRemote ?? []
-  console.log('[sessions/page] sessionId', id)
+  console.log('[sessions/page] sessionId', normalizedId)
   console.log('[sessions/page] exclusions fetched', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const withDnf = applyDnfByLaps(raw)
   const excluded = applyExclusionsToSession(withDnf, exclusions)
@@ -166,7 +167,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         {' | '}
         <span className="font-normal">{niceTrack(session.track)}</span>
         {' | '}
-        <span className="font-normal">{formatDateLong(session.date, id)}</span>
+        <span className="font-normal">{formatDateLong(session.date, normalizedId)}</span>
       </h1>
       <div className="flex items-center gap-2">
         <PublishSessionButton id={session.id} />

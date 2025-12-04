@@ -7,7 +7,8 @@ import type { Incident } from '@/types/Incident'
 
 function slugFromFile(filePath: string) {
   const base = path.basename(filePath, path.extname(filePath))
-  return base
+  const withNoPrefix = base.includes(":") ? base.split(":").pop() as string : base
+  return withNoPrefix
 }
 
 function inferType(raw: Record<string, unknown>, filePath: string): string {

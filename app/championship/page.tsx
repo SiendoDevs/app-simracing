@@ -54,7 +54,7 @@ export default async function Page() {
   )
   const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
   const isAdmin = isAdminRaw || devBypass
-  const sessionsPublished = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => published.has(s.id)) : sessions)
+  const sessionsPublished = hasPublishConfig ? sessions.filter((s) => published.has(s.id)) : sessions
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
