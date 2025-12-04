@@ -3,7 +3,6 @@ import { currentUser } from '@clerk/nextjs/server'
 import fs from 'node:fs'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { parseSession } from '@/lib/parseSession'
-import { del } from '@vercel/blob'
 import { Redis } from '@upstash/redis'
 
 export const runtime = 'nodejs'
@@ -122,7 +121,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     const filePath = target.sourceFilePath
     try {
-      const hasBlob = !!process.env.BLOB_READ_WRITE_TOKEN
       if (filePath && filePath.startsWith('upstash:')) {
         try {
           const redis = createRedis()
@@ -148,8 +146,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         } catch (e) {
           return NextResponse.json({ error: 'kv_unlink_failed', detail: String(e) }, { status: 500 })
         }
-      } else if (hasBlob) {
-        await del(filePath)
       } else if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
       }
