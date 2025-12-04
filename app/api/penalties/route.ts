@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server'
-import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'
 
-function kvConfigured() {
-  return !!(process.env.KV_URL && process.env.KV_REST_TOKEN)
-}
+// removed Vercel KV; using Upstash Redis only
 
 function resolveUpstashEnv() {
   const candidates = [
@@ -41,33 +38,27 @@ function createRedis() {
 
 export async function GET() {
   try {
-    if (kvConfigured()) {
-      const data = await kv.get('penalties')
+    const redis = createRedis()
+    try {
+      const data = await redis.json.get('penalties')
       if (Array.isArray(data)) return NextResponse.json(data)
       if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
-    } else {
-      const redis = createRedis()
-      try {
-        const data = await redis.json.get('penalties')
-        if (Array.isArray(data)) return NextResponse.json(data)
-        if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
-      } catch {}
-      try {
-        const s = await redis.get('penalties')
-        if (typeof s === 'string') {
-          const parsed = JSON.parse(s)
-          if (Array.isArray(parsed)) return NextResponse.json(parsed)
-          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
-        }
-      } catch {}
-    }
+    } catch {}
+    try {
+      const s = await redis.get('penalties')
+      if (typeof s === 'string') {
+        const parsed = JSON.parse(s)
+        if (Array.isArray(parsed)) return NextResponse.json(parsed)
+        if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
+      }
+    } catch {}
   } catch {}
   return NextResponse.json([])
 }
 
 export async function POST(req: Request) {
   try {
-    if (!kvConfigured() && !upstashConfigured()) return NextResponse.json({ error: 'kv_not_configured' }, { status: 500 })
+    if (!upstashConfigured()) return NextResponse.json({ error: 'redis_not_configured' }, { status: 500 })
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
     let isAllowed = false
@@ -101,24 +92,20 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'qualify_penalties_not_allowed' }, { status: 400 })
       }
     } catch {}
-    let list: Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>
-    if (kvConfigured()) {
-      const curr = await kv.get('penalties')
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>) : []
-    } else {
-      const redis = createRedis()
-      let curr: unknown = null
+    const redis = createRedis()
+    let curr: unknown = null
+    try {
+      curr = await redis.json.get('penalties')
+    } catch {}
+    if (!Array.isArray(curr)) {
       try {
-        curr = await redis.json.get('penalties')
+        const s = await redis.get('penalties')
+        if (typeof s === 'string') curr = JSON.parse(s)
       } catch {}
-      if (!Array.isArray(curr)) {
-        try {
-          const s = await redis.get('penalties')
-          if (typeof s === 'string') curr = JSON.parse(s)
-        } catch {}
-      }
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>) : []
     }
+    const list: Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }> = Array.isArray(curr)
+      ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>)
+      : []
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
     const confirmed = body.confirmed === true
     const secs: number = seconds as number
@@ -134,28 +121,24 @@ export async function POST(req: Request) {
       else list.push({ driverId, sessionId, seconds: secs, confirmed })
     
     }
-    if (kvConfigured()) {
-      await kv.set('penalties', list)
-    } else {
-      const redis = createRedis()
-      let writeOk = false
-      let lastError: unknown = null
+    const redis2 = createRedis()
+    let writeOk = false
+    let lastError: unknown = null
+    try {
+      await redis2.json.set('penalties', '$', list)
+      writeOk = true
+    } catch (e) {
+      lastError = e
+    }
+    if (!writeOk) {
       try {
-        await redis.json.set('penalties', '$', list)
+        await redis2.set('penalties', JSON.stringify(list))
         writeOk = true
       } catch (e) {
         lastError = e
       }
-      if (!writeOk) {
-        try {
-          await redis.set('penalties', JSON.stringify(list))
-          writeOk = true
-        } catch (e) {
-          lastError = e
-        }
-      }
-      if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
     }
+    if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })

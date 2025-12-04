@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server'
-import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
 import { currentUser } from '@clerk/nextjs/server'
 
 export const runtime = 'nodejs'
 
-function kvConfigured() {
-  return !!(process.env.KV_URL && process.env.KV_REST_TOKEN)
-}
+// removed Vercel KV; using Upstash Redis only
 
 function resolveUpstashEnv() {
   const candidates = [
@@ -48,60 +45,21 @@ function isValidBallast(x: unknown): x is { driverId: string; sessionId: string;
 
 export async function GET() {
   try {
-    const useKv = kvConfigured()
-    const useUpstash = upstashConfigured()
-    console.log('[api/ballast] config', { useKv, useUpstash })
-    if (!useKv && !useUpstash) {
-      console.log('[api/ballast] neither KV nor Upstash configured, returning []')
-      return NextResponse.json([])
-    }
-    if (useKv) {
-      const data = await kv.get('ballast')
-      console.log('[api/ballast] KV get type', typeof data)
-      if (Array.isArray(data)) {
-        console.log('[api/ballast] KV array length', data.length)
-        return NextResponse.json(data.filter(isValidBallast))
+    if (!upstashConfigured()) return NextResponse.json([])
+    const redis = createRedis()
+    try {
+      const data = await redis.json.get('ballast')
+      if (Array.isArray(data)) return NextResponse.json(data.filter(isValidBallast))
+      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>).filter(isValidBallast))
+    } catch {}
+    try {
+      const s = await redis.get('ballast')
+      if (typeof s === 'string') {
+        const parsed = JSON.parse(s)
+        if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isValidBallast))
+        if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isValidBallast))
       }
-      if (typeof data === 'string') {
-        try {
-          const parsed = JSON.parse(data)
-          console.log('[api/ballast] KV string parsed type', Array.isArray(parsed) ? 'array' : typeof parsed)
-          if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isValidBallast))
-          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isValidBallast))
-        } catch (e) {
-          console.log('[api/ballast] KV string parse error', String(e))
-        }
-      }
-      if (data && typeof data === 'object') {
-        const vals = Object.values(data as Record<string, unknown>)
-        console.log('[api/ballast] KV object values length', vals.length)
-        return NextResponse.json(vals.filter(isValidBallast))
-      }
-    } else {
-      const redis = createRedis()
-      try {
-        const data = await redis.json.get('ballast')
-        console.log('[api/ballast] Redis JSON get type', typeof data)
-        if (Array.isArray(data)) {
-          console.log('[api/ballast] Redis JSON array length', data.length)
-          return NextResponse.json(data.filter(isValidBallast))
-        }
-        if (data && typeof data === 'object') {
-          const vals = Object.values(data as Record<string, unknown>)
-          console.log('[api/ballast] Redis JSON object values length', vals.length)
-          return NextResponse.json(vals.filter(isValidBallast))
-        }
-      } catch {}
-      try {
-        const s = await redis.get('ballast')
-        if (typeof s === 'string') {
-          const parsed = JSON.parse(s)
-          console.log('[api/ballast] Redis string parsed type', Array.isArray(parsed) ? 'array' : typeof parsed)
-          if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isValidBallast))
-          if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isValidBallast))
-        }
-      } catch {}
-    }
+    } catch {}
     return NextResponse.json([])
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
@@ -110,7 +68,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    if (!kvConfigured() && !upstashConfigured()) return NextResponse.json({ error: 'kv_not_configured' }, { status: 500 })
+    if (!upstashConfigured()) return NextResponse.json({ error: 'redis_not_configured' }, { status: 500 })
     const adminToken = (process.env.ADMIN_TOKEN || '').trim()
     const headerToken = (req.headers.get('x-admin-token') || '').trim()
     let isAllowed = false
@@ -137,24 +95,15 @@ export async function POST(req: Request) {
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, kg } = body
     if (!driverId || !sessionId || typeof kg !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
-    let list: Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>
-    if (kvConfigured()) {
-      const curr = await kv.get('ballast')
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>) : []
-    } else {
-      const redis = createRedis()
-      let curr: unknown = null
-      try {
-        curr = await redis.json.get('ballast')
-      } catch {}
-      if (!Array.isArray(curr)) {
-        try {
-          const s = await redis.get('ballast')
-          if (typeof s === 'string') curr = JSON.parse(s)
-        } catch {}
-      }
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>) : []
+    const redis = createRedis()
+    let curr: unknown = null
+    try { curr = await redis.json.get('ballast') } catch {}
+    if (!Array.isArray(curr)) {
+      try { const s = await redis.get('ballast'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
     }
+    const list: Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }> = Array.isArray(curr)
+      ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>)
+      : []
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
     const confirmed = body.confirmed === true
     const weight: number = kg as number
@@ -170,28 +119,14 @@ export async function POST(req: Request) {
       else list.push({ driverId, sessionId, kg: weight, confirmed })
     
     }
-    if (kvConfigured()) {
-      await kv.set('ballast', list)
-    } else {
-      const redis = createRedis()
-      let writeOk = false
-      let lastError: unknown = null
-      try {
-        await redis.json.set('ballast', '$', list)
-        writeOk = true
-      } catch (e) {
-        lastError = e
-      }
-      if (!writeOk) {
-        try {
-          await redis.set('ballast', JSON.stringify(list))
-          writeOk = true
-        } catch (e) {
-          lastError = e
-        }
-      }
-      if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
+    const redis2 = createRedis()
+    let writeOk = false
+    let lastError: unknown = null
+    try { await redis2.json.set('ballast', '$', list); writeOk = true } catch (e) { lastError = e }
+    if (!writeOk) {
+      try { await redis2.set('ballast', JSON.stringify(list)); writeOk = true } catch (e) { lastError = e }
     }
+    if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
