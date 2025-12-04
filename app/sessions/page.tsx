@@ -55,12 +55,13 @@ export default async function Page() {
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const hasPublishConfig = pubEntries.length > 0
-  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => (p as { sessionId: string }).sessionId))
+  const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
+  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
   const publishedDateById = new Map<string, number>()
   for (const p of pubEntries) {
     if (typeof p.date === 'string') {
       const d = new Date(p.date)
-      if (!isNaN(d.getTime())) publishedDateById.set(p.sessionId, d.getTime())
+      if (!isNaN(d.getTime())) publishedDateById.set(normalizeId(p.sessionId), d.getTime())
     }
   }
   const countById = new Map<string, number>()
