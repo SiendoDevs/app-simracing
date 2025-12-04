@@ -1,4 +1,5 @@
 import type { Session } from '@/types/Session'
+import { headers } from 'next/headers'
 
 async function loadRemoteSessions(): Promise<Session[] | null> {
   try {
@@ -15,7 +16,17 @@ async function loadRemoteSessions(): Promise<Session[] | null> {
     const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
       ? `https://${process.env.VERCEL_URL}`
       : undefined
-    const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
+    const fromHeaders = await (async () => {
+      try {
+        const h = await headers()
+        const host = h.get('x-forwarded-host') || h.get('host') || ''
+        const proto = h.get('x-forwarded-proto') || 'https'
+        return host ? `${proto}://${host}` : null
+      } catch {
+        return null
+      }
+    })()
+    const origin = fromEnv ?? fromVercel ?? fromHeaders ?? 'http://localhost:3000'
     const r2 = await fetch(`${origin}/api/sessions`, { cache: 'no-store' }).catch(() => null)
     if (r2 && r2.ok) {
       const data = await r2.json()
