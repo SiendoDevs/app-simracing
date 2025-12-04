@@ -3,14 +3,11 @@ import { currentUser } from '@clerk/nextjs/server'
 import fs from 'node:fs'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { del } from '@vercel/blob'
-import { kv } from '@vercel/kv'
 import { Redis } from '@upstash/redis'
 
 export const runtime = 'nodejs'
 
-function kvConfigured() {
-  return !!(process.env.KV_URL && process.env.KV_REST_TOKEN)
-}
+// removed kv configuration; using Upstash Redis only
 
 function resolveUpstashEnv() {
   const candidates = [
@@ -40,44 +37,33 @@ function createRedis() {
 
 async function loadLinked(key: 'penalties' | 'exclusions' | 'ballast') {
   try {
-    if (kvConfigured()) {
-      const data = await kv.get(key)
-      if (Array.isArray(data)) return data as Array<Record<string, unknown>>
-      if (data && typeof data === 'object') return Object.values(data as Record<string, unknown>) as Array<Record<string, unknown>>
-    } else {
-      const redis = createRedis()
-      let curr: unknown = null
-      try { curr = await redis.json.get(key) } catch {}
-      if (!Array.isArray(curr)) {
-        try {
-          const s = await redis.get(key)
-          if (typeof s === 'string') curr = JSON.parse(s)
-        } catch {}
-      }
-      if (Array.isArray(curr)) return curr as Array<Record<string, unknown>>
-      if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>) as Array<Record<string, unknown>>
+    const redis = createRedis()
+    let curr: unknown = null
+    try { curr = await redis.json.get(key) } catch {}
+    if (!Array.isArray(curr)) {
+      try {
+        const s = await redis.get(key)
+        if (typeof s === 'string') curr = JSON.parse(s)
+      } catch {}
     }
+    if (Array.isArray(curr)) return curr as Array<Record<string, unknown>>
+    if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>) as Array<Record<string, unknown>>
   } catch {}
   return []
 }
 
 async function saveLinked(key: 'penalties' | 'exclusions' | 'ballast', list: Record<string, unknown>[]) {
   try {
-    if (kvConfigured()) {
-      await kv.set(key, list)
+    const redis = createRedis()
+    try {
+      const payload = list.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
+      await redis.json.set(key, '$', payload)
       return true
-    } else {
-      const redis = createRedis()
-      try {
-        const payload = list.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
-        await redis.json.set(key, '$', payload)
-        return true
-      } catch {}
-      try {
-        await redis.set(key, JSON.stringify(list))
-        return true
-      } catch {}
-    }
+    } catch {}
+    try {
+      await redis.set(key, JSON.stringify(list))
+      return true
+    } catch {}
   } catch {}
   return false
 }
