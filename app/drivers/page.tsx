@@ -43,8 +43,7 @@ export default async function Page() {
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
-  const hasPublishConfig = published.size > 0
-  const sessionsPublished = hasPublishConfig ? sessions.filter((s) => published.has(s.id)) : sessions
+  const sessionsPublished = sessions.filter((s) => published.has(s.id))
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
@@ -107,6 +106,14 @@ export default async function Page() {
     const sample = qual.slice(0, 2).map((s) => ({ id: s.id, top: s.results.slice(0, 3).map((r) => ({ driverId: r.driverId, pos: r.position })) }))
     console.log('[drivers/page] sample qual sessions', sample)
   } catch {}
+  if (sessionsPublished.length === 0) {
+    return (
+      <div className="py-6 space-y-4">
+        <h1 className="text-2xl font-bold">Pilotos</h1>
+        <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">No hay resultados oficiales publicados aún.</div>
+      </div>
+    )
+  }
   const table = calculateChampionship(adjusted)
   return (
     <div className="py-6 space-y-4">
