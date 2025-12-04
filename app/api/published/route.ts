@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { Redis } from '@upstash/redis'
 import { currentUser } from '@clerk/nextjs/server'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
+import { revalidatePath } from 'next/cache'
 
 export const runtime = 'nodejs'
 
@@ -110,6 +111,12 @@ export async function POST(req: Request) {
       try { await redis.set('published', JSON.stringify(list)); writeOk = true } catch (e) { lastError = e }
     }
     if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
+    try {
+      revalidatePath('/sessions')
+      revalidatePath('/sessions/[id]')
+      revalidatePath('/drivers')
+      revalidatePath('/championship')
+    } catch {}
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
