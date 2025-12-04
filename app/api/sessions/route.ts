@@ -39,11 +39,17 @@ export async function GET() {
       const redis = createRedis()
       let curr: unknown = null
       try { curr = await redis.json.get('sessions') } catch {}
-      if (!Array.isArray(curr)) {
+      if (!Array.isArray(curr) && (!curr || typeof curr !== 'object')) {
         try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
       }
-      const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
-      for (const R of listU) {
+      const items: unknown[] = Array.isArray(curr)
+        ? (curr as unknown[])
+        : curr && typeof curr === 'object'
+          ? Object.values(curr as Record<string, unknown>)
+          : []
+      for (const it of items) {
+        const R = typeof it === 'string' ? (() => { try { return JSON.parse(it as string) } catch { return null } })() : (it as Record<string, unknown>)
+        if (!R || typeof R !== 'object') continue
         const fp = typeof (R as Record<string, unknown>).sourceFilePath === 'string' ? ((R as Record<string, unknown>).sourceFilePath as string) : 'upstash:session.json'
         try {
           const s = parseSession(R as Record<string, unknown>, fp)
