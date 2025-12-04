@@ -54,9 +54,9 @@ export default async function Page() {
   const pubRaw = publishedRemote ?? []
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
-  const hasPublishConfig = pubEntries.length > 0
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
   const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
+  const hasPublishConfig = publishedSet.size > 0
   const publishedDateById = new Map<string, number>()
   for (const p of pubEntries) {
     if (typeof p.date === 'string') {
