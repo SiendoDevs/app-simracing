@@ -28,7 +28,8 @@ export default function PublishSessionButton({ id }: { id: string }) {
         const r = await fetch('/api/published', { cache: 'no-store' })
         const arr = r.ok ? await r.json() : []
         const list: Array<{ sessionId?: string; published?: boolean }> = Array.isArray(arr) ? arr : []
-        const found = list.find((x) => x && x.sessionId === id)
+        const norm = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
+        const found = list.find((x) => x && typeof x.sessionId === 'string' && norm(x.sessionId) === id)
         if (active) setPublished(found?.published === true ? true : false)
       } catch {
         if (active) setPublished(false)
@@ -76,6 +77,7 @@ export default function PublishSessionButton({ id }: { id: string }) {
                 if (!res.ok) throw new Error('error')
                 toast.success(published ? 'Sesión despublicada' : 'Sesión publicada', { description: id })
                 setOpen(false)
+                setPublished(!(published === true))
                 router.refresh()
               } catch {
                 toast.error('No se pudo actualizar', { description: id })
