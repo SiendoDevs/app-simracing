@@ -47,6 +47,7 @@ export async function GET() {
         : curr && typeof curr === 'object'
           ? Object.values(curr as Record<string, unknown>)
           : []
+      try { console.log('[api/sessions] GET items count', items.length) } catch {}
       for (const it of items) {
         const R = typeof it === 'string' ? (() => { try { return JSON.parse(it as string) } catch { return null } })() : (it as Record<string, unknown>)
         if (!R || typeof R !== 'object') continue
@@ -58,6 +59,7 @@ export async function GET() {
       }
     } catch {}
     sessions.sort((a, b) => a.id.localeCompare(b.id))
+    try { console.log('[api/sessions] GET sessions count', sessions.length) } catch {}
     return NextResponse.json(sessions)
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })

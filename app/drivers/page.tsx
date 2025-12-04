@@ -20,6 +20,7 @@ export default async function Page() {
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
   const origin = fromVercel ?? fromEnv ?? fromHeaders ?? 'http://localhost:3000'
+  try { console.log('[drivers/page] origin', origin, { fromVercel: !!fromVercel, fromEnv: !!fromEnv, fromHeaders: !!fromHeaders }) } catch {}
   const publishedRemote = await (async () => {
     try {
       const r1 = await fetch('/api/published', { cache: 'no-store', next: { revalidate: 0 } })
@@ -41,6 +42,7 @@ export default async function Page() {
   })()
   const pubRaw = publishedRemote ?? []
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
+  try { console.log('[drivers/page] published entries', Array.isArray(pubRaw) ? pubRaw.length : (pubRaw ? Object.keys(pubRaw as Record<string, unknown>).length : 0)) } catch {}
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
   const canonicalId = (s: string) => {
@@ -52,6 +54,7 @@ export default async function Page() {
   }
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
   const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
+  try { console.log('[drivers/page] sessionsPublished count', sessionsPublished.length, sessionsPublished.slice(0, 3).map((s) => s.id)) } catch {}
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store', next: { revalidate: 0 } })

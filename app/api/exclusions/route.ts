@@ -34,20 +34,24 @@ function createRedis() {
 
 export async function GET() {
   try {
+    try { console.log('[api/exclusions] GET start') } catch {}
     const redis = createRedis()
     let data: unknown = null
     try {
       data = await redis.json.get('exclusions')
+      try { console.log('[api/exclusions] json.get count', Array.isArray(data) ? data.length : (data ? Object.keys(data as Record<string, unknown>).length : 0)) } catch {}
     } catch {}
     if (Array.isArray(data)) return NextResponse.json(data)
     if (data && typeof data === 'object') {
       const values = Object.values(data as Record<string, unknown>)
+      try { console.log('[api/exclusions] json.get values count', values.length) } catch {}
       if (values.length > 0) return NextResponse.json(values)
     }
     try {
       const s = await redis.get('exclusions')
       if (typeof s === 'string') {
         const parsed = JSON.parse(s)
+        try { console.log('[api/exclusions] get count', Array.isArray(parsed) ? parsed.length : (parsed ? Object.keys(parsed as Record<string, unknown>).length : 0)) } catch {}
         if (Array.isArray(parsed)) return NextResponse.json(parsed)
         if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
       }

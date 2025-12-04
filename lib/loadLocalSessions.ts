@@ -8,6 +8,7 @@ async function loadRemoteSessions(): Promise<Session[] | null> {
     const r1 = await fetch('/api/sessions', { cache: 'no-store', next: { revalidate: 0 } }).catch(() => null)
     if (r1 && r1.ok) {
       const data = await r1.json()
+      try { console.log('[loadLocalSessions] source', 'relative_api', { ok: true }) } catch {}
       if (Array.isArray(data)) return data as Session[]
     }
   } catch {}
@@ -29,6 +30,7 @@ async function loadRemoteSessions(): Promise<Session[] | null> {
       }
     })()
     const origin = fromEnv ?? fromVercel ?? fromHeaders ?? 'http://localhost:3000'
+    try { console.log('[loadLocalSessions] source', 'absolute_api', { origin, fromEnv: !!fromEnv, fromVercel: !!fromVercel, fromHeaders: !!fromHeaders }) } catch {}
     const r2 = await fetch(`${origin}/api/sessions`, { cache: 'no-store', next: { revalidate: 0 } }).catch(() => null)
     if (r2 && r2.ok) {
       const data = await r2.json()
@@ -58,6 +60,7 @@ export async function loadLocalSessions(): Promise<Session[]> {
       process.env.UPSTASH_REDIS_TOKEN ||
       ''
     )
+    try { console.log('[loadLocalSessions] source', 'redis_sdk', { urlPresent: !!url, tokenPresent: !!token }) } catch {}
     const redis = url && token ? new Redis({ url, token }) : Redis.fromEnv()
     let curr: unknown = null
     try { curr = await redis.json.get('sessions') } catch {}

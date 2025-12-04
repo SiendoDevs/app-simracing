@@ -46,9 +46,11 @@ function isPub(x: unknown): x is Pub {
 
 export async function GET() {
   try {
+    try { console.log('[api/published] GET start', { hasUrl: !!process.env.UPSTASH_REDIS_REST_URL || !!process.env.UPSTASH_REDIS_URL }) } catch {}
     const redis = createRedis()
     try {
       const data = await redis.json.get('published')
+      try { console.log('[api/published] json.get count', Array.isArray(data) ? data.length : (data ? Object.keys(data as Record<string, unknown>).length : 0)) } catch {}
       if (Array.isArray(data)) return NextResponse.json(data.filter(isPub))
       if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>).filter(isPub))
     } catch {}
@@ -56,6 +58,7 @@ export async function GET() {
       const s = await redis.get('published')
       if (typeof s === 'string') {
         const parsed = JSON.parse(s)
+        try { console.log('[api/published] get count', Array.isArray(parsed) ? parsed.length : (parsed ? Object.keys(parsed as Record<string, unknown>).length : 0)) } catch {}
         if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isPub))
         if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isPub))
       }
@@ -110,6 +113,7 @@ export async function POST(req: Request) {
     if (!writeOk) {
       try { await redis.set('published', JSON.stringify(list)); writeOk = true } catch (e) { lastError = e }
     }
+    try { console.log('[api/published] POST writeOk', writeOk, { size: list.length, lastError: String(lastError ?? '') }) } catch {}
     if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
     try {
       revalidatePath('/sessions')

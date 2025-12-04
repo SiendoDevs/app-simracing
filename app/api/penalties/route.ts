@@ -38,9 +38,11 @@ function createRedis() {
 
 export async function GET() {
   try {
+    try { console.log('[api/penalties] GET start') } catch {}
     const redis = createRedis()
     try {
       const data = await redis.json.get('penalties')
+      try { console.log('[api/penalties] json.get count', Array.isArray(data) ? data.length : (data ? Object.keys(data as Record<string, unknown>).length : 0)) } catch {}
       if (Array.isArray(data)) return NextResponse.json(data)
       if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
     } catch {}
@@ -48,6 +50,7 @@ export async function GET() {
       const s = await redis.get('penalties')
       if (typeof s === 'string') {
         const parsed = JSON.parse(s)
+        try { console.log('[api/penalties] get count', Array.isArray(parsed) ? parsed.length : (parsed ? Object.keys(parsed as Record<string, unknown>).length : 0)) } catch {}
         if (Array.isArray(parsed)) return NextResponse.json(parsed)
         if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
       }
