@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { currentUser } from '@clerk/nextjs/server'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { applyExclusionsToSession } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
@@ -7,6 +8,7 @@ import BestLapCard from '@/components/BestLapCard'
 import MostOvertakesCard from '@/components/MostOvertakesCard'
 import RaceResults from '@/components/RaceResults'
 import IncidentsList from '@/components/IncidentsList'
+import PublishSessionButton from '@/components/PublishSessionButton'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -16,6 +18,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const sessions = await loadLocalSessions()
   const raw = sessions.find((s) => s.id === id)
   if (!raw) return <div className="p-6">Sesión no encontrada</div>
+  const user = await currentUser().catch(() => null)
+  const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  const isAdminRaw = !!user && (
+    (user.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
+    user.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
+  )
+  const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
+  const isAdmin = isAdminRaw || devBypass
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
     ? `https://${process.env.VERCEL_URL}`
     : undefined
@@ -23,6 +36,40 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
   const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
+  const publishedRemote = await (async () => {
+    try {
+      const r1 = await fetch('/api/published', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store' })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    return null
+  })()
+  const isPub = (x: unknown): x is { sessionId: string; published: boolean } => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { sessionId?: unknown; published?: unknown }
+    return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
+  }
+  const publishedSet = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
+  const isPublished = publishedSet.has(id)
+  if (!isPublished && !isAdmin) {
+    return (
+      <div className="p-6 space-y-2">
+        <div className="text-sm text-muted-foreground">Sesión no publicada</div>
+        <div className="text-xs text-muted-foreground">Vuelve pronto: se publicará cuando finalice la revisión.</div>
+      </div>
+    )
+  }
   const exclusionsRemote = await (async () => {
     try {
       const r1 = await fetch('/api/exclusions', { cache: 'no-store' })
@@ -122,6 +169,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         {' | '}
         <span className="font-normal">{formatDateLong(session.date, id)}</span>
       </h1>
+      <div className="flex items-center gap-2">
+        <PublishSessionButton id={session.id} />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         <BestLapCard session={session} />
         {session.type === 'RACE' && <MostOvertakesCard session={session} />}

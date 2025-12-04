@@ -30,16 +30,22 @@ export default function RaceResults({ session, exclusions }: { session: Session;
   const [localExclusions, setLocalExclusions] = useState<Exclusion[]>(exclusions ?? [])
   const sWithPoints = applySessionPoints(session)
   const [loading, setLoading] = useState(false)
+  const [hasDrafts, setHasDrafts] = useState(false)
+  
   const [openExcludeFor, setOpenExcludeFor] = useState<string | null>(null)
   const [openReincFor, setOpenReincFor] = useState<string | null>(null)
   const [openPenaltyFor, setOpenPenaltyFor] = useState<string | null>(null)
   const [penaltySeconds, setPenaltySeconds] = useState<number>(0)
   const [penaltiesMap, setPenaltiesMap] = useState<Map<string, number>>(new Map())
   const [ballastAdjMap, setBallastAdjMap] = useState<Map<string, number>>(new Map())
+  const [penaltiesLoaded, setPenaltiesLoaded] = useState(false)
+  const [exclusionsLoaded, setExclusionsLoaded] = useState(false)
+  const [ballastLoaded, setBallastLoaded] = useState(false)
   useEffect(() => {
     const incoming = exclusions ?? []
     console.log('[RaceResults] incoming exclusions', session.id, incoming.length)
     setLocalExclusions(incoming)
+    if (incoming.length > 0) setExclusionsLoaded(true)
     if (incoming.length === 0) {
       ;(async () => {
         let list: Exclusion[] = []
@@ -63,6 +69,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
         }
         console.log('[RaceResults] fallback fetched exclusions', session.id, list.length)
         setLocalExclusions(list)
+        setExclusionsLoaded(true)
       })()
     }
   }, [exclusions, session.id])
@@ -81,10 +88,59 @@ export default function RaceResults({ session, exclusions }: { session: Session;
             }
           }
         }
-        if (active) setPenaltiesMap(map)
+        if (active) {
+          setPenaltiesMap(map)
+          setPenaltiesLoaded(true)
+        }
       } catch {
-        if (active) setPenaltiesMap(new Map())
+        if (active) {
+          setPenaltiesMap(new Map())
+          setPenaltiesLoaded(true)
+        }
       } finally {}
+    })()
+    return () => { active = false }
+  }, [session.id])
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const [pRes, eRes, bRes] = await Promise.all([
+          fetch('/api/penalties', { cache: 'no-store' }),
+          fetch('/api/exclusions', { cache: 'no-store' }),
+          fetch('/api/ballast', { cache: 'no-store' }),
+        ])
+        const toArray = (j: unknown) => Array.isArray(j) ? j : (j && typeof j === 'object' ? Object.values(j as Record<string, unknown>) : [])
+        type Pen = { driverId: string; sessionId: string; seconds: number; confirmed?: boolean }
+        type Excl = { driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }
+        type Ball = { driverId: string; sessionId: string; kg: number; confirmed?: boolean }
+        const isPen = (x: unknown): x is Pen => {
+          if (!x || typeof x !== 'object') return false
+          const o = x as { driverId?: unknown; sessionId?: unknown; seconds?: unknown; confirmed?: unknown }
+          return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.seconds === 'number'
+        }
+        const isExcl = (x: unknown): x is Excl => {
+          if (!x || typeof x !== 'object') return false
+          const o = x as { driverId?: unknown; sessionId?: unknown; exclude?: unknown; confirmed?: unknown }
+          return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.exclude === 'boolean'
+        }
+        const isBall = (x: unknown): x is Ball => {
+          if (!x || typeof x !== 'object') return false
+          const o = x as { driverId?: unknown; sessionId?: unknown; kg?: unknown; confirmed?: unknown }
+          return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.kg === 'number'
+        }
+        const pList = pRes.ok ? toArray(await pRes.json()) : []
+        const eList = eRes.ok ? toArray(await eRes.json()) : []
+        const bList = bRes.ok ? toArray(await bRes.json()) : []
+        const has = pList.filter(isPen).some((x) => x.sessionId === session.id && x.confirmed !== true) ||
+          eList.filter(isExcl).some((x) => x.sessionId === session.id && x.confirmed !== true) ||
+          bList.filter(isBall).some((x) => x.sessionId === session.id && x.confirmed !== true)
+        if (active) {
+          setHasDrafts(has)
+        }
+      } catch {
+        if (active) setHasDrafts(false)
+      }
     })()
     return () => { active = false }
   }, [session.id])
@@ -103,9 +159,15 @@ export default function RaceResults({ session, exclusions }: { session: Session;
             }
           }
         }
-        if (active) setBallastAdjMap(map)
+        if (active) {
+          setBallastAdjMap(map)
+          setBallastLoaded(true)
+        }
       } catch {
-        if (active) setBallastAdjMap(new Map())
+        if (active) {
+          setBallastAdjMap(new Map())
+          setBallastLoaded(true)
+        }
       } finally {}
     })()
     return () => { active = false }
@@ -171,9 +233,84 @@ export default function RaceResults({ session, exclusions }: { session: Session;
       return out
     }
   })()
+  const ready = penaltiesLoaded && exclusionsLoaded && ballastLoaded
+  if (!ready) {
+    return (
+      <div className="rounded-md border p-3 md:p-4 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-[#d8552b]" />
+      </div>
+    )
+  }
   return (
     <div className="rounded-md border p-3 md:p-4">
-      <h2 className="text-base md:text-lg font-semibold">Resultados</h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-base md:text-lg font-semibold">Resultados</h2>
+        {isAdmin ? (
+          <Button
+            className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90 focus-visible:ring-[#d8552b]/20 dark:focus-visible:ring-[#d8552b]/40"
+            disabled={loading || !hasDrafts}
+            onClick={async () => {
+              try {
+                setLoading(true)
+                const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+                const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+                if (adminToken) headers['x-admin-token'] = adminToken
+                const [pRes, eRes, bRes] = await Promise.all([
+                  fetch('/api/penalties', { cache: 'no-store' }),
+                  fetch('/api/exclusions', { cache: 'no-store' }),
+                  fetch('/api/ballast', { cache: 'no-store' }),
+                ])
+                const pList = pRes.ok ? await pRes.json() : []
+                const eList = eRes.ok ? await eRes.json() : []
+                const bList = bRes.ok ? await bRes.json() : []
+                const toArray = (j: unknown) => Array.isArray(j) ? j : (j && typeof j === 'object' ? Object.values(j as Record<string, unknown>) : [])
+                type Pen = { driverId: string; sessionId: string; seconds: number; confirmed?: boolean }
+                type Excl = { driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }
+                type Ball = { driverId: string; sessionId: string; kg: number; confirmed?: boolean }
+                const isPen = (x: unknown): x is Pen => {
+                  if (!x || typeof x !== 'object') return false
+                  const o = x as { driverId?: unknown; sessionId?: unknown; seconds?: unknown; confirmed?: unknown }
+                  return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.seconds === 'number'
+                }
+                const isExcl = (x: unknown): x is Excl => {
+                  if (!x || typeof x !== 'object') return false
+                  const o = x as { driverId?: unknown; sessionId?: unknown; exclude?: unknown; confirmed?: unknown }
+                  return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.exclude === 'boolean'
+                }
+                const isBall = (x: unknown): x is Ball => {
+                  if (!x || typeof x !== 'object') return false
+                  const o = x as { driverId?: unknown; sessionId?: unknown; kg?: unknown; confirmed?: unknown }
+                  return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.kg === 'number'
+                }
+                const pens = toArray(pList).filter(isPen).filter((x) => x.sessionId === session.id && x.confirmed !== true)
+                const excls = toArray(eList).filter(isExcl).filter((x) => x.sessionId === session.id && x.confirmed !== true)
+                const balls = toArray(bList).filter(isBall).filter((x) => x.sessionId === session.id && x.confirmed !== true)
+                const tasks: Promise<Response>[] = []
+                for (const p of pens) {
+                  tasks.push(fetch('/api/penalties', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: p.driverId, seconds: p.seconds, confirmed: true }) }))
+                }
+                for (const e of excls) {
+                  tasks.push(fetch('/api/exclusions', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: e.driverId, exclude: e.exclude, confirmed: true }) }))
+                }
+                for (const b of balls) {
+                  tasks.push(fetch('/api/ballast', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: b.driverId, kg: b.kg, confirmed: true }) }))
+                }
+                await Promise.all(tasks)
+                toast.success('Sesión publicada', { description: session.id })
+                setHasDrafts(false)
+                router.refresh()
+              } catch {
+                toast.error('No se pudo publicar sesión', { description: session.id })
+              } finally {
+                setLoading(false)
+              }
+            }}
+          >
+            Publicar sesión
+          </Button>
+        ) : null}
+        
+      </div>
       <div className="overflow-x-auto -mx-3 md:mx-0">
       <Table>
         <TableHeader>
@@ -298,10 +435,12 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                               try {
                                 setLoading(true)
                                 const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+                                const hdrs: Record<string, string> = { 'Content-Type': 'application/json' }
+                                if (adminToken) hdrs['x-admin-token'] = adminToken
                                 const res = await fetch('/api/penalties', {
                                   method: 'POST',
-                                  headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, seconds: penaltySeconds }),
+                                  headers: hdrs,
+                                  body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, seconds: penaltySeconds, confirmed: false }),
                                 })
                                 if (!res.ok) throw new Error('error')
                                 toast.success('Penalización aplicada', { description: d?.name ?? r.driverId })
@@ -312,7 +451,8 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                   return next
                                 })
                                 setOpenPenaltyFor(null)
-                                router.refresh()
+                                setHasDrafts(true)
+                                setLoading(false)
                               } catch {
                                 toast.error('No se pudo penalizar', { description: d?.name ?? r.driverId })
                                 setLoading(false)
@@ -322,6 +462,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             Confirmar
                           </Button>
+                          
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
@@ -360,15 +501,18 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                 setLoading(true)
                                 const kg = ballastAdjMap.get(r.driverId) ?? 0
                                 const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+                                const hdrs2: Record<string, string> = { 'Content-Type': 'application/json' }
+                                if (adminToken) hdrs2['x-admin-token'] = adminToken
                                 const res = await fetch('/api/ballast', {
                                   method: 'POST',
-                                  headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, kg }),
+                                  headers: hdrs2,
+                                  body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, kg, confirmed: false }),
                                 })
                                 if (!res.ok) throw new Error('error')
                                 toast.success('Lastre actualizado', { description: d?.name ?? r.driverId })
                                 setOpenPenaltyFor(null)
-                                router.refresh()
+                                setHasDrafts(true)
+                                setLoading(false)
                               } catch {
                                 toast.error('No se pudo aplicar lastre', { description: d?.name ?? r.driverId })
                                 setLoading(false)
@@ -378,6 +522,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             Confirmar
                           </Button>
+                          
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
@@ -404,10 +549,12 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                   try {
                                     setLoading(true)
                                     const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+                                  const hdrs3: Record<string, string> = { 'Content-Type': 'application/json' }
+                                  if (adminToken) hdrs3['x-admin-token'] = adminToken
                                   const res = await fetch('/api/exclusions', {
                                     method: 'POST',
-                                    headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: false }),
+                                    headers: hdrs3,
+                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: false, confirmed: false }),
                                   })
                                   if (!res.ok) throw new Error('error')
                                   toast.success('Piloto reincorporado', { description: d?.name ?? r.driverId })
@@ -420,6 +567,8 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                       else next.push(entry)
                                       return next
                                     })
+                                    setHasDrafts(true)
+                                    setLoading(false)
                                     try {
                                       const sync = await fetch('/api/exclusions', { cache: 'no-store' })
                                       if (sync.ok) {
@@ -464,10 +613,12 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                   try {
                                     setLoading(true)
                                     const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+                                  const hdrs4: Record<string, string> = { 'Content-Type': 'application/json' }
+                                  if (adminToken) hdrs4['x-admin-token'] = adminToken
                                   const res = await fetch('/api/exclusions', {
                                     method: 'POST',
-                                    headers: adminToken ? { 'Content-Type': 'application/json', 'x-admin-token': adminToken } : { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: true }),
+                                    headers: hdrs4,
+                                    body: JSON.stringify({ sessionId: session.id, driverId: r.driverId, exclude: true, confirmed: false }),
                                   })
                                   if (!res.ok) throw new Error('error')
                                   toast.success('Piloto excluido', { description: d?.name ?? r.driverId })
@@ -480,6 +631,8 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                                       else next.push(entry)
                                       return next
                                     })
+                                    setHasDrafts(true)
+                                    setLoading(false)
                                     try {
                                       const sync = await fetch('/api/exclusions', { cache: 'no-store' })
                                       if (sync.ok) {
@@ -502,6 +655,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                         </DialogContent>
                       </Dialog>
                     ) : null}
+                    
                   </div>
                 </TableCell>
                 )}
@@ -514,3 +668,4 @@ export default function RaceResults({ session, exclusions }: { session: Session;
     </div>
   )
 }
+                              

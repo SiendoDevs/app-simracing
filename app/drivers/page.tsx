@@ -18,6 +18,33 @@ export default async function Page() {
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
   const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
+  const publishedRemote = await (async () => {
+    try {
+      const r1 = await fetch('/api/published', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store' })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    return null
+  })()
+  type Pub = { sessionId: string; published: boolean }
+  const isPub = (x: unknown): x is Pub => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { sessionId?: unknown; published?: unknown }
+    return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
+  }
+  const published = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
+  const sessionsPublished = sessions.filter((s) => published.has(s.id))
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
@@ -37,7 +64,13 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const exclusions = exclusionsRemote ?? []
+  type Excl = { driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }
+  const isExcl = (x: unknown): x is Excl => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { driverId?: unknown; sessionId?: unknown; exclude?: unknown; confirmed?: unknown }
+    return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.exclude === 'boolean'
+  }
+  const exclusions = (exclusionsRemote ?? []).filter(isExcl).filter((e) => e.confirmed === true || e.confirmed == null)
   console.log('[drivers/page] exclusions count', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const penaltiesRemote = await (async () => {
     try {
@@ -58,8 +91,14 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  const penalties = penaltiesRemote ?? []
-  const adjusted = sessions
+  type Pen = { driverId: string; sessionId: string; seconds: number; confirmed?: boolean }
+  const isPen = (x: unknown): x is Pen => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { driverId?: unknown; sessionId?: unknown; seconds?: unknown; confirmed?: unknown }
+    return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.seconds === 'number'
+  }
+  const penalties = (penaltiesRemote ?? []).filter(isPen)
+  const adjusted = sessionsPublished
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
     .map((s) => stripExcluded(s, exclusions))

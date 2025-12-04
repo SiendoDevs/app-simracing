@@ -123,6 +123,17 @@ export function parseSession(raw: Record<string, unknown>, sourceFilePath: strin
     }
   }
 
+  const totalByDriver = new Map<string, number>()
+  {
+    const perDriver = new Map<string, number>()
+    for (const l of laps) {
+      if (l.timeMs != null && typeof l.driverId === 'string') {
+        const prev = perDriver.get(l.driverId) ?? 0
+        perDriver.set(l.driverId, prev + (l.timeMs as number))
+      }
+    }
+    for (const [d, ms] of perDriver) totalByDriver.set(d, ms)
+  }
   const resultsRaw: unknown[] = Array.isArray(resultU) ? (resultU as unknown[]) : carEntries
   const results = resultsRaw
     .map((rRaw, idx: number) => {
@@ -158,7 +169,8 @@ export function parseSession(raw: Record<string, unknown>, sourceFilePath: strin
       const skinRaw: string | undefined = typeof skinU === 'string' ? (skinU as string) : undefined
       const positionU = RR['Position'] ?? RR['position']
       const position: number = typeof positionU === 'number' ? (positionU as number) : idx + 1
-      const totalTimeMs = toMs(RR['TotalTime'] ?? RR['totalTime'])
+      const parsedTotal = toMs(RR['TotalTime'] ?? RR['totalTime'])
+      const totalTimeMs = typeof parsedTotal === 'number' ? parsedTotal : (totalByDriver.get(driverId) ?? undefined)
       const bestLapMs = toMs(RR['BestLap'] ?? RR['bestLap'] ?? RR['BestLapTime'] ?? RR['bestLapTime'])
       const lapsCompleted =
         typeof RR['NumLaps'] === 'number' ? (RR['NumLaps'] as number) :

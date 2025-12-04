@@ -4,10 +4,22 @@ import { loadLocalSessions } from "@/lib/loadLocalSessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Home() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
   const sessions = await loadLocalSessions();
+  const user = await currentUser().catch(() => null)
+  const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  const isAdminRaw = !!user && (
+    (user?.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
+    user?.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
+  )
+  const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
+  const isAdmin = isAdminRaw || devBypass
   let playersOnline: number | null = null
   try {
     const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
@@ -44,10 +56,43 @@ export default async function Home() {
     if (m) return `${m[1]}-${m[2]}-${m[3]}`
     return 'Sin-fecha'
   }
+  const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
+    ? `https://${process.env.VERCEL_URL}`
+    : undefined
+  const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
+    ? process.env.NEXT_PUBLIC_BASE_URL
+    : undefined
+  const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
+  const publishedRemote = await (async () => {
+    try {
+      const r1 = await fetch('/api/published', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store' })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    return null
+  })()
+  const isPub = (x: unknown): x is { sessionId: string; published: boolean } => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { sessionId?: unknown; published?: unknown }
+    return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
+  }
+  const publishedSet = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
+  const sessionsForViewer = isAdmin ? sessions : sessions.filter((s) => publishedSet.has(s.id))
   const raceIndexMap = new Map<string, number>()
   {
-    const grouped = new Map<string, typeof sessions>()
-    for (const s of sessions) {
+    const grouped = new Map<string, typeof sessionsForViewer>()
+    for (const s of sessionsForViewer) {
       const k = sessionDateKey(s)
       const arr = grouped.get(k) ?? []
       arr.push(s)
@@ -69,7 +114,7 @@ export default async function Home() {
     { idx: 8, label: 'Zárate 9', extra: 'Especial – 40 vueltas', nuevo: true },
   ]
   const plannedCounts = [3, 3, 3, 2, 3, 3, 2, 2]
-  const relevant = sessions.filter((s) => {
+  const relevant = sessionsForViewer.filter((s) => {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
   })
@@ -86,6 +131,8 @@ export default async function Home() {
     const list = byDate.get(sortedKeys[i]) ?? []
     statusByIdx.set(i + 1, list.length >= plannedCounts[i])
   }
+  const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null
+  const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer
   const formatId = (id: string) => {
     const m = id.match(/^(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})/);
     if (!m) return id;
@@ -241,10 +288,13 @@ export default async function Home() {
         </div>
       </div>
       <ul className="rounded-lg border divide-y">
-        {sessions.length === 0 && (
+        {sessionsRecent.length === 0 && (
           <li className="p-4 text-sm text-muted-foreground">No se encontraron archivos JSON de sesiones.</li>
         )}
-        {sessions.map((s) => (
+        {sessionsRecent
+          .slice()
+          .sort((a, b) => b.id.localeCompare(a.id))
+          .map((s) => (
           <li key={s.id} className="p-3 flex items-center justify-between">
             <div className="space-y-0.5">
               <div className="flex flex-wrap items-center gap-3">
@@ -263,7 +313,7 @@ export default async function Home() {
                 <span className="font-medium text-sm">{niceTrack(s.track) }</span>
                 <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
                   <Users className="h-3 w-3" />
-                  {s.drivers.length}
+                  {s.results.length}
                 </span>
                 <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
                   <CalendarDays className="h-3 w-3" />

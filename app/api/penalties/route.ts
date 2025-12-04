@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       } catch {}
     }
     if (!isAllowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-    const body = await req.json().catch(() => null) as { driverId?: string; sessionId?: string; seconds?: number } | null
+    const body = await req.json().catch(() => null) as { driverId?: string; sessionId?: string; seconds?: number; confirmed?: boolean } | null
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, seconds } = body
     if (!driverId || !sessionId || typeof seconds !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
@@ -101,10 +101,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'qualify_penalties_not_allowed' }, { status: 400 })
       }
     } catch {}
-    let list: Array<{ driverId: string; sessionId: string; seconds: number }>
+    let list: Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>
     if (kvConfigured()) {
       const curr = await kv.get('penalties')
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>) : []
     } else {
       const redis = createRedis()
       let curr: unknown = null
@@ -117,14 +117,22 @@ export async function POST(req: Request) {
           if (typeof s === 'string') curr = JSON.parse(s)
         } catch {}
       }
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number }>) : []
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>) : []
     }
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
-    if (seconds <= 0) {
-      if (idx >= 0) list.splice(idx, 1)
+    const confirmed = body.confirmed === true
+    const secs: number = seconds as number
+    if (secs <= 0) {
+      if (confirmed) {
+        if (idx >= 0) list.splice(idx, 1)
+      } else {
+        if (idx >= 0) list[idx] = { driverId, sessionId, seconds: 0, confirmed: false }
+        else list.push({ driverId, sessionId, seconds: 0, confirmed: false })
+      }
     } else {
-      if (idx >= 0) list[idx] = { driverId, sessionId, seconds }
-      else list.push({ driverId, sessionId, seconds })
+      if (idx >= 0) list[idx] = { driverId, sessionId, seconds: secs, confirmed }
+      else list.push({ driverId, sessionId, seconds: secs, confirmed })
+    
     }
     if (kvConfigured()) {
       await kv.set('penalties', list)

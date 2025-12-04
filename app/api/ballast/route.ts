@@ -133,14 +133,14 @@ export async function POST(req: Request) {
       } catch {}
     }
     if (!isAllowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-    const body = await req.json().catch(() => null) as { driverId?: string; sessionId?: string; kg?: number } | null
+    const body = await req.json().catch(() => null) as { driverId?: string; sessionId?: string; kg?: number; confirmed?: boolean } | null
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, kg } = body
     if (!driverId || !sessionId || typeof kg !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
-    let list: Array<{ driverId: string; sessionId: string; kg: number }>
+    let list: Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>
     if (kvConfigured()) {
       const curr = await kv.get('ballast')
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number }>) : []
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>) : []
     } else {
       const redis = createRedis()
       let curr: unknown = null
@@ -153,14 +153,22 @@ export async function POST(req: Request) {
           if (typeof s === 'string') curr = JSON.parse(s)
         } catch {}
       }
-      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number }>) : []
+      list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>) : []
     }
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
-    if (kg <= 0) {
-      if (idx >= 0) list.splice(idx, 1)
+    const confirmed = body.confirmed === true
+    const weight: number = kg as number
+    if (weight <= 0) {
+      if (confirmed) {
+        if (idx >= 0) list.splice(idx, 1)
+      } else {
+        if (idx >= 0) list[idx] = { driverId, sessionId, kg: 0, confirmed: false }
+        else list.push({ driverId, sessionId, kg: 0, confirmed: false })
+      }
     } else {
-      if (idx >= 0) list[idx] = { driverId, sessionId, kg }
-      else list.push({ driverId, sessionId, kg })
+      if (idx >= 0) list[idx] = { driverId, sessionId, kg: weight, confirmed }
+      else list.push({ driverId, sessionId, kg: weight, confirmed })
+    
     }
     if (kvConfigured()) {
       await kv.set('ballast', list)

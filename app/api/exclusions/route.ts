@@ -84,6 +84,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'driverId y sessionId requeridos' }, { status: 400 })
     }
     const exclude = !!body.exclude
+    const confirmed = body.confirmed === true
     try {
       const sessions = await loadLocalSessions()
       const target = sessions.find((s) => s.id === body.sessionId)
@@ -103,10 +104,10 @@ export async function POST(req: Request) {
           if (typeof s === 'string') curr = JSON.parse(s)
         } catch {}
       }
-      const list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; exclude: boolean }>) : []
+      const list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }>) : []
       const idx = list.findIndex((x) => x.driverId === body.driverId && x.sessionId === body.sessionId)
-      if (idx >= 0) list[idx] = { driverId: body.driverId, sessionId: body.sessionId, exclude }
-      else list.push({ driverId: body.driverId, sessionId: body.sessionId, exclude })
+      if (idx >= 0) list[idx] = { driverId: body.driverId, sessionId: body.sessionId, exclude, confirmed }
+      else list.push({ driverId: body.driverId, sessionId: body.sessionId, exclude, confirmed })
       let writeOk = false
       let lastError: unknown = null
       try {
