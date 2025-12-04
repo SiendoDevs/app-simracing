@@ -12,16 +12,17 @@ export const revalidate = 0
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
+  const fromHeaders = await (async () => { try { const h = await (await import('next/headers')).headers(); const host = h.get('x-forwarded-host') || h.get('host') || ''; const proto = h.get('x-forwarded-proto') || 'https'; return host ? `${proto}://${host}` : null } catch { return null } })()
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
     ? `https://${process.env.VERCEL_URL}`
     : undefined
   const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
-  const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
+  const origin = fromVercel ?? fromEnv ?? fromHeaders ?? 'http://localhost:3000'
   const publishedRemote = await (async () => {
     try {
-      const r1 = await fetch('/api/published', { cache: 'no-store' })
+      const r1 = await fetch('/api/published', { cache: 'no-store', next: { revalidate: 0 } })
       if (r1.ok) {
         const j = await r1.json()
         if (Array.isArray(j)) return j
@@ -29,7 +30,7 @@ export default async function Page() {
       }
     } catch {}
     try {
-      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store' })
+      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store', next: { revalidate: 0 } })
       if (r2.ok) {
         const j = await r2.json()
         if (Array.isArray(j)) return j
@@ -53,7 +54,7 @@ export default async function Page() {
   const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
   const exclusionsRemote = await (async () => {
     try {
-      const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
+      const res1 = await fetch('/api/exclusions', { cache: 'no-store', next: { revalidate: 0 } })
       if (res1.ok) {
         const j = await res1.json()
         if (Array.isArray(j)) return j
@@ -61,7 +62,7 @@ export default async function Page() {
       }
     } catch {}
     try {
-      const res2 = await fetch(`${origin}/api/exclusions`, { cache: 'no-store' })
+      const res2 = await fetch(`${origin}/api/exclusions`, { cache: 'no-store', next: { revalidate: 0 } })
       if (res2.ok) {
         const j = await res2.json()
         if (Array.isArray(j)) return j
@@ -80,7 +81,7 @@ export default async function Page() {
   console.log('[drivers/page] exclusions count', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const penaltiesRemote = await (async () => {
     try {
-      const r1 = await fetch('/api/penalties', { cache: 'no-store' })
+      const r1 = await fetch('/api/penalties', { cache: 'no-store', next: { revalidate: 0 } })
       if (r1.ok) {
         const j = await r1.json()
         if (Array.isArray(j)) return j
@@ -88,7 +89,7 @@ export default async function Page() {
       }
     } catch {}
     try {
-      const r2 = await fetch(`${origin}/api/penalties`, { cache: 'no-store' })
+      const r2 = await fetch(`${origin}/api/penalties`, { cache: 'no-store', next: { revalidate: 0 } })
       if (r2.ok) {
         const j = await r2.json()
         if (Array.isArray(j)) return j

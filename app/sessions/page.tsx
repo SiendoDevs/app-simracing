@@ -8,6 +8,7 @@ import PublishSessionButton from '@/components/PublishSessionButton'
 import SessionsToolbar from '@/components/SessionsToolbar'
 import { CalendarDays, Eye, Users } from 'lucide-react'
 import path from 'node:path'
+import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,10 +32,11 @@ export default async function Page() {
   const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
-  const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
+  const fromHeaders = await (async () => { try { const h = await headers(); const host = h.get('x-forwarded-host') || h.get('host') || ''; const proto = h.get('x-forwarded-proto') || 'https'; return host ? `${proto}://${host}` : null } catch { return null } })()
+  const origin = fromVercel ?? fromEnv ?? fromHeaders ?? 'http://localhost:3000'
   const publishedRemote = await (async () => {
     try {
-      const r1 = await fetch('/api/published', { cache: 'no-store' })
+      const r1 = await fetch('/api/published', { cache: 'no-store', next: { revalidate: 0 } })
       if (r1.ok) {
         const j = await r1.json()
         if (Array.isArray(j)) return j
@@ -42,7 +44,7 @@ export default async function Page() {
       }
     } catch {}
     try {
-      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store' })
+      const r2 = await fetch(`${origin}/api/published`, { cache: 'no-store', next: { revalidate: 0 } })
       if (r2.ok) {
         const j = await r2.json()
         if (Array.isArray(j)) return j
