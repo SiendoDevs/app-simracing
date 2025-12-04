@@ -51,17 +51,13 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  type Pub = { sessionId: string; published: boolean; date?: string }
-  const isPub = (x: unknown): x is Pub => {
-    if (!x || typeof x !== 'object') return false
-    const o = x as { sessionId?: unknown; published?: unknown; date?: unknown }
-    return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
-  }
-  const publishedList = (publishedRemote ?? []).filter(isPub)
-  const hasPublishConfig = publishedList.length > 0
-  const publishedSet = new Set(publishedList.filter((p) => p.published === true).map((p) => p.sessionId))
+  const pubRaw = publishedRemote ?? []
+  const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
+  const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
+  const hasPublishConfig = pubEntries.length > 0
+  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => (p as { sessionId: string }).sessionId))
   const publishedDateById = new Map<string, number>()
-  for (const p of publishedList) {
+  for (const p of pubEntries) {
     if (typeof p.date === 'string') {
       const d = new Date(p.date)
       if (!isNaN(d.getTime())) publishedDateById.set(p.sessionId, d.getTime())

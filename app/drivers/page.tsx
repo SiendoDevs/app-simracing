@@ -38,15 +38,11 @@ export default async function Page() {
     } catch {}
     return null
   })()
-  type Pub = { sessionId: string; published: boolean }
-  const isPub = (x: unknown): x is Pub => {
-    if (!x || typeof x !== 'object') return false
-    const o = x as { sessionId?: unknown; published?: unknown }
-    return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
-  }
-  const pubList = (publishedRemote ?? []).filter(isPub)
-  const hasPublishConfig = pubList.length > 0
-  const published = new Set(pubList.filter((p) => p.published === true).map((p) => p.sessionId))
+  const pubRaw = publishedRemote ?? []
+  const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
+  const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
+  const hasPublishConfig = pubEntries.length > 0
+  const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => (p as { sessionId: string }).sessionId))
   const user = await currentUser().catch(() => null)
   const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
