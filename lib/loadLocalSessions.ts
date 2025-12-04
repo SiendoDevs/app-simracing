@@ -2,6 +2,13 @@ import type { Session } from '@/types/Session'
 
 async function loadRemoteSessions(): Promise<Session[] | null> {
   try {
+    const r1 = await fetch('/api/sessions', { cache: 'no-store' }).catch(() => null)
+    if (r1 && r1.ok) {
+      const data = await r1.json()
+      if (Array.isArray(data)) return data as Session[]
+    }
+  } catch {}
+  try {
     const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
       ? process.env.NEXT_PUBLIC_BASE_URL
       : undefined
@@ -9,10 +16,11 @@ async function loadRemoteSessions(): Promise<Session[] | null> {
       ? `https://${process.env.VERCEL_URL}`
       : undefined
     const origin = fromEnv ?? fromVercel ?? 'http://localhost:3000'
-    const res = await fetch(`${origin}/api/sessions`, { cache: 'no-store' })
-    if (!res.ok) return null
-    const data = await res.json()
-    if (Array.isArray(data)) return data as Session[]
+    const r2 = await fetch(`${origin}/api/sessions`, { cache: 'no-store' }).catch(() => null)
+    if (r2 && r2.ok) {
+      const data = await r2.json()
+      if (Array.isArray(data)) return data as Session[]
+    }
   } catch {}
   return null
 }
