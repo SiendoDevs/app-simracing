@@ -42,8 +42,15 @@ export default async function Page() {
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
-  const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
-  const sessionsPublished = sessions.filter((s) => published.has(s.id))
+  const canonicalId = (s: string) => {
+    const n = normalizeId(s)
+    const m = n.match(/^([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{1,2})_([0-9]{1,2})_(.+)$/)
+    if (!m) return n
+    const [, y, mo, d, h, mi, t] = m
+    return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
+  }
+  const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
+  const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })

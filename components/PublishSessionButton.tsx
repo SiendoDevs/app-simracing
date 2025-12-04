@@ -29,7 +29,14 @@ export default function PublishSessionButton({ id }: { id: string }) {
         const arr = r.ok ? await r.json() : []
         const list: Array<{ sessionId?: string; published?: boolean }> = Array.isArray(arr) ? arr : []
         const norm = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
-        const found = list.find((x) => x && typeof x.sessionId === 'string' && norm(x.sessionId) === id)
+        const canon = (s: string) => {
+          const n = norm(s)
+          const m = n.match(/^([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{1,2})_([0-9]{1,2})_(.+)$/)
+          if (!m) return n
+          const [, y, mo, d, h, mi, t] = m
+          return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
+        }
+        const found = list.find((x) => x && typeof x.sessionId === 'string' && canon(x.sessionId) === canon(id))
         if (active) setPublished(found?.published === true ? true : false)
       } catch {
         if (active) setPublished(false)

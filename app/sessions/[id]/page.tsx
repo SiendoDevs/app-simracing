@@ -60,9 +60,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const hasPublishConfig = pubEntries.length > 0
-  const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
-  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
-  const isPublished = publishedSet.has(normalizedId)
+  const normalizeId2 = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
+  const canonicalId2 = (s: string) => {
+    const n = normalizeId2(s)
+    const m = n.match(/^([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{1,2})_([0-9]{1,2})_(.+)$/)
+    if (!m) return n
+    const [, y, mo, d, h, mi, t] = m
+    return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
+  }
+  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId2((p as { sessionId: string }).sessionId)))
+  const isPublished = publishedSet.has(canonicalId2(normalizedId))
   if (hasPublishConfig && !isPublished && !isAdmin) {
     return (
       <div className="p-6 space-y-2">

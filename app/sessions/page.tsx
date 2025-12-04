@@ -55,13 +55,20 @@ export default async function Page() {
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
-  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => normalizeId((p as { sessionId: string }).sessionId)))
+  const canonicalId = (s: string) => {
+    const n = normalizeId(s)
+    const m = n.match(/^([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{1,2})_([0-9]{1,2})_(.+)$/)
+    if (!m) return n
+    const [, y, mo, d, h, mi, t] = m
+    return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
+  }
+  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
   const hasPublishConfig = publishedSet.size > 0
   const publishedDateById = new Map<string, number>()
   for (const p of pubEntries) {
     if (typeof p.date === 'string') {
       const d = new Date(p.date)
-      if (!isNaN(d.getTime())) publishedDateById.set(normalizeId(p.sessionId), d.getTime())
+      if (!isNaN(d.getTime())) publishedDateById.set(canonicalId(p.sessionId), d.getTime())
     }
   }
   const countById = new Map<string, number>()
@@ -133,7 +140,7 @@ export default async function Page() {
     }
     return words.map(map).join(' ')
   }
-  const sessionsForViewer = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => publishedSet.has(s.id)) : sessions)
+  const sessionsForViewer = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => publishedSet.has(canonicalId(s.id))) : sessions)
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -162,7 +169,7 @@ export default async function Page() {
         })
         return order.map((key) => {
           const list = grouped.get(key) ?? []
-          const forViewer = isAdmin ? list : (hasPublishConfig ? list.filter((s) => publishedSet.has(s.id)) : list)
+          const forViewer = isAdmin ? list : (hasPublishConfig ? list.filter((s) => publishedSet.has(canonicalId(s.id))) : list)
           if (forViewer.length === 0) return null
           const races = list.filter((x) => x.type.toUpperCase() === 'RACE').sort((a, b) => a.id.localeCompare(b.id))
           const raceIndexMap = new Map<string, number>()
@@ -174,8 +181,8 @@ export default async function Page() {
                 {forViewer
                   .slice()
                   .sort((a, b) => {
-                    const pa = publishedSet.has(a.id) ? 1 : 0
-                    const pb = publishedSet.has(b.id) ? 1 : 0
+                    const pa = publishedSet.has(canonicalId(a.id)) ? 1 : 0
+                    const pb = publishedSet.has(canonicalId(b.id)) ? 1 : 0
                     if (pa !== pb) return pb - pa
                     return b.id.localeCompare(a.id)
                   })
