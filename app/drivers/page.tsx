@@ -6,6 +6,7 @@ import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
 import { currentUser } from '@clerk/nextjs/server'
+import { Redis } from '@upstash/redis'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -34,6 +35,34 @@ export default async function Page() {
         const j = await r2.json()
         if (Array.isArray(j)) return j
         if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const candidates = [
+        process.env.UPSTASH_REDIS_REST_URL,
+        process.env.UPSTASH_REDIS_REST_REDIS_URL,
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+        process.env.UPSTASH_REDIS_REST_KV_URL,
+        process.env.UPSTASH_REDIS_URL,
+      ].filter(Boolean) as string[]
+      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+      const token = (
+        process.env.UPSTASH_REDIS_REST_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+        process.env.UPSTASH_REDIS_TOKEN ||
+        ''
+      )
+      if (url && token) {
+        const redis = new Redis({ url, token })
+        let curr: unknown = null
+        try { curr = await redis.json.get('published') } catch {}
+        if (!Array.isArray(curr)) {
+          try { const s = await redis.get('published'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
+        }
+        if (Array.isArray(curr)) return curr as unknown[]
+        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>)
       }
     } catch {}
     return null
