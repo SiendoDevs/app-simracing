@@ -58,6 +58,7 @@ export default async function Page() {
     return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
   }
   const publishedList = (publishedRemote ?? []).filter(isPub)
+  const hasPublishConfig = publishedList.length > 0
   const publishedSet = new Set(publishedList.filter((p) => p.published === true).map((p) => p.sessionId))
   const publishedDateById = new Map<string, number>()
   for (const p of publishedList) {
@@ -135,7 +136,7 @@ export default async function Page() {
     }
     return words.map(map).join(' ')
   }
-  const sessionsForViewer = isAdmin ? sessions : sessions.filter((s) => publishedSet.has(s.id))
+  const sessionsForViewer = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => publishedSet.has(s.id)) : sessions)
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -164,7 +165,7 @@ export default async function Page() {
         })
         return order.map((key) => {
           const list = grouped.get(key) ?? []
-          const forViewer = isAdmin ? list : list.filter((s) => publishedSet.has(s.id))
+          const forViewer = isAdmin ? list : (hasPublishConfig ? list.filter((s) => publishedSet.has(s.id)) : list)
           if (forViewer.length === 0) return null
           const races = list.filter((x) => x.type.toUpperCase() === 'RACE').sort((a, b) => a.id.localeCompare(b.id))
           const raceIndexMap = new Map<string, number>()

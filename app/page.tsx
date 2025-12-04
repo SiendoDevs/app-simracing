@@ -87,8 +87,10 @@ export default async function Home() {
     const o = x as { sessionId?: unknown; published?: unknown }
     return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
   }
-  const publishedSet = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
-  const sessionsForViewer = isAdmin ? sessions : sessions.filter((s) => publishedSet.has(s.id))
+  const pubList = (publishedRemote ?? []).filter(isPub)
+  const hasPublishConfig = pubList.length > 0
+  const publishedSet = new Set(pubList.filter((p) => p.published === true).map((p) => p.sessionId))
+  const sessionsForViewer = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => publishedSet.has(s.id)) : sessions)
   const raceIndexMap = new Map<string, number>()
   {
     const grouped = new Map<string, typeof sessionsForViewer>()

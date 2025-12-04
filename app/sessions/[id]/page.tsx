@@ -60,9 +60,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const o = x as { sessionId?: unknown; published?: unknown }
     return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
   }
-  const publishedSet = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
+  const pubList = (publishedRemote ?? []).filter(isPub)
+  const hasPublishConfig = pubList.length > 0
+  const publishedSet = new Set(pubList.filter((p) => p.published === true).map((p) => p.sessionId))
   const isPublished = publishedSet.has(id)
-  if (!isPublished && !isAdmin) {
+  if (hasPublishConfig && !isPublished && !isAdmin) {
     return (
       <div className="p-6 space-y-2">
         <div className="text-sm text-muted-foreground">Sesión no publicada</div>

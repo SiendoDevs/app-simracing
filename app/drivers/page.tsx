@@ -44,7 +44,9 @@ export default async function Page() {
     const o = x as { sessionId?: unknown; published?: unknown }
     return typeof o.sessionId === 'string' && typeof o.published === 'boolean'
   }
-  const published = new Set((publishedRemote ?? []).filter(isPub).filter((p) => p.published === true).map((p) => p.sessionId))
+  const pubList = (publishedRemote ?? []).filter(isPub)
+  const hasPublishConfig = pubList.length > 0
+  const published = new Set(pubList.filter((p) => p.published === true).map((p) => p.sessionId))
   const user = await currentUser().catch(() => null)
   const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
@@ -54,7 +56,7 @@ export default async function Page() {
   )
   const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
   const isAdmin = isAdminRaw || devBypass
-  const sessionsPublished = isAdmin ? sessions : sessions.filter((s) => published.has(s.id))
+  const sessionsPublished = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => published.has(s.id)) : sessions)
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
