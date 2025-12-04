@@ -1,29 +1,56 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
-import { list, put } from '@vercel/blob'
-// no local fallback
 import { parseSession } from '@/lib/parseSession'
 import path from 'node:path'
-// import fs from 'node:fs'
+import { Redis } from '@upstash/redis'
 
 export const runtime = 'nodejs'
 
+function resolveUpstashEnv() {
+  const candidates = [
+    process.env.UPSTASH_REDIS_REST_URL,
+    process.env.UPSTASH_REDIS_REST_REDIS_URL,
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    process.env.UPSTASH_REDIS_REST_KV_URL,
+    process.env.UPSTASH_REDIS_URL,
+  ].filter(Boolean) as string[]
+  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+  const token = (
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+    process.env.UPSTASH_REDIS_TOKEN ||
+    ''
+  )
+  return { url, token }
+}
+
+function createRedis() {
+  const { url, token } = resolveUpstashEnv()
+  if (url && token) return new Redis({ url, token })
+  return Redis.fromEnv()
+}
+
 export async function GET() {
   try {
-    const token = process.env.BLOB_READ_WRITE_TOKEN
-    if (!token) {
-      return NextResponse.json([])
-    }
-    const res = await list({ prefix: 'sessions/' })
-    const files = res.blobs || []
-    const sessions = [] as ReturnType<typeof parseSession>[]
-    for (const f of files) {
-      try {
-        const j = await fetch(f.url, { cache: 'no-store' }).then((r) => r.json())
-        const s = parseSession(j as Record<string, unknown>, f.pathname)
-        sessions.push(s)
-      } catch {}
-    }
+    const sessions: ReturnType<typeof parseSession>[] = []
+    try {
+      const redis = createRedis()
+      let curr: unknown = null
+      try { curr = await redis.json.get('sessions') } catch {}
+      if (!Array.isArray(curr)) {
+        try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
+      }
+      const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
+      for (const R of listU) {
+        const fp = typeof (R as Record<string, unknown>).sourceFilePath === 'string' ? ((R as Record<string, unknown>).sourceFilePath as string) : 'upstash:session.json'
+        try {
+          const s = parseSession(R as Record<string, unknown>, fp)
+          sessions.push(s)
+        } catch {}
+      }
+    } catch {}
     sessions.sort((a, b) => a.id.localeCompare(b.id))
     return NextResponse.json(sessions)
   } catch (e) {
@@ -57,21 +84,34 @@ export async function POST(req: Request) {
     if (!isAllowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const body = await req.json().catch(() => null) as Record<string, unknown> | null
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
-    const token = process.env.BLOB_READ_WRITE_TOKEN
     const headerName = (req.headers.get('x-filename') || '').trim()
     const baseNameRaw = headerName ? path.basename(headerName) : 'session.json'
     const baseName = baseNameRaw.toLowerCase().endsWith('.json') ? baseNameRaw : `${baseNameRaw}.json`
-    if (token) {
-      const key = `sessions/${baseName}`
-      try {
-        const existing = await list({ prefix: 'sessions/' })
-        const found = (existing.blobs || []).some((b) => b.pathname === key)
-        if (found) return NextResponse.json({ error: 'duplicate', detail: baseName }, { status: 409 })
-      } catch {}
-      const blob = await put(key, JSON.stringify(body, null, 2), { access: 'public' })
-      return NextResponse.json({ ok: true, url: blob.url, pathname: blob.pathname })
+    try {
+      const redis = createRedis()
+      const rawWithPath = { ...(body as Record<string, unknown>), sourceFilePath: `upstash:${baseName}` }
+      let curr: unknown = null
+      try { curr = await redis.json.get('sessions') } catch {}
+      if (!Array.isArray(curr)) {
+        try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
+      }
+      const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
+      const idNew = parseSession(rawWithPath as Record<string, unknown>, `upstash:${baseName}`).id
+      const exists = listU.some((x) => {
+        const raw = x as Record<string, unknown>
+        const fp = typeof raw.sourceFilePath === 'string' ? (raw.sourceFilePath as string) : 'upstash:session.json'
+        const sid = parseSession(raw, fp).id
+        return sid === idNew
+      })
+      if (exists) return NextResponse.json({ error: 'duplicate', detail: idNew }, { status: 409 })
+      const next = [...listU, rawWithPath]
+      try { await redis.json.set('sessions', '$', next) } catch {
+        await redis.set('sessions', JSON.stringify(next))
+      }
+      return NextResponse.json({ ok: true, pathname: `upstash:${baseName}` })
+    } catch (e) {
+      return NextResponse.json({ error: 'kv_write_failed', detail: String(e) }, { status: 500 })
     }
-    return NextResponse.json({ error: 'blob_not_configured' }, { status: 500 })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
   }

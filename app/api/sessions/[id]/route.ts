@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import fs from 'node:fs'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
+import { parseSession } from '@/lib/parseSession'
 import { del } from '@vercel/blob'
 import { Redis } from '@upstash/redis'
 
@@ -122,7 +123,32 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const filePath = target.sourceFilePath
     try {
       const hasBlob = !!process.env.BLOB_READ_WRITE_TOKEN
-      if (hasBlob) {
+      if (filePath && filePath.startsWith('upstash:')) {
+        try {
+          const redis = createRedis()
+          let curr: unknown = null
+          try { curr = await redis.json.get('sessions') } catch {}
+          if (!Array.isArray(curr)) {
+            try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
+          }
+          const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
+          const kept = listU.filter((x) => {
+            const raw = x as Record<string, unknown>
+            const fp = typeof raw.sourceFilePath === 'string' ? (raw.sourceFilePath as string) : 'upstash:session.json'
+            try {
+              const s = parseSession(raw, fp)
+              return s.id !== id
+            } catch {
+              return true
+            }
+          })
+          try { await redis.json.set('sessions', '$', kept) } catch {
+            await redis.set('sessions', JSON.stringify(kept))
+          }
+        } catch (e) {
+          return NextResponse.json({ error: 'kv_unlink_failed', detail: String(e) }, { status: 500 })
+        }
+      } else if (hasBlob) {
         await del(filePath)
       } else if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)

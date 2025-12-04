@@ -34,9 +34,12 @@ export default function UploadSessionsDialog({ existing }: { existing: string[] 
           setErrorMsg(`El archivo "${f.name}" no es JSON válido.`)
           throw new Error('invalid_json')
         }
+        const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN
+        const headers: Record<string, string> = { 'Content-Type': 'application/json', 'x-filename': f.name }
+        if (adminToken) headers['x-admin-token'] = adminToken
         const res = await fetch('/api/sessions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-filename': f.name },
+          headers,
           body: JSON.stringify(json),
         })
         if (!res.ok) {
