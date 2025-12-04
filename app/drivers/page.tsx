@@ -5,7 +5,7 @@ import DriverCompare from '@/components/DriverCompare'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
-import { currentUser } from '@clerk/nextjs/server'
+ 
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -43,15 +43,6 @@ export default async function Page() {
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const hasPublishConfig = pubEntries.length > 0
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => (p as { sessionId: string }).sessionId))
-  const user = await currentUser().catch(() => null)
-  const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
-    .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
-  const isAdminRaw = !!user && (
-    (user?.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
-    user?.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
-  )
-  const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
-  const isAdmin = isAdminRaw || devBypass
   const sessionsPublished = hasPublishConfig ? sessions.filter((s) => published.has(s.id)) : sessions
   const exclusionsRemote = await (async () => {
     try {
