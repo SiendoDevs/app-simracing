@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { currentUser } from '@clerk/nextjs/server'
 // removed server-side admin gating; client toolbar handles admin visibility
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { Badge } from '@/components/ui/badge'
@@ -16,17 +15,7 @@ export const dynamic = 'force-dynamic'
 export default async function Page() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
   const sessions = await loadLocalSessions()
-  const user = await currentUser().catch(() => null)
-  const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean)
-  const isAdminRaw = !!user && (
-    (user.publicMetadata as Record<string, unknown>)?.role === 'admin' ||
-    user.emailAddresses?.some((e) => adminEmails.includes(e.emailAddress.toLowerCase()))
-  )
-  const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
-  const isAdmin = isAdminRaw || devBypass
+  
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
     ? `https://${process.env.VERCEL_URL}`
     : undefined
@@ -94,7 +83,7 @@ export default async function Page() {
     return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
   }
   const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
-  const hasPublishConfig = publishedSet.size > 0
+  
   const publishedDateById = new Map<string, number>()
   for (const p of pubEntries) {
     if (typeof p.date === 'string') {
@@ -171,7 +160,7 @@ export default async function Page() {
     }
     return words.map(map).join(' ')
   }
-  const sessionsForViewer = isAdmin ? sessions : (hasPublishConfig ? sessions.filter((s) => publishedSet.has(canonicalId(s.id))) : sessions)
+  const sessionsForViewer = sessions
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -200,7 +189,7 @@ export default async function Page() {
         })
         return order.map((key) => {
           const list = grouped.get(key) ?? []
-          const forViewer = isAdmin ? list : (hasPublishConfig ? list.filter((s) => publishedSet.has(canonicalId(s.id))) : list)
+          const forViewer = list
           if (forViewer.length === 0) return null
           const races = list.filter((x) => x.type.toUpperCase() === 'RACE').sort((a, b) => a.id.localeCompare(b.id))
           const raceIndexMap = new Map<string, number>()
