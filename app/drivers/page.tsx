@@ -43,6 +43,7 @@ export default async function Page() {
   const pubRaw = publishedRemote ?? []
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
   try { console.log('[drivers/page] published entries', Array.isArray(pubRaw) ? pubRaw.length : (pubRaw ? Object.keys(pubRaw as Record<string, unknown>).length : 0)) } catch {}
+  try { console.log('[drivers/page] published sample', pubEntries.slice(0, 3)) } catch {}
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
   const canonicalId = (s: string) => {
@@ -55,6 +56,7 @@ export default async function Page() {
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
   const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
   try { console.log('[drivers/page] sessionsPublished count', sessionsPublished.length, sessionsPublished.slice(0, 3).map((s) => s.id)) } catch {}
+  try { console.log('[drivers/page] publishedSet values', Array.from(published).slice(0, 5)) } catch {}
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store', next: { revalidate: 0 } })
