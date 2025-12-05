@@ -9,6 +9,7 @@ import SessionsToolbar from '@/components/SessionsToolbar'
 import { CalendarDays, Eye, Users } from 'lucide-react'
 import path from 'node:path'
 import { headers } from 'next/headers'
+import { Redis } from '@upstash/redis'
 
 export const dynamic = 'force-dynamic'
 

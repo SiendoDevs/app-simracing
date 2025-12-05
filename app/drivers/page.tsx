@@ -1,4 +1,5 @@
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
+import { Redis } from '@upstash/redis'
 import { calculateChampionship } from '@/lib/calculatePoints'
 import DriversTable from '@/components/DriversTable'
 import DriverCompare from '@/components/DriverCompare'
