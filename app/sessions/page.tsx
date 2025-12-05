@@ -214,7 +214,7 @@ export default async function Page() {
                           {' • '}
                           <span className="font-medium text-xs md:text-sm">{niceTrack(s.track)}</span>
                         </span>
-                        {publishedSet.has(s.id) ? (
+                        {publishedSet.has(canonicalId(s.id)) ? (
                           <Badge className="text-xs px-2 py-0.5 bg-[#2b855d] text-white" variant="default">Resultado oficial</Badge>
                         ) : (
                           <Badge className="text-xs px-2 py-0.5" variant="outline">Resultado provisorio</Badge>
