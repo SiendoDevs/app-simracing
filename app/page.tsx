@@ -185,7 +185,7 @@ export default async function Home() {
       
       <section className="relative rounded-xl overflow-hidden border">
         <div className="h-56 md:h-72 bg-cover bg-center" style={{ backgroundImage: 'url(/assets/fondo-inicio-2.jpg)' }} />
-        <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-background/50 to-transparent" />
         <Image
           src="/assets/Assetto_Corsa_Logo.png"
           alt="Assetto Corsa"
@@ -201,7 +201,7 @@ export default async function Home() {
         ) : null}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <h1 className="text-2xl md:text-4xl font-bold">Liga de Karting | Asseto Corsa</h1>
-          <p className="mt-3 mb-3 text-md md:text-base">Noticias, resultados, sesiones y campeonatos.</p>
+          <p className="mt-3 mb-3 text-lg md:text-md font-medium">Noticias, resultados, sesiones y campeonatos.</p>
           <div className="mt-4 flex gap-2">
             <Button className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" asChild>
               <Link href="https://siendostudio.com/timing" target="_blank" rel="noopener noreferrer">

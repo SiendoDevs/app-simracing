@@ -24,6 +24,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
   title: "ZN Kart SimRacing | 2026",
   description: "Resultados y campeonatos",

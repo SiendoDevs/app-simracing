@@ -37,12 +37,18 @@ export default function ChampionshipTable({ data }: { data: ChampionshipRow[] })
               className={`${idx === 0 ? 'bg-[#d8552b]/20 hover:bg-transparent' : idx === 1 ? 'bg-[#d8552b]/12 hover:bg-transparent' : idx === 2 ? 'bg-[#d8552b]/6 hover:bg-transparent' : ''}` }
             >
               <TableCell>
-                <span className="inline-flex items-center justify-center w-20 h-8 rounded-md bg-[#d8552b] text-white font-bold text-lg">
+                <span className={`inline-flex items-center justify-center w-20 h-9 md:w-24 md:h-10 rounded-md ${idx === 0 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e]' : 'bg-[#d8552b]'} text-white font-extrabold italic text-xl md:text-2xl`}>
                   {idx + 1}
                 </span>
               </TableCell>
               <TableCell>
-                <span className="font-bold text-base">{d.name}</span>
+                <span
+                  className={`font-extrabold text-xl md:text-2xl uppercase italic ${
+                    idx === 0 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e] bg-clip-text text-transparent drop-shadow-sm' : ''
+                  }`}
+                >
+                  {d.name}
+                </span>
               </TableCell>
               <TableCell>
                 <span className="text-sm text-[#9ca3af]">{d.team ?? '-'}</span>
@@ -52,7 +58,7 @@ export default function ChampionshipTable({ data }: { data: ChampionshipRow[] })
               </TableCell>
               <TableCell>
                 <span
-                  className={`inline-flex items-center justify-center rounded-full border font-bold w-12 h-9 text-base ${
+                  className={`inline-flex items-center justify-center rounded-full border font-extrabold w-14 h-11 text-lg ${
                     d.points > 0 ? 'border-[#d8552b] text-[#d8552b]' : 'border-[#9ca3af] text-[#9ca3af]'
                   }`}
                 >

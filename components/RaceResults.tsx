@@ -337,12 +337,18 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                 className={`${r.position === 1 ? 'bg-[#d8552b]/20 hover:bg-transparent' : r.position === 2 ? 'bg-[#d8552b]/12 hover:bg-transparent' : r.position === 3 ? 'bg-[#d8552b]/6 hover:bg-transparent' : ''} ${(isExcluded || r.dnf) ? 'opacity-60' : ''}` }
               >
                 <TableCell>
-                  <span className="inline-flex items-center justify-center w-16 h-7 md:w-20 md:h-8 rounded-md bg-[#d8552b] text-white font-bold text-sm md:text-lg">
+                  <span className={`inline-flex items-center justify-center w-20 h-9 md:w-24 md:h-10 rounded-md ${r.position === 1 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e]' : 'bg-[#d8552b]'} text-white font-extrabold italic text-xl md:text-2xl`}>
                     {r.position}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-base md:text-lg">{d?.name ?? r.driverId}</span>
+                  <span
+                    className={`font-extrabold text-xl md:text-2xl uppercase italic ${
+                      r.position === 1 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e] bg-clip-text text-transparent drop-shadow-sm' : ''
+                    }`}
+                  >
+                    {d?.name ?? r.driverId}
+                  </span>
                   {r.dnf ? <span className="ml-2 text-xs px-2 py-0.5 rounded-full border text-[#9ca3af] border-[#9ca3af]">DNF</span> : null}
                   {isExcluded ? <span className="ml-2 text-xs px-2 py-0.5 rounded-full border text-[#9ca3af] border-[#9ca3af]">Excluido</span> : null}
                 </TableCell>
@@ -401,7 +407,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                     const val = (isExcluded || r.dnf) ? 0 : (r.points ?? 0)
                     const positive = val > 0
                     return (
-                      <span className={`inline-flex items-center justify-center rounded-full border font-bold w-8 h-8 text-sm md:w-9 md:h-9 md:text-base ${positive ? 'border-[#d8552b] text-[#d8552b]' : 'border-[#9ca3af] text-[#9ca3af]'}`}>{val}</span>
+                      <span className={`inline-flex items-center justify-center rounded-full border font-extrabold w-10 h-10 text-base md:w-12 md:h-12 md:text-lg ${positive ? 'border-[#d8552b] text-[#d8552b]' : 'border-[#9ca3af] text-[#9ca3af]'}`}>{val}</span>
                     )
                   })()}
                 </TableCell>
