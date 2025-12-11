@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import type { Session } from '@/types/Session'
 import type { Exclusion } from '@/lib/exclusions'
 import { applySessionPoints, pointsForPosition } from '@/lib/calculatePoints'
+import { Input } from '@/components/ui/input'
  
 
 function formatTotalTime(ms: number): string {
@@ -31,6 +32,10 @@ export default function RaceResults({ session, exclusions }: { session: Session;
   const sWithPoints = applySessionPoints(session)
   const [loading, setLoading] = useState(false)
   const [hasDrafts, setHasDrafts] = useState(false)
+  const [pointsText, setPointsText] = useState<string>("")
+  const [pointsSaved, setPointsSaved] = useState<number[] | null>(null)
+  const [pointsLoaded, setPointsLoaded] = useState(false)
+  const [pointsInitDone, setPointsInitDone] = useState(false)
   
   const [openExcludeFor, setOpenExcludeFor] = useState<string | null>(null)
   const [openReincFor, setOpenReincFor] = useState<string | null>(null)
@@ -73,6 +78,34 @@ export default function RaceResults({ session, exclusions }: { session: Session;
       })()
     }
   }, [exclusions, session.id])
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/points', { cache: 'no-store' })
+        if (!res.ok) throw new Error('err')
+        const raw = await res.json()
+        const arr = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' ? Object.values(raw as Record<string, unknown>) : [])
+        type Pts = { sessionId?: string; points?: unknown; confirmed?: boolean }
+        const entry = (arr as Array<Pts>).find((x) => x && x.sessionId === session.id && Array.isArray(x.points) && (x.confirmed === true || x.confirmed == null))
+        const nums = entry && Array.isArray(entry.points) ? (entry.points as number[]).filter((n) => Number.isFinite(n) && n >= 0).map((n) => Math.floor(n)) : []
+        if (active) {
+          setPointsSaved(nums.length > 0 ? nums : null)
+          if (!pointsInitDone && nums.length > 0) {
+            setPointsText(nums.join(','))
+            setPointsInitDone(true)
+          }
+          setPointsLoaded(true)
+        }
+      } catch {
+        if (active) {
+          setPointsSaved(null)
+          setPointsLoaded(true)
+        }
+      }
+    })()
+    return () => { active = false }
+  }, [session.id, pointsInitDone])
   useEffect(() => {
     let active = true
     ;(async () => {
@@ -132,9 +165,17 @@ export default function RaceResults({ session, exclusions }: { session: Session;
         const pList = pRes.ok ? toArray(await pRes.json()) : []
         const eList = eRes.ok ? toArray(await eRes.json()) : []
         const bList = bRes.ok ? toArray(await bRes.json()) : []
-        const has = pList.filter(isPen).some((x) => x.sessionId === session.id && x.confirmed !== true) ||
+        const hasUnconfirmed = pList.filter(isPen).some((x) => x.sessionId === session.id && x.confirmed !== true) ||
           eList.filter(isExcl).some((x) => x.sessionId === session.id && x.confirmed !== true) ||
           bList.filter(isBall).some((x) => x.sessionId === session.id && x.confirmed !== true)
+        const hasCustomChange = (() => {
+          const tokens = pointsText.split(/[\s,]+/).map((t) => t.trim()).filter((t) => t.length > 0)
+          const nums = tokens.map((t) => Number(t)).filter((n) => Number.isFinite(n) && n >= 0)
+          const saved = Array.isArray(pointsSaved) ? pointsSaved : []
+          const eq = nums.length === saved.length && nums.every((v, i) => v === saved[i])
+          return !eq
+        })()
+        const has = hasUnconfirmed || hasCustomChange
         if (active) {
           setHasDrafts(has)
         }
@@ -143,7 +184,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
       }
     })()
     return () => { active = false }
-  }, [session.id])
+  }, [session.id, pointsText, pointsSaved])
   useEffect(() => {
     let active = true
     ;(async () => {
@@ -183,6 +224,13 @@ export default function RaceResults({ session, exclusions }: { session: Session;
     if (session.type.toUpperCase() === 'RACE') {
       const finishers = sWithPoints.results.filter((r) => !r.dnf && !excludedSet.has(r.driverId))
       const dnfs = sWithPoints.results.filter((r) => r.dnf || excludedSet.has(r.driverId))
+      const customPoints = (() => {
+        const tokens = pointsText.split(/[\s,]+/).map((t) => t.trim()).filter((t) => t.length > 0)
+        const nums = tokens.map((t) => Number(t)).filter((n) => Number.isFinite(n) && n >= 0)
+        if (nums.length > 0) return nums
+        if (Array.isArray(pointsSaved) && pointsSaved.length > 0) return pointsSaved
+        return undefined
+      })()
       const adjusted = finishers
         .map((r) => {
           const secs = penaltiesMap.get(r.driverId) ?? 0
@@ -202,7 +250,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
           if (tb != null) return 1
           return a.position - b.position
         })
-        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
+        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type, customPoints) }))
       const appended = dnfs.map((r, idx) => ({ ...r, position: adjusted.length + idx + 1, points: 0 }))
       const out = [...adjusted, ...appended]
       if (typeof window !== 'undefined') console.log('[RaceResults] displayResults RACE positions', out.map((r) => [r.driverId, r.position]))
@@ -210,6 +258,13 @@ export default function RaceResults({ session, exclusions }: { session: Session;
     } else {
       const nonExcluded = sWithPoints.results.filter((r) => !excludedSet.has(r.driverId))
       const excluded = sWithPoints.results.filter((r) => excludedSet.has(r.driverId))
+      const customPoints = (() => {
+        const tokens = pointsText.split(/[\s,]+/).map((t) => t.trim()).filter((t) => t.length > 0)
+        const nums = tokens.map((t) => Number(t)).filter((n) => Number.isFinite(n) && n >= 0)
+        if (nums.length > 0) return nums
+        if (Array.isArray(pointsSaved) && pointsSaved.length > 0) return pointsSaved
+        return undefined
+      })()
       const adjusted = nonExcluded
         .map((r) => {
           const secs = penaltiesMap.get(r.driverId) ?? 0
@@ -226,14 +281,14 @@ export default function RaceResults({ session, exclusions }: { session: Session;
           if (bb != null) return 1
           return a.position - b.position
         })
-        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type) }))
+        .map((r, idx) => ({ ...r, position: idx + 1, points: pointsForPosition(idx + 1, session.type, customPoints) }))
       const appended = excluded.map((r, idx) => ({ ...r, dnf: true, position: adjusted.length + idx + 1, points: 0 }))
       const out = [...adjusted, ...appended]
       if (typeof window !== 'undefined') console.log('[RaceResults] displayResults QUAL positions', out.map((r) => [r.driverId, r.position]))
       return out
     }
   })()
-  const ready = penaltiesLoaded && exclusionsLoaded && ballastLoaded
+  const ready = penaltiesLoaded && exclusionsLoaded && ballastLoaded && pointsLoaded
   if (!ready) {
     return (
       <div className="rounded-md border p-3 md:p-4 flex items-center justify-center">
@@ -246,7 +301,27 @@ export default function RaceResults({ session, exclusions }: { session: Session;
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-base md:text-lg font-semibold">Resultados</h2>
         {isAdmin ? (
-          <Button
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Input
+                className="w-80 md:w-xl h-9 md:h-10"
+                placeholder="Puntos por posición (25,20,18,...)"
+                value={pointsText}
+                onChange={(e) => setPointsText(e.target.value)}
+              />
+              <Button
+                variant="outline"
+                className="h-9 md:h-10"
+                onClick={() => {
+                  setPointsText("")
+                  setPointsSaved(null)
+                  setHasDrafts(true)
+                }}
+              >
+                Reset
+              </Button>
+            </div>
+            <Button
             className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90 focus-visible:ring-[#d8552b]/20 dark:focus-visible:ring-[#d8552b]/40"
             disabled={loading || !hasDrafts}
             onClick={async () => {
@@ -285,21 +360,26 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                 const pens = toArray(pList).filter(isPen).filter((x) => x.sessionId === session.id && x.confirmed !== true)
                 const excls = toArray(eList).filter(isExcl).filter((x) => x.sessionId === session.id && x.confirmed !== true)
                 const balls = toArray(bList).filter(isBall).filter((x) => x.sessionId === session.id && x.confirmed !== true)
-                const tasks: Promise<Response>[] = []
-                for (const p of pens) {
-                  tasks.push(fetch('/api/penalties', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: p.driverId, seconds: p.seconds, confirmed: true }) }))
-                }
-                for (const e of excls) {
-                  tasks.push(fetch('/api/exclusions', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: e.driverId, exclude: e.exclude, confirmed: true }) }))
-                }
-                for (const b of balls) {
-                  tasks.push(fetch('/api/ballast', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: b.driverId, kg: b.kg, confirmed: true }) }))
-                }
-                await Promise.all(tasks)
-                toast.success('Sesión publicada', { description: session.id })
-                setHasDrafts(false)
-                router.refresh()
-              } catch {
+            const tasks: Promise<Response>[] = []
+            for (const p of pens) {
+              tasks.push(fetch('/api/penalties', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: p.driverId, seconds: p.seconds, confirmed: true }) }))
+            }
+            for (const e of excls) {
+              tasks.push(fetch('/api/exclusions', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: e.driverId, exclude: e.exclude, confirmed: true }) }))
+            }
+            for (const b of balls) {
+              tasks.push(fetch('/api/ballast', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, driverId: b.driverId, kg: b.kg, confirmed: true }) }))
+            }
+            {
+              const tokens = pointsText.split(/[\s,]+/).map((t) => t.trim()).filter((t) => t.length > 0)
+              const nums = tokens.map((t) => Number(t)).filter((n) => Number.isFinite(n) && n >= 0).map((n) => Math.floor(n))
+              tasks.push(fetch('/api/points', { method: 'POST', headers, body: JSON.stringify({ sessionId: session.id, points: nums, confirmed: true }) }))
+            }
+            await Promise.all(tasks)
+            toast.success('Sesión publicada', { description: session.id })
+            setHasDrafts(false)
+            router.refresh()
+          } catch {
                 toast.error('No se pudo publicar sesión', { description: session.id })
               } finally {
                 setLoading(false)
@@ -308,6 +388,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
           >
             Publicar sesión
           </Button>
+          </div>
         ) : null}
         
       </div>
@@ -353,7 +434,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                   {isExcluded ? <span className="ml-2 text-xs px-2 py-0.5 rounded-full border text-[#9ca3af] border-[#9ca3af]">Excluido</span> : null}
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs md:text-sm text-[#9ca3af]">{d?.team ?? '-'}</span>
+                  <span className="text-sm md:text-base font-semibold text-[#9ca3af]">{d?.team ?? '-'}</span>
                 </TableCell>
                 {session.type === 'RACE' ? (
                   <TableCell>

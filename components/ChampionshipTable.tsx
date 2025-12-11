@@ -51,7 +51,7 @@ export default function ChampionshipTable({ data }: { data: ChampionshipRow[] })
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-[#9ca3af]">{d.team ?? '-'}</span>
+                <span className="text-sm md:text-base font-semibold text-[#9ca3af]">{d.team ?? '-'}</span>
               </TableCell>
               <TableCell>
                 <span className={`text-sm ${Math.max(0, Math.floor(d.ballastKg ?? 0)) === 0 ? 'text-[#9ca3af] font-normal' : 'font-bold'}`}>{Math.max(0, Math.floor(d.ballastKg ?? 0))} kg</span>

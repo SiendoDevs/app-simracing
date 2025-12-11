@@ -35,7 +35,7 @@ function createRedis() {
   return Redis.fromEnv()
 }
 
-async function loadLinked(key: 'penalties' | 'exclusions' | 'ballast') {
+async function loadLinked(key: 'penalties' | 'exclusions' | 'ballast' | 'points') {
   try {
     const redis = createRedis()
     let curr: unknown = null
@@ -52,7 +52,7 @@ async function loadLinked(key: 'penalties' | 'exclusions' | 'ballast') {
   return []
 }
 
-async function saveLinked(key: 'penalties' | 'exclusions' | 'ballast', list: Record<string, unknown>[]) {
+async function saveLinked(key: 'penalties' | 'exclusions' | 'ballast' | 'points', list: Record<string, unknown>[]) {
   try {
     const redis = createRedis()
     try {
@@ -102,6 +102,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const pens = await loadLinked('penalties')
     const excls = await loadLinked('exclusions')
     const balls = await loadLinked('ballast')
+    const points = await loadLinked('points')
     const isConfirmedForId = (x: unknown): boolean => {
       if (!x || typeof x !== 'object') return false
       const obj = x as Record<string, unknown>
@@ -113,6 +114,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       penalties: pens.filter(isConfirmedForId).length,
       exclusions: excls.filter(isConfirmedForId).length,
       ballast: balls.filter(isConfirmedForId).length,
+      points: points.filter(isConfirmedForId).length,
     }
     const hasConfirmed = confirmed.penalties + confirmed.exclusions + confirmed.ballast > 0
     if (hasConfirmed && !force) {
@@ -160,10 +162,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       const pensKept = pens.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object').filter(keepIfNotId)
       const exclsKept = excls.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object').filter(keepIfNotId)
       const ballsKept = balls.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object').filter(keepIfNotId)
+      const pointsKept = points.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object').filter(keepIfNotId)
       let ok = true
       ok = ok && await saveLinked('penalties', pensKept)
       ok = ok && await saveLinked('exclusions', exclsKept)
       ok = ok && await saveLinked('ballast', ballsKept)
+      ok = ok && await saveLinked('points', pointsKept)
       if (!ok) return NextResponse.json({ error: 'cascade_write_failed' }, { status: 500 })
       return NextResponse.json({ ok: true, cascaded: true })
     }

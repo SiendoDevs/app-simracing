@@ -50,7 +50,7 @@ export default function DriversTable({ data }: { data: DriverRow[] }) {
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-[#9ca3af]">{d.team ?? '-'}</span>
+                <span className="text-sm md:text-base font-semibold text-[#9ca3af]">{d.team ?? '-'}</span>
               </TableCell>
               <TableCell>
                 <span

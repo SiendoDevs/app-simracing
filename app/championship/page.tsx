@@ -1,6 +1,7 @@
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { calculateChampionship } from '@/lib/calculatePoints'
 import ChampionshipBallast from '@/components/ChampionshipBallast'
+import ExportChampionshipButton from '@/components/ExportChampionshipButton'
 import { Progress } from '@/components/ui/progress'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
@@ -159,7 +160,38 @@ export default async function Page() {
       </div>
     )
   }
-  const table = calculateChampionship(adjusted)
+  const pointsRemote = await (async () => {
+    try {
+      const r1 = await fetch('/api/points', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/points`, { cache: 'no-store' })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    return null
+  })()
+  type Pts = { sessionId: string; points: number[]; confirmed?: boolean }
+  const isPts = (x: unknown): x is Pts => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { sessionId?: unknown; points?: unknown; confirmed?: unknown }
+    return typeof o.sessionId === 'string' && Array.isArray(o.points)
+  }
+  const pointsMap = new Map<string, number[]>()
+  for (const it of (pointsRemote ?? [])) {
+    if (isPts(it) && (it.confirmed === true || it.confirmed == null)) {
+      pointsMap.set((it as Pts).sessionId, ((it as Pts).points as number[]).filter((n) => Number.isFinite(n) && n >= 0))
+    }
+  }
+  const table = calculateChampionship(adjusted, pointsMap)
   const manualRemote = await (async () => {
     try {
       // intento 1: ruta interna
@@ -244,6 +276,9 @@ export default async function Page() {
       <div className="space-y-1">
         <Progress value={progressValue} />
         <div className="text-xs text-muted-foreground">{fechasCompletas}/{totalFechas} fechas</div>
+      </div>
+      <div className="flex items-center justify-end">
+        <ExportChampionshipButton data={table} />
       </div>
       <ChampionshipBallast data={table} />
     </div>

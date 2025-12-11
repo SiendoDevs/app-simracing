@@ -156,7 +156,38 @@ export default async function Page() {
       </div>
     )
   }
-  const table = calculateChampionship(adjusted)
+  const pointsRemote = await (async () => {
+    try {
+      const r1 = await fetch('/api/points', { cache: 'no-store', next: { revalidate: 0 } })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    try {
+      const r2 = await fetch(`${origin}/api/points`, { cache: 'no-store', next: { revalidate: 0 } })
+      if (r2.ok) {
+        const j = await r2.json()
+        if (Array.isArray(j)) return j
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
+      }
+    } catch {}
+    return null
+  })()
+  type Pts = { sessionId: string; points: number[]; confirmed?: boolean }
+  const isPts = (x: unknown): x is Pts => {
+    if (!x || typeof x !== 'object') return false
+    const o = x as { sessionId?: unknown; points?: unknown; confirmed?: unknown }
+    return typeof o.sessionId === 'string' && Array.isArray(o.points)
+  }
+  const pointsMap = new Map<string, number[]>()
+  for (const it of (pointsRemote ?? [])) {
+    if (isPts(it) && (it.confirmed === true || it.confirmed == null)) {
+      pointsMap.set((it as Pts).sessionId, ((it as Pts).points as number[]).filter((n) => Number.isFinite(n) && n >= 0))
+    }
+  }
+  const table = calculateChampionship(adjusted, pointsMap)
   return (
     <div className="py-6 space-y-4">
       <h1 className="text-2xl font-bold">Pilotos</h1>
