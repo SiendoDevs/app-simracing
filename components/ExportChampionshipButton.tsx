@@ -15,7 +15,7 @@ export default function ExportChampionshipButton({ data }: { data: ChampionshipR
       canvas.width = w
       canvas.height = h
       const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-      const isDark = document.documentElement.classList.contains('dark')
+      const isDark = true
       const bgGrad = ctx.createLinearGradient(0, h, 0, 0)
       bgGrad.addColorStop(0.00, '#d8552b')
       bgGrad.addColorStop(0.08, '#d8552b')
