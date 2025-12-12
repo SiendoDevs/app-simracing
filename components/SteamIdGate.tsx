@@ -11,6 +11,9 @@ export default function SteamIdGate() {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState('')
   const [saving, setSaving] = useState(false)
+  const isDigits = useMemo(() => /^\d+$/.test(value.trim()), [value])
+  const isSteam64 = useMemo(() => value.trim().length === 17 && value.trim().startsWith('7656119'), [value])
+  const isValid = useMemo(() => isDigits && isSteam64, [isDigits, isSteam64])
 
   const hasSteamId = useMemo(() => {
     const pm = (user?.publicMetadata || {}) as Record<string, unknown>
@@ -37,7 +40,10 @@ export default function SteamIdGate() {
       toast.error('Por favor, ingresa tu Steam ID')
       return
     }
-    // Steam IDs suelen ser números largos (SteamID64). Permitimos texto por si usa GUID.
+    if (!isValid) {
+      toast.error('Steam ID inválido', { description: 'Debe ser un número de 17 dígitos que comience con 7656119.' })
+      return
+    }
     setSaving(true)
     try {
       const prevU = (user?.unsafeMetadata || {}) as Record<string, unknown>
@@ -65,7 +71,12 @@ export default function SteamIdGate() {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               disabled={saving}
+              inputMode="numeric"
+              pattern="[0-9]*"
             />
+            {!isValid && value.trim().length > 0 ? (
+              <div className="text-xs text-red-500">Formato inválido: debe ser un número de 17 dígitos que comience con 7656119.</div>
+            ) : null}
           </div>
           <DialogFooter>
             <Button onClick={handleSave} disabled={saving} className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90">
