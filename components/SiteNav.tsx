@@ -43,7 +43,7 @@ export default function SiteNav() {
             <DropdownMenuItem onSelect={() => router.push('/championship')}>Campeonato</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => router.push('/drivers')}>Pilotos</DropdownMenuItem>
           {isLoaded && isSignedIn ? (
-            <DropdownMenuItem onSelect={() => router.push('/pilot-profile')}>Perfil Piloto</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push('/driver-profile')}>Perfil Piloto</DropdownMenuItem>
           ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -53,7 +53,7 @@ export default function SiteNav() {
         <NavLink href="/sessions">Sesiones</NavLink>
         <NavLink href="/championship">Campeonato</NavLink>
         <NavLink href="/drivers">Pilotos</NavLink>
-        {isLoaded && isSignedIn ? <NavLink href="/pilot-profile">Perfil Piloto</NavLink> : null}
+        {isLoaded && isSignedIn ? <NavLink href="/driver-profile">Perfil Piloto</NavLink> : null}
       </nav>
     </>
   )
