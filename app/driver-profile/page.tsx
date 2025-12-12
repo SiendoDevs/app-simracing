@@ -8,6 +8,7 @@ import PilotProfileCard from '@/components/PilotProfileCard'
 import { currentUser } from '@clerk/nextjs/server'
 import { resolveSkinImageFor, resolveSkinNumber } from '@/lib/skins'
 import Image from 'next/image'
+import DonationDialog from '@/components/DonationDialog'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -195,19 +196,23 @@ export default async function Page() {
     let acc = 0
     for (const s of sorted) {
       const r = s.results.find((x) => (x.driverId || '').trim() === steamId)
-      const pts = typeof r?.points === 'number' ? (r!.points as number) : 0
+      if (!r) continue
+      const pts = typeof r.points === 'number' ? (r.points as number) : 0
       acc += pts
-      const label = s.date ? (() => { try { const d = new Date(s.date as string); return d.toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }) } catch { return s.id.slice(0, 10).replace(/_/g, '-') } })() : s.id.slice(0, 10).replace(/_/g, '-')
+      const label = s.date
+        ? (() => { try { const d = new Date(s.date as string); return d.toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }) } catch { return s.id.slice(0, 10).replace(/_/g, '-') } })()
+        : s.id.slice(0, 10).replace(/_/g, '-')
       list.push({ label, acc, pts })
     }
-    return list
+    const firstPositiveIdx = list.findIndex((it) => it.acc > 0 || it.pts > 0)
+    return firstPositiveIdx >= 0 ? list.slice(firstPositiveIdx) : list
   })()
   const PointsProgressChart = (await import('@/components/PointsProgressChart')).default
   return (
     <div className="py-6 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
         <PilotProfileCard data={table} sessions={adjusted} numberToken={numberToken} />
-        <div className="flex flex-col gap-4 h-full min-h-0">
+        <div className="flex flex-col gap-4 h-full min-h-0 min-w-0">
           <div className="rounded-md border p-4 flex items-center justify-center">
             {previewUrl ? (
               <div className="relative w-full aspect-video rounded-md overflow-hidden">
@@ -217,7 +222,7 @@ export default async function Page() {
               <div className="text-sm text-muted-foreground">Sin preview</div>
             )}
           </div>
-          <div className="rounded-md border p-4 flex-1 min-h-0 flex flex-col">
+          <div className="rounded-md border p-4 flex-1 min-h-0 min-w-0 flex flex-col">
             <div className="text-sm font-medium">Progreso de puntos</div>
             <div className="mt-2 flex-1 min-h-0">
               <PointsProgressChart data={myPointEntries} />
@@ -225,6 +230,25 @@ export default async function Page() {
           </div>
         </div>
       </div>
+      <section className="rounded-lg border p-3 md:p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="p-2 text-center">
+            <p className="font-semibold">Apoyá la liga</p>
+            <p className="text-sm text-muted-foreground">Tu aporte ayuda a sostener el proyecto.</p>
+          </div>
+          <div className="p-2 text-center">
+            <p className="font-semibold">Servidores y premios</p>
+            <p className="text-sm text-muted-foreground">Contribuí para mantener costos operativos.</p>
+          </div>
+          <div className="p-2 text-center">
+            <p className="font-semibold">Mejoras continuas</p>
+            <p className="text-sm text-muted-foreground">Seguimos sumando funciones y calidad.</p>
+          </div>
+          <div className="p-2 flex items-center justify-center">
+            <DonationDialog />
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
