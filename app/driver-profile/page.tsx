@@ -8,7 +8,6 @@ import PilotProfileCard from '@/components/PilotProfileCard'
 import { currentUser } from '@clerk/nextjs/server'
 import { resolveSkinImageFor, resolveSkinNumber } from '@/lib/skins'
 import Image from 'next/image'
-import DonationDialog from '@/components/DonationDialog'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -230,25 +229,6 @@ export default async function Page() {
           </div>
         </div>
       </div>
-      <section className="rounded-lg border p-3 md:p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <div className="p-2 text-center">
-            <p className="font-semibold">Apoyá la liga</p>
-            <p className="text-sm text-muted-foreground">Tu aporte ayuda a sostener el proyecto.</p>
-          </div>
-          <div className="p-2 text-center">
-            <p className="font-semibold">Servidores y premios</p>
-            <p className="text-sm text-muted-foreground">Contribuí para mantener costos operativos.</p>
-          </div>
-          <div className="p-2 text-center">
-            <p className="font-semibold">Mejoras continuas</p>
-            <p className="text-sm text-muted-foreground">Seguimos sumando funciones y calidad.</p>
-          </div>
-          <div className="p-2 flex items-center justify-center">
-            <DonationDialog />
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
