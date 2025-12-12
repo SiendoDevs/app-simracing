@@ -8,8 +8,8 @@ export default function PointsProgressChart({ data }: { data: Array<{ label: str
     pts: { label: "Por sesión", color: "#f29f85" },
   }
   return (
-    <ChartContainer config={config} className="h-full w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <ChartContainer config={config} className="h-[240px] md:h-full w-full">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <BarChart accessibilityLayer data={data}>
           <CartesianGrid vertical={false} />
           <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={10} />
@@ -17,7 +17,7 @@ export default function PointsProgressChart({ data }: { data: Array<{ label: str
           <Legend />
           <Bar dataKey="acc" name="Acumulado" fill="var(--color-acc)" radius={4} />
           <Bar dataKey="pts" name="Por sesión" fill="var(--color-pts)" radius={4} />
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip cursor={{ fill: 'rgba(156, 163, 175, 0.12)' }} content={<ChartTooltipContent />} />
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>

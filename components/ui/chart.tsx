@@ -22,7 +22,7 @@ export function ChartContainer({
     }
   }
   return (
-    <div className={cn("w-full", className)} style={styleVars as React.CSSProperties}>
+    <div className={cn("w-full min-w-0", className)} style={styleVars as React.CSSProperties}>
       {children}
     </div>
   )
