@@ -9,6 +9,10 @@ import MostOvertakesCard from '@/components/MostOvertakesCard'
 import RaceResults from '@/components/RaceResults'
 import IncidentsList from '@/components/IncidentsList'
 import PublishSessionButton from '@/components/PublishSessionButton'
+import Image from 'next/image'
+import { Card } from '@/components/ui/card'
+import { Trophy } from 'lucide-react'
+import { resolveSkinImageFor } from '@/lib/skins'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -165,6 +169,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const monthName = months[d.getMonth()]
     return `${dayName} ${dayNum} de ${monthName}`
   }
+  const winner = session.results.find((r) => r.position === 1) ?? session.results[0]
+  const winnerName = winner ? (session.drivers.find((d) => d.id === winner.driverId)?.name ?? winner.driverId) : undefined
+  const winnerPreview = winner ? resolveSkinImageFor(winner.skin, winnerName) : undefined
   return (
     <div className="p-4 md:p-6 space-y-3 md:space-y-4">
       <div className="text-sm">
@@ -183,6 +190,27 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         <BestLapCard session={session} />
         {session.type === 'RACE' && <MostOvertakesCard session={session} />}
+        <Card className="relative overflow-hidden aspect-video border-black">
+          {winnerPreview ? (
+            <Image src={winnerPreview} alt={`Preview ganador ${winnerName ?? ''}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-muted" />
+          )}
+          <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+          <div className="absolute top-0 left-0 z-10 p-4">
+            <span className="inline-flex items-center gap-2 text-white text-lg font-bold">
+              <Trophy className="h-5 w-5 text-white" />
+              Ganador
+            </span>
+          </div>
+          {winnerName ? (
+            <div className="absolute bottom-0 left-0 z-10 p-4">
+              <span className="font-extrabold text-white text-md md:text-lg uppercase italic">
+                {winnerName}
+              </span>
+            </div>
+          ) : null}
+        </Card>
       </div>
       <RaceResults session={session} allSessions={sessions} exclusions={exclusions} />
       
