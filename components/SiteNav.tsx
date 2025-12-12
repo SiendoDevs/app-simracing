@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
+import { useUser } from '@clerk/nextjs'
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname()
@@ -25,6 +26,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 export default function SiteNav() {
   const router = useRouter()
+  const { user, isLoaded } = useUser()
+  const isSignedIn = !!user
   return (
     <>
       <div className="md:hidden">
@@ -38,7 +41,10 @@ export default function SiteNav() {
             <DropdownMenuItem onSelect={() => router.push('/')}>Inicio</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => router.push('/sessions')}>Sesiones</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => router.push('/championship')}>Campeonato</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => router.push('/drivers')}>Pilotos</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push('/drivers')}>Pilotos</DropdownMenuItem>
+          {isLoaded && isSignedIn ? (
+            <DropdownMenuItem onSelect={() => router.push('/pilot-profile')}>Perfil Piloto</DropdownMenuItem>
+          ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -47,6 +53,7 @@ export default function SiteNav() {
         <NavLink href="/sessions">Sesiones</NavLink>
         <NavLink href="/championship">Campeonato</NavLink>
         <NavLink href="/drivers">Pilotos</NavLink>
+        {isLoaded && isSignedIn ? <NavLink href="/pilot-profile">Perfil Piloto</NavLink> : null}
       </nav>
     </>
   )

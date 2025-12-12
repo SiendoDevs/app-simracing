@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import AuthButtons from "@/components/AuthButtons";
+import SteamIdGate from "@/components/SteamIdGate";
 import { Toaster } from "sonner";
  
 import { Anek_Gurmukhi, Geist_Mono } from "next/font/google";
@@ -92,9 +93,11 @@ export default function RootLayout({
           </main>
           <Footer />
           <Toaster theme="system" richColors closeButton />
+          {/* Gate que solicita Steam ID al usuario autenticado si falta */}
+          <SteamIdGate />
         </ThemeProvider>
         </ClerkProvider>
       </body>
-    </html>
-  );
+      </html>
+    );
 }

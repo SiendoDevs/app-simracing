@@ -39,10 +39,10 @@ export function resolveSkinImage(skin?: string): string | undefined {
   const preview = path.join(base, 'preview.jpg')
   const previewPng = path.join(base, 'preview.png')
   const folderUrl = encodeURIComponent(folder)
-  if (fs.existsSync(livery)) return `/assets/skins/${folderUrl}/livery.png`
-  if (fs.existsSync(liveryJpg)) return `/assets/skins/${folderUrl}/livery.jpg`
   if (fs.existsSync(preview)) return `/assets/skins/${folderUrl}/preview.jpg`
   if (fs.existsSync(previewPng)) return `/assets/skins/${folderUrl}/preview.png`
+  if (fs.existsSync(livery)) return `/assets/skins/${folderUrl}/livery.png`
+  if (fs.existsSync(liveryJpg)) return `/assets/skins/${folderUrl}/livery.jpg`
   return undefined
 }
 
@@ -56,57 +56,80 @@ function normalizeName(str: string) {
 }
 
 export function resolveSkinImageFor(skin?: string, driverName?: string): string | undefined {
-  const direct = resolveSkinImage(skin)
-  if (direct) return direct
-  if (!driverName) return undefined
+  if (!driverName && !skin) return undefined
   let folders: string[] = []
   try {
     folders = fs.readdirSync(SKINS_ROOT_FS).filter((f) => fs.statSync(path.join(SKINS_ROOT_FS, f)).isDirectory())
   } catch {
     return undefined
   }
-  const target = normalizeName(driverName)
+  if (driverName) {
+    const target = normalizeName(driverName)
+    for (const f of folders) {
+      const ui = path.join(SKINS_ROOT_FS, f, 'ui_skin.json')
+      try {
+        if (fs.existsSync(ui)) {
+          const raw = JSON.parse(fs.readFileSync(ui, 'utf-8')) as Record<string, unknown>
+          const dn = typeof raw['drivername'] === 'string' ? raw['drivername'] : undefined
+          if (dn && normalizeName(dn) === target) {
+            const base = path.join(SKINS_ROOT_FS, f)
+            const livery = path.join(base, 'livery.png')
+            const liveryJpg = path.join(base, 'livery.jpg')
+            const preview = path.join(base, 'preview.jpg')
+            const previewPng = path.join(base, 'preview.png')
+            const fUrl = encodeURIComponent(f)
+            if (fs.existsSync(preview)) return `/assets/skins/${fUrl}/preview.jpg`
+            if (fs.existsSync(previewPng)) return `/assets/skins/${fUrl}/preview.png`
+            if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
+            if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
+          }
+        }
+      } catch {}
+    }
+  }
+  const direct = resolveSkinImage(skin)
+  if (direct) return direct
   for (const f of folders) {
     const ui = path.join(SKINS_ROOT_FS, f, 'ui_skin.json')
     try {
       if (fs.existsSync(ui)) {
         const raw = JSON.parse(fs.readFileSync(ui, 'utf-8')) as Record<string, unknown>
         const dn = typeof raw['drivername'] === 'string' ? raw['drivername'] : undefined
-        if (dn && normalizeName(dn) === target) {
+        if (driverName && dn && normalizeName(dn) === normalizeName(driverName)) {
           const base = path.join(SKINS_ROOT_FS, f)
           const livery = path.join(base, 'livery.png')
           const liveryJpg = path.join(base, 'livery.jpg')
           const preview = path.join(base, 'preview.jpg')
           const previewPng = path.join(base, 'preview.png')
           const fUrl = encodeURIComponent(f)
-          if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
-          if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
           if (fs.existsSync(preview)) return `/assets/skins/${fUrl}/preview.jpg`
           if (fs.existsSync(previewPng)) return `/assets/skins/${fUrl}/preview.png`
+          if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
+          if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
         }
       }
     } catch {}
   }
   // Fallback: match by folder name containing driver name
-  const nDriver = normalize(driverName)
+  const nDriver = driverName ? normalize(driverName) : ''
   for (const f of folders) {
     const nFolder = normalize(f)
-    if (nFolder.includes(nDriver) || nDriver.includes(nFolder)) {
+    if (nDriver && (nFolder.includes(nDriver) || nDriver.includes(nFolder))) {
       const base = path.join(SKINS_ROOT_FS, f)
       const livery = path.join(base, 'livery.png')
       const liveryJpg = path.join(base, 'livery.jpg')
       const preview = path.join(base, 'preview.jpg')
       const previewPng = path.join(base, 'preview.png')
       const fUrl = encodeURIComponent(f)
-      if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
-      if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
       if (fs.existsSync(preview)) return `/assets/skins/${fUrl}/preview.jpg`
       if (fs.existsSync(previewPng)) return `/assets/skins/${fUrl}/preview.png`
+      if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
+      if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
     }
   }
   // Fallback: match by number token inside folder name if present in skin or driver
   const numberFromSkin = typeof skin === 'string' ? (skin.match(/\d{1,3}/)?.[0] ?? undefined) : undefined
-  const numberFromName = driverName.match(/\d{1,3}/)?.[0] ?? undefined
+  const numberFromName = driverName ? driverName.match(/\d{1,3}/)?.[0] ?? undefined : undefined
   const numberToken = numberFromSkin ?? numberFromName
   if (numberToken) {
     for (const f of folders) {
@@ -117,10 +140,10 @@ export function resolveSkinImageFor(skin?: string, driverName?: string): string 
         const preview = path.join(base, 'preview.jpg')
         const previewPng = path.join(base, 'preview.png')
         const fUrl = encodeURIComponent(f)
-        if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
-        if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
         if (fs.existsSync(preview)) return `/assets/skins/${fUrl}/preview.jpg`
         if (fs.existsSync(previewPng)) return `/assets/skins/${fUrl}/preview.png`
+        if (fs.existsSync(livery)) return `/assets/skins/${fUrl}/livery.png`
+        if (fs.existsSync(liveryJpg)) return `/assets/skins/${fUrl}/livery.jpg`
       }
     }
   }
@@ -166,6 +189,30 @@ export function resolveSkinTeam(skin?: string, driverName?: string): string | un
 }
 
 export function resolveSkinNumber(skin?: string, driverName?: string): string | undefined {
+  // Prefer matching by driver name first (reads ui_skin.json across folders)
+  if (driverName) {
+    let folders: string[] = []
+    try {
+      folders = fs.readdirSync(SKINS_ROOT_FS).filter((f) => fs.statSync(path.join(SKINS_ROOT_FS, f)).isDirectory())
+    } catch {
+      folders = []
+    }
+    const target = normalizeName(driverName)
+    for (const f of folders) {
+      const ui = path.join(SKINS_ROOT_FS, f, 'ui_skin.json')
+      try {
+        if (fs.existsSync(ui)) {
+          const raw = JSON.parse(fs.readFileSync(ui, 'utf-8')) as Record<string, unknown>
+          const dn = typeof raw['drivername'] === 'string' ? (raw['drivername'] as string) : undefined
+          if (dn && normalizeName(dn) === target) {
+            const num = typeof raw['number'] === 'string' ? (raw['number'] as string) : typeof raw['number'] === 'number' ? String(raw['number']) : undefined
+            if (num) return num
+          }
+        }
+      } catch {}
+    }
+  }
+  // If not found by name, try explicit skin folder
   const folder = resolveSkinFolder(skin)
   if (folder) {
     const ui = path.join(SKINS_ROOT_FS, folder, 'ui_skin.json')
@@ -177,29 +224,10 @@ export function resolveSkinNumber(skin?: string, driverName?: string): string | 
       }
     } catch {}
   }
-  if (!driverName) return undefined
-  let folders: string[] = []
-  try {
-    folders = fs.readdirSync(SKINS_ROOT_FS).filter((f) => fs.statSync(path.join(SKINS_ROOT_FS, f)).isDirectory())
-  } catch {
-    return undefined
+  // Fallbacks
+  if (driverName) {
+    const numberFromName = driverName.match(/\d{1,3}/)?.[0] ?? undefined
+    if (numberFromName) return numberFromName
   }
-  const target = normalizeName(driverName)
-  for (const f of folders) {
-    const ui = path.join(SKINS_ROOT_FS, f, 'ui_skin.json')
-    try {
-      if (fs.existsSync(ui)) {
-        const raw = JSON.parse(fs.readFileSync(ui, 'utf-8')) as Record<string, unknown>
-        const dn = typeof raw['drivername'] === 'string' ? (raw['drivername'] as string) : undefined
-        if (dn && normalizeName(dn) === target) {
-          const num = typeof raw['number'] === 'string' ? (raw['number'] as string) : typeof raw['number'] === 'number' ? String(raw['number']) : undefined
-          if (num) return num
-        }
-      }
-    } catch {}
-  }
-  // Fallback: infer number from folder names by matching tokens
-  const numberFromName = driverName.match(/\d{1,3}/)?.[0] ?? undefined
-  if (numberFromName) return numberFromName
   return undefined
 }
