@@ -31,11 +31,21 @@ export default async function Home() {
     const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
     const tryServers = async (): Promise<number | null> => {
       for (const s of [1, 2]) {
+        // Prefer relative route first (works reliably in prod and dev)
         try {
-          const r = await fetch(`${origin}/api/live-timing?server=${s}`, { cache: 'no-store' })
-          if (!r.ok) continue
-          const j = await r.json()
-          if (typeof j?.playersOnline === 'number') return j.playersOnline as number
+          const rRel = await fetch(`/api/live-timing?server=${s}`, { cache: 'no-store', next: { revalidate: 0 } })
+          if (rRel.ok) {
+            const j = await rRel.json()
+            if (typeof j?.playersOnline === 'number') return j.playersOnline as number
+          }
+        } catch {}
+        // Fallback to absolute origin if relative failed
+        try {
+          const rAbs = await fetch(`${origin}/api/live-timing?server=${s}`, { cache: 'no-store', next: { revalidate: 0 } })
+          if (rAbs.ok) {
+            const j = await rAbs.json()
+            if (typeof j?.playersOnline === 'number') return j.playersOnline as number
+          }
         } catch {}
       }
       return null
