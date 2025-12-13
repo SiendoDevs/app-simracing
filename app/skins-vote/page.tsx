@@ -14,27 +14,30 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-function getRedisClient(): Redis | null {
-  try {
-    const url =
-      process.env.UPSTASH_REDIS_REST_URL ||
-      process.env.UPSTASH_REDIS_REST_REDIS_URL ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
-      process.env.UPSTASH_REDIS_REST_KV_URL ||
-      process.env.UPSTASH_REDIS_URL ||
-      ''
-    const token =
-      process.env.UPSTASH_REDIS_REST_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-      process.env.UPSTASH_REDIS_TOKEN ||
-      ''
-    if (url && token) return new Redis({ url, token })
-    return null
-  } catch {
-    return null
-  }
+function resolveUpstashEnv() {
+  const candidates = [
+    process.env.UPSTASH_REDIS_REST_URL,
+    process.env.UPSTASH_REDIS_REST_REDIS_URL,
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    process.env.UPSTASH_REDIS_REST_KV_URL,
+    process.env.UPSTASH_REDIS_URL,
+  ].filter(Boolean) as string[]
+  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+  const token = (
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+    process.env.UPSTASH_REDIS_TOKEN ||
+    ''
+  )
+  return { url, token }
+}
+
+function createRedis(): Redis {
+  const { url, token } = resolveUpstashEnv()
+  if (url && token) return new Redis({ url, token })
+  return Redis.fromEnv()
 }
 
 export default async function Page() {
@@ -42,32 +45,30 @@ export default async function Page() {
   const adjusted = sessions.map((s) => applyDnfByLaps(s)).map((s) => applyPenaltiesToSession(s, [])).map((s) => stripExcluded(s, []))
   const table = calculateChampionship(adjusted)
   const user = await currentUser().catch(() => null)
-  const redis = getRedisClient()
+  const redis = createRedis()
   let votes: Record<string, number> = {}
   let mySelection: string | null = null
   try {
-    if (redis) {
-      const j = await redis.json.get('skin_votes')
-      if (j && typeof j === 'object') {
-        const obj = j as Record<string, unknown>
-        const counts = obj['counts']
-        const users = obj['users']
-        votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>)
+    const j = await redis.json.get('skin_votes')
+    if (j && typeof j === 'object') {
+      const obj = j as Record<string, unknown>
+      const counts = obj['counts']
+      const users = obj['users']
+      votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>)
+      if (user?.id && users && typeof users === 'object') {
+        const m = users as Record<string, string>
+        mySelection = m[user.id] ?? null
+      }
+    } else {
+      const s = await redis.get('skin_votes')
+      if (typeof s === 'string') {
+        const parsed = JSON.parse(s) as Record<string, unknown>
+        const counts = parsed['counts']
+        const users = parsed['users']
+        votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>)
         if (user?.id && users && typeof users === 'object') {
           const m = users as Record<string, string>
           mySelection = m[user.id] ?? null
-        }
-      } else {
-        const s = await redis.get('skin_votes')
-        if (typeof s === 'string') {
-          const parsed = JSON.parse(s) as Record<string, unknown>
-          const counts = parsed['counts']
-          const users = parsed['users']
-          votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>)
-          if (user?.id && users && typeof users === 'object') {
-            const m = users as Record<string, string>
-            mySelection = m[user.id] ?? null
-          }
         }
       }
     }

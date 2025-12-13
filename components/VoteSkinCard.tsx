@@ -24,9 +24,10 @@ export default function VoteSkinCard({
 }) {
   const [count, setCount] = useState<number>(Math.max(0, Math.floor(initialCount ?? 0)))
   const [loading, setLoading] = useState(false)
+  const [voted, setVoted] = useState(false)
   const router = useRouter()
   const handleVote = async () => {
-    if (disabled || loading) return
+    if (disabled || loading || voted) return
     setLoading(true)
     try {
       const res = await fetch('/api/skin-votes', {
@@ -42,6 +43,7 @@ export default function VoteSkinCard({
       if (!res.ok) {
         if (res.status === 409) {
           toast.info('Ya registraste tu voto')
+          setVoted(true)
         } else {
           toast.error('No se pudo registrar el voto')
         }
@@ -50,6 +52,7 @@ export default function VoteSkinCard({
       const votes = (j?.votes ?? {}) as Record<string, number>
       const curr = Math.max(0, Math.floor(votes[driverId] ?? (count + 1)))
       setCount(curr)
+      setVoted(true)
       onVoted?.(curr)
       toast.success('Voto registrado')
       router.refresh()
@@ -84,8 +87,8 @@ export default function VoteSkinCard({
             <span className="text-muted-foreground">votos</span>
           </div>
         </div>
-        <Button onClick={handleVote} disabled={disabled || loading} className="w-full bg-[#d8552b] text-white hover:bg-[#d8552b]/90">
-          {disabled ? 'Ya votaste' : loading ? 'Votando…' : 'Votar esta Livery'}
+        <Button onClick={handleVote} disabled={disabled || loading || voted} className="w-full bg-[#d8552b] text-white hover:bg-[#d8552b]/90">
+          {disabled || voted ? 'Ya votaste' : loading ? 'Votando…' : 'Votar esta Livery'}
         </Button>
       </div>
     </div>
