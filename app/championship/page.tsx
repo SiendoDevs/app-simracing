@@ -7,6 +7,7 @@ import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession, loadPenalties } from '@/lib/penalties'
 import { Redis } from '@upstash/redis'
+import TopThreeChampionship from '@/components/TopThreeChampionship'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -271,16 +272,19 @@ export default async function Page() {
   }
   const progressValue = Math.round(((fechasCompletas + parcial) / totalFechas) * 100)
   return (
-    <div className="py-6 space-y-4">
+    <div className="py-6 space-y-12">
       <h1 className="text-2xl font-bold">Campeonato</h1>
-      <div className="space-y-1">
+      <TopThreeChampionship data={table} />
+      <div className="space-y-4">
         <Progress value={progressValue} />
         <div className="text-xs text-muted-foreground">{fechasCompletas}/{totalFechas} fechas</div>
       </div>
-      <div className="flex items-center justify-end">
-        <ExportChampionshipButton data={table} />
+      <div className="space-y-4">
+        <ChampionshipBallast data={table} />
+        <div className="flex items-center justify-end">
+          <ExportChampionshipButton data={table} />
+        </div>
       </div>
-      <ChampionshipBallast data={table} />
     </div>
   )
 }

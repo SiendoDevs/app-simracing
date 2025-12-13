@@ -8,11 +8,11 @@ export default function BestLapCard({ session }: { session: Session }) {
     .sort((a, b) => (a.bestLapMs! - b.bestLapMs!))[0]
   const name = best ? session.drivers.find((d) => d.id === best.driverId)?.name ?? best.driverId : undefined
   return (
-    <Card className="bg-[#d8552b]/12 border-[#d8552b]/30">
+    <Card className="bg-brand-animated border-[#d8552b]">
       <CardHeader>
-        <CardTitle className='text-lg font-bold text-[#d8552b]'>
+        <CardTitle className='text-lg font-bold text-black'>
           <span className="inline-flex items-center gap-2">
-            <Timer className="h-5 w-5 text-[#d8552b]" />
+            <Timer className="h-5 w-5 text-black" />
             Mejor Vuelta
           </span>
         </CardTitle>
@@ -20,11 +20,11 @@ export default function BestLapCard({ session }: { session: Session }) {
       <CardContent>
         {best ? (
           <div className="space-y-1">
-            <div className="font-extrabold text-xl md:text-2xl uppercase italic">{name}</div>
-            <div className="text-xl font-bold text-[#d8552b]">{(best.bestLapMs! / 1000).toFixed(3)}s</div>
+            <div className="font-extrabold text-xl md:text-2xl uppercase italic text-white">{name}</div>
+            <div className="text-3xl md:text-4xl font-bold text-black tracking-tighter">{(best.bestLapMs! / 1000).toFixed(3)}s</div>
           </div>
         ) : (
-          <div className="text-sm">Sin datos</div>
+          <div className="text-sm text-black">Sin datos</div>
         )}
       </CardContent>
     </Card>

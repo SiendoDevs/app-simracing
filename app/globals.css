@@ -120,3 +120,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Animated brand gradient background */
+.bg-brand-animated {
+  background: linear-gradient(230deg, #d8552b, #a82f09, #f36030);
+  background-size: 600% 600%;
+  -webkit-animation: brandGradientAnim 30s ease infinite;
+  -moz-animation: brandGradientAnim 30s ease infinite;
+  animation: brandGradientAnim 30s ease infinite;
+}
+
+@-webkit-keyframes brandGradientAnim {
+  0% { background-position: 0% 87% }
+  50% { background-position: 100% 14% }
+  100% { background-position: 0% 87% }
+}
+@-moz-keyframes brandGradientAnim {
+  0% { background-position: 0% 87% }
+  50% { background-position: 100% 14% }
+  100% { background-position: 0% 87% }
+}
+@keyframes brandGradientAnim {
+  0% { background-position: 0% 87% }
+  50% { background-position: 100% 14% }
+  100% { background-position: 0% 87% }
+}

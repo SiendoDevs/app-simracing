@@ -23,7 +23,7 @@ export default function MostOvertakesCard({ session }: { session: Session }) {
         {positiveBest ? (
           <div className="space-y-1">
             <div className="font-extrabold text-xl md:text-2xl uppercase italic">{name}</div>
-            <div className="text-xl font-bold text-green-600">+{value}</div>
+            <div className="text-3xl md:text-4xl font-bold text-green-600 tracking-tighter">+{value}</div>
           </div>
         ) : (
           <div className="text-sm">Sin datos</div>

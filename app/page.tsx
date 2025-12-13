@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
+import DonationDialog from "@/components/DonationDialog";
 
 export default async function Home() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
@@ -339,6 +340,26 @@ export default async function Home() {
       <div className="text-sm hidden md:block">
         <Link href="/sessions" className="underline">Ver todas las sesiones</Link>
       </div>
+      
+      <section className="rounded-lg border p-3 md:p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="p-2 text-center">
+            <p className="font-semibold">Apoyá la liga</p>
+            <p className="text-sm text-muted-foreground">Tu aporte ayuda a sostener el proyecto.</p>
+          </div>
+          <div className="p-2 text-center">
+            <p className="font-semibold">Servidores y premios</p>
+            <p className="text-sm text-muted-foreground">Contribuí para mantener costos operativos.</p>
+          </div>
+          <div className="p-2 text-center">
+            <p className="font-semibold">Mejoras continuas</p>
+            <p className="text-sm text-muted-foreground">Seguimos sumando funciones y calidad.</p>
+          </div>
+          <div className="p-2 flex items-center justify-center">
+            <DonationDialog />
+          </div>
+        </div>
+      </section>
       
     </div>
   );

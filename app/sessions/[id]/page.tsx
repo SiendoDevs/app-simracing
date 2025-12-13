@@ -13,6 +13,7 @@ import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Trophy } from 'lucide-react'
 import { resolveSkinImageFor } from '@/lib/skins'
+import CheckeredFlagIcon from '@/components/CheckeredFlagIcon'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -177,13 +178,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <div className="text-sm">
         <Link href="/sessions" className="underline text-muted-foreground hover:text-foreground">Sesiones</Link>
       </div>
-      <h1 className="text-xl md:text-2xl">
-        <span className="font-bold">{labelType(session.type)}</span>
-        {' | '}
-        <span className="font-normal">{niceTrack(session.track)}</span>
-        {' | '}
-        <span className="font-normal">{formatDateLong(session.date, normalizedId)}</span>
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl md:text-2xl">
+          <span className="font-bold">{labelType(session.type)}</span>
+          {' | '}
+          <span className="font-normal">{niceTrack(session.track)}</span>
+          {' | '}
+          <span className="font-normal">{formatDateLong(session.date, normalizedId)}</span>
+        </h1>
+        {session.type.toUpperCase() === 'RACE' ? (
+          <CheckeredFlagIcon className="w-9 h-9 md:w-10 md:h-10" />
+        ) : null}
+      </div>
       <div className="flex items-center gap-2">
         <PublishSessionButton id={session.id} />
       </div>
