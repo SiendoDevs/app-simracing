@@ -8,6 +8,9 @@ import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession, loadPenalties } from '@/lib/penalties'
 import { Redis } from '@upstash/redis'
 import TopThreeChampionship from '@/components/TopThreeChampionship'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Palette } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -273,7 +276,20 @@ export default async function Page() {
   const progressValue = Math.round(((fechasCompletas + parcial) / totalFechas) * 100)
   return (
     <div className="py-6 space-y-12">
-      <h1 className="text-2xl font-bold">Campeonato</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Campeonato</h1>
+        <div className="text-sm">
+          <Button
+            asChild
+            className="bg-linear-to-r from-[#e6c463] via-[#d8552b] to-[#b9902e] text-white hover:brightness-110 hover:scale-[1.02] transition-all shadow-sm hover:shadow-md"
+          >
+            <Link href="/skins-vote">
+              <Palette className="size-4" />
+              Votar Mejor Livery
+            </Link>
+          </Button>
+        </div>
+      </div>
       <TopThreeChampionship data={table} />
       <div className="space-y-4">
         <Progress value={progressValue} />

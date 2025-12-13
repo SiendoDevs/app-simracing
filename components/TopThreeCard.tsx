@@ -8,10 +8,12 @@ export default function TopThreeCard({
   name,
   idx,
   previewUrl,
+  count,
 }: {
   name: string
   idx: number
   previewUrl?: string
+  count?: number
 }) {
   const [loaded, setLoaded] = React.useState(false)
   const place = idx === 0 ? '1°' : idx === 1 ? '2°' : '3°'
@@ -59,6 +61,14 @@ export default function TopThreeCard({
           }
         </span>
       </div>
+      {typeof count === 'number' ? (
+        <div className="absolute top-0 right-0 z-10 p-4">
+          <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs bg-background/80">
+            <span className="font-semibold">{Math.max(0, Math.floor(count))}</span>
+            <span className="text-muted-foreground">votos</span>
+          </span>
+        </div>
+      ) : null}
       <div className="absolute bottom-0 left-0 z-10 p-4">
         {textGradient
           ? <span className={`font-extrabold text-md md:text-lg uppercase italic ${textGradient}`}>{name}</span>
