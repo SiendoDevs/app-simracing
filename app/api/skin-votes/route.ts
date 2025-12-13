@@ -26,7 +26,11 @@ function getRedisClient(): Redis | null {
       process.env.UPSTASH_REDIS_TOKEN ||
       ''
     if (url && token) return new Redis({ url, token })
-    return null
+    try {
+      return Redis.fromEnv()
+    } catch {
+      return null
+    }
   } catch {
     return null
   }
