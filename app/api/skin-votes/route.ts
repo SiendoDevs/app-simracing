@@ -9,31 +9,35 @@ import { applyPenaltiesToSession } from '@/lib/penalties'
 
 export const runtime = 'nodejs'
 
-function getRedisClient(): Redis | null {
-  try {
-    const url =
-      process.env.UPSTASH_REDIS_REST_URL ||
-      process.env.UPSTASH_REDIS_REST_REDIS_URL ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
-      process.env.UPSTASH_REDIS_REST_KV_URL ||
-      process.env.UPSTASH_REDIS_URL ||
-      ''
-    const token =
-      process.env.UPSTASH_REDIS_REST_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-      process.env.UPSTASH_REDIS_TOKEN ||
-      ''
-    if (url && token) return new Redis({ url, token })
-    try {
-      return Redis.fromEnv()
-    } catch {
-      return null
-    }
-  } catch {
-    return null
-  }
+function resolveUpstashEnv() {
+  const candidates = [
+    process.env.UPSTASH_REDIS_REST_URL,
+    process.env.UPSTASH_REDIS_REST_REDIS_URL,
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+    process.env.UPSTASH_REDIS_REST_KV_URL,
+    process.env.UPSTASH_REDIS_URL,
+  ].filter(Boolean) as string[]
+  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+  const token = (
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+    process.env.UPSTASH_REDIS_TOKEN ||
+    ''
+  )
+  return { url, token }
+}
+
+function upstashConfigured() {
+  const { url, token } = resolveUpstashEnv()
+  return !!(url && token)
+}
+
+function createRedis(): Redis {
+  const { url, token } = resolveUpstashEnv()
+  if (url && token) return new Redis({ url, token })
+  return Redis.fromEnv()
 }
 
 type VoteBody = {
@@ -42,8 +46,7 @@ type VoteBody = {
 
 export async function GET() {
   try {
-    const redis = getRedisClient()
-    if (!redis) return NextResponse.json({ error: 'redis_unavailable' }, { status: 500 })
+    const redis = createRedis()
     let votes: Record<string, number> = {}
     try {
       const j = await redis.json.get('skin_votes')
@@ -85,8 +88,25 @@ export async function POST(req: Request) {
     const known = new Set(table.map((r) => (r.driverId || '').trim()))
     if (!known.has(driverId)) return NextResponse.json({ error: 'unknown_driver' }, { status: 404 })
 
-    const redis = getRedisClient()
-    if (!redis) return NextResponse.json({ error: 'redis_unavailable' }, { status: 500 })
+    if (!upstashConfigured()) {
+      return NextResponse.json({
+        error: 'redis_unavailable',
+        detail: 'No se pudo conectar a Upstash Redis',
+        required_env_vars: [
+          'UPSTASH_REDIS_REST_URL',
+          'UPSTASH_REDIS_REST_REDIS_URL',
+          'UPSTASH_REDIS_REST_KV_REST_API_URL',
+          'UPSTASH_REDIS_REST_KV_URL',
+          'UPSTASH_REDIS_URL',
+          'UPSTASH_REDIS_REST_TOKEN',
+          'UPSTASH_REDIS_REST_KV_REST_API_TOKEN',
+          'UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN',
+          'UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN',
+          'UPSTASH_REDIS_TOKEN'
+        ]
+      }, { status: 500 })
+    }
+    const redis = createRedis()
     let doc: { counts: Record<string, number>; users: Record<string, string> } = { counts: {}, users: {} }
     try {
       const j = await redis.json.get('skin_votes')
