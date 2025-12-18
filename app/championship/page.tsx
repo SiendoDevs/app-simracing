@@ -26,7 +26,6 @@ export default async function Page() {
     ? process.env.NEXT_PUBLIC_BASE_URL
     : undefined
   const origin = fromVercel ?? fromEnv ?? fromHeaders ?? 'http://localhost:3000'
-  try { console.log('[championship/page] origin', origin, { fromVercel: !!fromVercel, fromEnv: !!fromEnv, fromHeaders: !!fromHeaders }) } catch {}
   const publishedRemote = await (async () => {
     try {
       const r1 = await fetch('/api/published', { cache: 'no-store', next: { revalidate: 0 } })
@@ -76,8 +75,6 @@ export default async function Page() {
   })()
   const pubRaw = publishedRemote ?? []
   const pubEntries = Array.isArray(pubRaw) ? pubRaw.filter((x) => x && typeof (x as { sessionId?: unknown }).sessionId === 'string') : []
-  try { console.log('[championship/page] published entries', Array.isArray(pubRaw) ? pubRaw.length : (pubRaw ? Object.keys(pubRaw as Record<string, unknown>).length : 0)) } catch {}
-  try { console.log('[championship/page] published sample', pubEntries.slice(0, 3)) } catch {}
   const toBool = (v: unknown) => v === true || v === 'true' || v === 1 || v === '1'
   const normalizeId = (s: string) => (s.includes(':') ? (s.split(':').pop() as string) : s)
   const canonicalId = (s: string) => {
@@ -89,8 +86,6 @@ export default async function Page() {
   }
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
   const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
-  try { console.log('[championship/page] sessionsPublished count', sessionsPublished.length, sessionsPublished.slice(0, 3).map((s) => s.id)) } catch {}
-  try { console.log('[championship/page] publishedSet values', Array.from(published).slice(0, 5)) } catch {}
   const exclusionsRemote = await (async () => {
     try {
       const res1 = await fetch('/api/exclusions', { cache: 'no-store' })
@@ -117,7 +112,6 @@ export default async function Page() {
     return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.exclude === 'boolean'
   }
   const exclusions = (exclusionsRemote ?? []).filter(isExcl).filter((e) => e.confirmed === true || e.confirmed == null)
-  console.log('[championship/page] exclusions count', Array.isArray(exclusionsRemote) ? exclusionsRemote.length : (exclusionsRemote ? Object.keys(exclusionsRemote as Record<string, unknown>).length : 0))
   const penaltiesRemote = await (async () => {
     try {
       const res = await fetch('/api/penalties', { cache: 'no-store', next: { revalidate: 0 } })
@@ -151,11 +145,6 @@ export default async function Page() {
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
     .map((s) => stripExcluded(s, exclusions))
-  try {
-    const qual = adjusted.filter((s) => s.type.toUpperCase() === 'QUALIFY')
-    const sample = qual.slice(0, 2).map((s) => ({ id: s.id, top: s.results.slice(0, 3).map((r) => ({ driverId: r.driverId, pos: r.position })) }))
-    console.log('[championship/page] sample qual sessions', sample)
-  } catch {}
   if (sessionsPublished.length === 0) {
     return (
       <div className="py-6 space-y-4">
@@ -165,6 +154,37 @@ export default async function Page() {
     )
   }
   const pointsRemote = await (async () => {
+    // Intento 1: Leer directo de Redis (Prioridad en Server Component)
+    try {
+      const candidates = [
+        process.env.UPSTASH_REDIS_REST_URL,
+        process.env.UPSTASH_REDIS_REST_REDIS_URL,
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
+        process.env.UPSTASH_REDIS_REST_KV_URL,
+        process.env.UPSTASH_REDIS_URL,
+      ].filter(Boolean) as string[]
+      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
+      const token = (
+        process.env.UPSTASH_REDIS_REST_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
+        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
+        process.env.UPSTASH_REDIS_TOKEN ||
+        ''
+      )
+      if (url && token) {
+        const redis = new Redis({ url, token })
+        let curr: unknown = null
+        try { curr = await redis.json.get('points') } catch {}
+        if (!Array.isArray(curr)) {
+          try { const s = await redis.get('points'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
+        }
+        if (Array.isArray(curr)) return curr
+        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>)
+      }
+    } catch {}
+
+    // Intento 2: API interna
     try {
       const r1 = await fetch('/api/points', { cache: 'no-store' })
       if (r1.ok) {
@@ -173,6 +193,8 @@ export default async function Page() {
         if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
       }
     } catch {}
+
+    // Intento 3: API absoluta
     try {
       const r2 = await fetch(`${origin}/api/points`, { cache: 'no-store' })
       if (r2.ok) {
@@ -195,26 +217,11 @@ export default async function Page() {
       pointsMap.set((it as Pts).sessionId, ((it as Pts).points as number[]).filter((n) => Number.isFinite(n) && n >= 0))
     }
   }
+
   const table = calculateChampionship(adjusted, pointsMap)
   const manualRemote = await (async () => {
+    // intento 1: leer directo de Redis SDK (Prioridad)
     try {
-      // intento 1: ruta interna
-      const r1 = await fetch('/api/ballast', { cache: 'no-store' })
-      if (r1.ok) {
-        const j = await r1.json()
-        if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
-        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
-      }
-      // intento 2: origen absoluto (útil en ciertos entornos dev)
-      if (origin) {
-        const r2 = await fetch(`${origin}/api/ballast`, { cache: 'no-store' })
-          if (r2.ok) {
-            const j = await r2.json()
-            if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
-            if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
-          }
-        }
-      // intento 3: leer directo de Redis SDK
       const candidates = [
         process.env.UPSTASH_REDIS_REST_URL,
         process.env.UPSTASH_REDIS_REST_REDIS_URL,
@@ -250,10 +257,28 @@ export default async function Page() {
         if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>).filter(isValid) as Array<{ driverId: string; sessionId: string; kg: number }>
       }
     } catch {}
+
+    try {
+      // intento 2: ruta interna
+      const r1 = await fetch('/api/ballast', { cache: 'no-store' })
+      if (r1.ok) {
+        const j = await r1.json()
+        if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
+        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
+      }
+      // intento 3: origen absoluto
+      if (origin) {
+        const r2 = await fetch(`${origin}/api/ballast`, { cache: 'no-store' })
+          if (r2.ok) {
+            const j = await r2.json()
+            if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
+            if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
+          }
+        }
+    } catch {}
     return null
   })()
   const manual = manualRemote ?? []
-  try { console.log('[championship/page] ballast manual count', manual.length, manual.slice(0, 3)) } catch {}
   const relevant = sessionsPublished.filter((s) => {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
