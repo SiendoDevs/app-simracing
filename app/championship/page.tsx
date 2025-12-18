@@ -219,66 +219,6 @@ export default async function Page() {
   }
 
   const table = calculateChampionship(adjusted, pointsMap)
-  const manualRemote = await (async () => {
-    // intento 1: leer directo de Redis SDK (Prioridad)
-    try {
-      const candidates = [
-        process.env.UPSTASH_REDIS_REST_URL,
-        process.env.UPSTASH_REDIS_REST_REDIS_URL,
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-        process.env.UPSTASH_REDIS_REST_KV_URL,
-        process.env.UPSTASH_REDIS_URL,
-      ].filter(Boolean) as string[]
-      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-      const token = (
-        process.env.UPSTASH_REDIS_REST_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-        process.env.UPSTASH_REDIS_TOKEN ||
-        ''
-      )
-      if (url && token) {
-        const redis = new Redis({ url, token })
-        let curr: unknown = null
-        try { curr = await redis.json.get('ballast') } catch {}
-        if (!Array.isArray(curr) && (!curr || typeof curr !== 'object')) {
-          try {
-            const s = await redis.get('ballast')
-            if (typeof s === 'string') curr = JSON.parse(s)
-          } catch {}
-        }
-        const isValid = (x: unknown): x is { driverId: string; sessionId: string; kg: number } => {
-          if (!x || typeof x !== 'object') return false
-          const obj = x as Record<string, unknown>
-          return (typeof obj.driverId === 'string' && typeof obj.sessionId === 'string' && typeof obj.kg === 'number')
-        }
-        if (Array.isArray(curr)) return (curr as unknown[]).filter(isValid) as Array<{ driverId: string; sessionId: string; kg: number }>
-        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>).filter(isValid) as Array<{ driverId: string; sessionId: string; kg: number }>
-      }
-    } catch {}
-
-    try {
-      // intento 2: ruta interna
-      const r1 = await fetch('/api/ballast', { cache: 'no-store' })
-      if (r1.ok) {
-        const j = await r1.json()
-        if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
-        if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
-      }
-      // intento 3: origen absoluto
-      if (origin) {
-        const r2 = await fetch(`${origin}/api/ballast`, { cache: 'no-store' })
-          if (r2.ok) {
-            const j = await r2.json()
-            if (Array.isArray(j)) return j as Array<{ driverId: string; sessionId: string; kg: number }>
-            if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>) as Array<{ driverId: string; sessionId: string; kg: number }>
-          }
-        }
-    } catch {}
-    return null
-  })()
-  const manual = manualRemote ?? []
   const relevant = sessionsPublished.filter((s) => {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
