@@ -119,7 +119,7 @@ export default async function Home() {
     { idx: 4, label: 'Ciudad Evita', extra: 'Especial – 40 vueltas', nuevo: true },
     { idx: 5, label: 'Zárate 4' },
     { idx: 6, label: 'Buenos Aires 1' },
-    { idx: 7, label: 'Mar del Plata', extra: 'Especial – 40 vueltas', nuevo: true },
+    { idx: 7, label: 'Mar del Plata' },
     { idx: 8, label: 'Zárate 9', extra: 'Especial – 40 vueltas', nuevo: true },
   ]
   const plannedCounts = [3, 3, 3, 2, 3, 3, 2, 2]
