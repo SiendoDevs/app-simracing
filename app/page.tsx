@@ -3,7 +3,7 @@ import Image from "next/image";
 import { loadLocalSessions } from "@/lib/loadLocalSessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus } from "lucide-react";
+import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Home() {
@@ -269,20 +269,32 @@ export default async function Home() {
         <div className="rounded-lg border h-full flex flex-col">
           <div className="px-3 md:px-4 py-2 text-sm md:text-base font-semibold border-b">Fechas del campeonato</div>
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
-            {schedule.map((f) => (
-              <li key={f.idx} className="flex items-center justify-start rounded-md border p-2 shadow-sm bg-[#d8552b]/10 hover:bg-[#d8552b]/20 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center justify-center h-9 w-12 rounded-md font-bold shrink-0 bg-[#d8552b] text-white">{String(f.idx).padStart(2, '0')}</span>
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium inline-flex items-center gap-2">
-                      <span>{f.label}</span>
-                      {statusByIdx.get(f.idx) ? <span className="px-2 py-0.5 rounded-full border text-[#9ca3af] border-[#9ca3af] text-xs">Completada</span> : null}
+            {schedule.map((f, index) => {
+              const isLast = index === schedule.length - 1
+              return (
+                <li key={f.idx} className="group relative flex items-center justify-start rounded-md border p-2 shadow-sm overflow-hidden">
+                  <div className={`absolute inset-0 transition-colors ${
+                    isLast 
+                      ? "bg-gradient-to-r from-[#d8552b]/20 via-[#d8552b]/40 to-[#d8552b]/20 animate-pulse" 
+                      : "bg-[#d8552b]/10 group-hover:bg-[#d8552b]/20"
+                  }`} />
+                  <div className="relative z-10 flex items-center gap-3">
+                    <span className="inline-flex items-center justify-center h-9 w-12 rounded-md font-bold shrink-0 bg-[#d8552b] text-white">{String(f.idx).padStart(2, '0')}</span>
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium inline-flex items-center gap-2">
+                        {statusByIdx.get(f.idx) ? (
+                          <span className="flex items-center justify-center h-5 w-5 rounded-full border border-[#9ca3af] text-[#9ca3af]">
+                            <Check className="h-3 w-3" />
+                          </span>
+                        ) : null}
+                        <span>{f.label}</span>
+                      </div>
+                      {f.extra ? <div className="text-xs text-muted-foreground">{f.extra}</div> : null}
                     </div>
-                    {f.extra ? <div className="text-xs text-muted-foreground">{f.extra}</div> : null}
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              )
+            })}
           </ul>
         </div>
       </section>
