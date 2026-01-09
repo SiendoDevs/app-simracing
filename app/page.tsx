@@ -381,7 +381,7 @@ export default async function Home() {
             Entrena, diviértete y compite con amigos las 24 horas. Nuestro servidor está abierto para todos, sin contraseñas ni inscripciones previas.
           </p>
           <p className="text-sm font-medium text-foreground/80">
-            Buscá <span className="text-[#d8552b] font-bold">"ZN Simracing"</span> en Content Manager y empezá a girar ya mismo.
+            Buscá <span className="text-[#d8552b] font-bold">&quot;ZN Simracing&quot;</span> en Content Manager y empezá a girar ya mismo.
           </p>
         </div>
         <div className="shrink-0">
