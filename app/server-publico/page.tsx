@@ -53,7 +53,7 @@ export default function ServerPublicoPage() {
               className="bg-black/40 hover:bg-black/60 text-white border border-white/20 backdrop-blur-sm"
               size="lg"
             >
-              <Link href="https://acstuff.ru/s/q:race/online/join?httpPort=8251&ip=24.152.39.252">
+              <Link href="https://acstuff.ru/s/q:race/online/join?httpPort=8251&ip=24.152.39.252" target="_blank" rel="noopener noreferrer">
                 <Flag className="h-5 w-5" />
                 Unirse
               </Link>

@@ -3,12 +3,40 @@ import Image from "next/image";
 import { loadLocalSessions } from "@/lib/loadLocalSessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check } from "lucide-react";
+import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check, Globe } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
+import { currentChampionship } from "@/data/championships";
 
 export default async function Home() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
-  const sessions = await loadLocalSessions();
+  
+  // 1. Cargar todas las sesiones
+  const allSessions = await loadLocalSessions();
+  
+  // 2. Filtrar sesiones por fecha del campeonato activo
+  const sessions = allSessions.filter(s => {
+    // Extraer fecha de la sesión (YYYY-MM-DD)
+    let sDate = ''
+    if (typeof s.date === 'string') {
+       const d = new Date(s.date)
+       if (!isNaN(d.getTime())) {
+         sDate = d.toISOString().split('T')[0]
+       }
+    }
+    if (!sDate) {
+      const m = s.id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+      if (m) sDate = `${m[1]}-${m[2]}-${m[3]}`
+    }
+    
+    // Comparar con rango del campeonato
+    if (!sDate) return false // Si no tiene fecha, descartar (o manejar según política)
+    
+    if (sDate < currentChampionship.startDate) return false
+    if (currentChampionship.endDate && sDate > currentChampionship.endDate) return false
+    
+    return true
+  })
+
   const user = await currentUser().catch(() => null)
   const adminEmails = (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",")
@@ -112,17 +140,8 @@ export default async function Home() {
       for (let i = 0; i < races.length; i++) raceIndexMap.set(races[i].id, i + 1)
     }
   }
-  const schedule = [
-    { idx: 1, label: 'Zárate 1' },
-    { idx: 2, label: 'Baradero' },
-    { idx: 3, label: 'Buenos Aires 2 Invertido' },
-    { idx: 4, label: 'Ciudad Evita', extra: 'Especial – 40 vueltas', nuevo: true },
-    { idx: 5, label: 'Zárate 4' },
-    { idx: 6, label: 'Buenos Aires 1' },
-    { idx: 7, label: 'Mar del Plata' },
-    { idx: 8, label: 'Zárate 9', extra: 'Especial – 40 vueltas', nuevo: true },
-  ]
-  const plannedCounts = [3, 3, 3, 2, 3, 3, 2, 2]
+  const schedule = currentChampionship.schedule
+  const plannedCounts = currentChampionship.plannedCounts
   const relevant = sessionsForViewer.filter((s) => {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
@@ -194,33 +213,33 @@ export default async function Home() {
     <div className="space-y-6">
       
       <section className="relative rounded-xl overflow-hidden border">
-        <div className="h-56 md:h-72 bg-cover bg-center" style={{ backgroundImage: 'url(/assets/fondo-inicio-2.jpg)' }} />
-        <div className="absolute inset-0 bg-linear-to-t from-background/50 to-transparent" />
+        <div className="h-56 md:h-72 bg-cover bg-center" style={{ backgroundImage: `url(${currentChampionship.assets.background})` }} />
+        <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/30 to-transparent" />
         <Image
-          src="/assets/Assetto_Corsa_Logo.png"
+          src={currentChampionship.assets.logo}
           alt="Assetto Corsa"
           height={48}
           width={160}
           className="absolute top-6 right-6 h-10 w-auto md:h-12 opacity-90"
         />
         {playersOnline !== null ? (
-          <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-background/80 px-2 py-1 text-xs">
+          <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-black/80 px-2 py-1 text-xs text-white border-white/10">
             <Users className="h-4 w-4" />
             {`${playersOnline} piloto/s en linea`}
           </div>
         ) : null}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <h1 className="text-2xl md:text-4xl font-bold">Liga de Karting | Asseto Corsa</h1>
-          <p className="mt-3 mb-3 text-lg md:text-md font-medium">Noticias, resultados, sesiones y campeonatos.</p>
+          <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-md">{currentChampionship.subtitle}</h1>
+          <p className="mt-3 mb-3 text-lg md:text-md font-medium text-white/90 drop-shadow-sm">{currentChampionship.description}</p>
           <div className="mt-4 flex gap-2">
             <Button className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" asChild>
-              <Link href="https://siendostudio.com/timing" target="_blank" rel="noopener noreferrer">
+              <Link href={currentChampionship.links.liveTiming || "#"} target="_blank" rel="noopener noreferrer">
                 <Timer className="size-4" />
                 Livetiming Server
               </Link>
             </Button>
             <Button variant="secondary" className="hidden md:inline-flex" asChild>
-              <Link href="/championship">
+              <Link href={currentChampionship.links.championship || "/championship"}>
                 <Trophy className="size-4" />
                 Ver campeonato
               </Link>
@@ -231,35 +250,35 @@ export default async function Home() {
       <section className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-stretch">
         <div className="rounded-lg border p-3 md:p-4 h-full flex flex-col">
           <div className="flex-1 space-y-3">
-            <div className="text-xl md:text-2xl font-bold">Edición #2 · Kart KZ 125cc</div>
+            <div className="text-xl md:text-2xl font-bold">{currentChampionship.title}</div>
             <div className="text-sm text-muted-foreground inline-flex flex-wrap gap-4">
-              <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4" /> Miércoles 21:30 hs.</span>
-              <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Comenzó el 26 de Noviembre</span>
+              <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4" /> {currentChampionship.rules.schedule}</span>
+              <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Comenzó el {new Date(currentChampionship.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <div className="text-sm font-semibold">Requisitos</div>
-                <p className="text-sm text-muted-foreground">PC, Asseto Corsa, Content Manager, CSP, Real Penalty.</p>
+                <p className="text-sm text-muted-foreground">{currentChampionship.rules.requirements}</p>
                 <div className="text-sm font-semibold">Pistas</div>
-                <p className="text-sm text-muted-foreground">Jotracks (Modder Oficial)</p>
+                <p className="text-sm text-muted-foreground">{currentChampionship.rules.tracks}</p>
               </div>
               <div className="space-y-1.5">
                 <div className="text-sm font-semibold">Inscripción</div>
-                <p className="text-sm text-muted-foreground">Gratis (incluye mod y pistas para todo el campeonato).</p>
+                <p className="text-sm text-muted-foreground">{currentChampionship.rules.inscription}</p>
                 <div className="text-sm font-semibold">Cupo</div>
-                <p className="text-sm text-muted-foreground">Máximo 35 pilotos.</p>
+                <p className="text-sm text-muted-foreground">{currentChampionship.rules.quota}</p>
               </div>
             </div>
           </div>
           <div className="mt-auto pt-2 flex gap-2">
             <Button className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90" asChild>
-              <Link href="https://docs.google.com/forms/d/e/1FAIpQLScjoch5V5d-BjkwS_wq7jDCCAu9r_KyU5QyJ_1MwsK_7HTLcw/viewform?usp=header" target="_blank" rel="noopener noreferrer">
+              <Link href={currentChampionship.links.inscriptions || "#"} target="_blank" rel="noopener noreferrer">
                 <UserPlus className="size-4" />
                 Inscripciones
               </Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link href="https://chat.whatsapp.com/FYY7DU9mPchIUAYl1FAuzP" target="_blank" rel="noopener noreferrer">
+              <Link href={currentChampionship.links.whatsapp || "#"} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="size-4" />
                 Comunidad Whatsapp
               </Link>
@@ -275,7 +294,7 @@ export default async function Home() {
                 <li key={f.idx} className="group relative flex items-center justify-start rounded-md border p-2 shadow-sm overflow-hidden">
                   <div className={`absolute inset-0 transition-colors ${
                     isLast 
-                      ? "bg-gradient-to-r from-[#d8552b]/20 via-[#d8552b]/40 to-[#d8552b]/20 animate-pulse" 
+                      ? "bg-linear-to-r from-[#d8552b]/20 via-[#d8552b]/40 to-[#d8552b]/20 animate-pulse"
                       : "bg-[#d8552b]/10 group-hover:bg-[#d8552b]/20"
                   }`} />
                   <div className="relative z-10 flex items-center gap-3">
@@ -351,6 +370,28 @@ export default async function Home() {
       <div className="text-sm hidden md:block">
         <Link href="/sessions" className="underline">Ver todas las sesiones</Link>
       </div>
+      
+      <section className="rounded-xl border bg-muted/40 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <div className="space-y-3">
+          <h2 className="text-2xl md:text-3xl font-bold inline-flex items-center gap-3">
+            <Globe className="h-8 w-8 text-[#d8552b]" />
+            ¡Sumate al Server Público!
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            Entrena, diviértete y compite con amigos las 24 horas. Nuestro servidor está abierto para todos, sin contraseñas ni inscripciones previas.
+          </p>
+          <p className="text-sm font-medium text-foreground/80">
+            Buscá <span className="text-[#d8552b] font-bold">"ZN Simracing"</span> en Content Manager y empezá a girar ya mismo.
+          </p>
+        </div>
+        <div className="shrink-0">
+          <Button size="lg" className="bg-[#d8552b] text-white hover:bg-[#d8552b]/90 text-lg px-8 h-12 shadow-lg shadow-[#d8552b]/20" asChild>
+            <Link href={currentChampionship.links.serverPublic || "/server-publico"}>
+              Ver Estado del Server
+            </Link>
+          </Button>
+        </div>
+      </section>
      
     </div>
   );
