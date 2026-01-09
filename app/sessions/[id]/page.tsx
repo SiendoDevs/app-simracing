@@ -198,7 +198,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         {session.type === 'RACE' && <MostOvertakesCard session={session} />}
         <Card className="relative overflow-hidden aspect-video border-black">
           {winnerPreview ? (
-            <Image src={winnerPreview} alt={`Preview ganador ${winnerName ?? ''}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
+            <Image src={winnerPreview} alt={`Preview ${session.type === 'QUALIFY' ? 'Pole Position' : 'Ganador'} ${winnerName ?? ''}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
           ) : (
             <div className="absolute inset-0 bg-muted" />
           )}
@@ -206,7 +206,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <div className="absolute top-0 left-0 z-10 p-4">
             <span className="inline-flex items-center gap-2 text-white text-lg font-bold">
               <Trophy className="h-5 w-5 text-white" />
-              Ganador
+              {session.type === 'QUALIFY' ? 'Pole Position' : 'Ganador'}
             </span>
           </div>
           {winnerName ? (

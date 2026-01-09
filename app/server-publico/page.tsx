@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Timer, Flag } from 'lucide-react'
+import { Timer, Flag, Info, Shield, Cpu, MessageCircle } from 'lucide-react'
+import { currentChampionship } from '../../data/championships'
 
 export default function ServerPublicoPage() {
   return (
@@ -14,7 +15,7 @@ export default function ServerPublicoPage() {
             src="/assets/tn-c3.jpg"
             alt="Fondo SimRacing"
             fill
-            className="object-cover"
+            className="object-cover animate-hero-zoom"
             priority
           />
           {/* Overlay */}
@@ -68,25 +69,90 @@ export default function ServerPublicoPage() {
 
       {/* Content Blocks */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8">
-        {/* Server Info Block */}
+        
+        {/* Block 1: Info */}
         <div className="flex flex-col space-y-4 h-full">
-          <h2 className="text-2xl font-bold">Información del Servidor</h2>
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1">
-            <p className="text-muted-foreground">
-              Servidor de libre acceso con contenido oficial de Kunos. Los autos y pistas van rotando regularmente. 
-              <br /><br />Cuando haya contenido adicional para descargar, lo encontrarás aquí mismo.
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-linear-to-br from-orange-500/30 to-orange-500/10 border border-orange-500/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+                <Info className="h-6 w-6 text-[#d8552b]" />
+             </div>
+             <h2 className="text-xl font-bold">Acerca del Server</h2>
+          </div>
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1 hover:shadow-md transition-shadow">
+            <p className="text-muted-foreground leading-relaxed">
+              Disfruta de carreras casuales las 24 horas en nuestro servidor público. 
+              La rotación de pistas y categorías es automática, ofreciendo variedad constante.
+              <br/><br/>
+              Ideal para entrenar, probar setups o simplemente divertirte con amigos sin presiones.
             </p>
           </div>
         </div>
-        
-        {/* Empty Block */}
+
+        {/* Block 2: Normas */}
         <div className="flex flex-col space-y-4 h-full">
-          {/* Spacer to align with the title of the first block */}
-          <h2 className="text-2xl font-bold invisible" aria-hidden="true">Placeholder</h2>
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1 min-h-[200px]">
-            {/* Espacio reservado */}
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-linear-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+                <Shield className="h-6 w-6 text-[#d8552b]" />
+             </div>
+             <h2 className="text-xl font-bold">Normas de Convivencia</h2>
+          </div>
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1 hover:shadow-md transition-shadow">
+            <ul className="space-y-3 text-muted-foreground">
+                <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span> Respeto ante todo (Fair Play).
+                </li>
+                <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span> Ceder el paso con banderas azules.
+                </li>
+                <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span> Evitar el chat ofensivo.
+                </li>
+                <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span> Reincorporarse a pista con precaución.
+                </li>
+            </ul>
           </div>
         </div>
+
+        {/* Block 3: Requisitos */}
+        <div className="flex flex-col space-y-4 h-full">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-gradient-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+                <Cpu className="h-6 w-6 text-[#d8552b]" />
+             </div>
+             <h2 className="text-xl font-bold">Requisitos Técnicos</h2>
+          </div>
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1 hover:shadow-md transition-shadow">
+            <p className="text-muted-foreground mb-4">
+              Para la mejor experiencia, recomendamos utilizar <strong>Content Manager</strong> y <strong>Custom Shaders Patch (CSP)</strong>.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Si al intentar entrar te falta contenido (coches o pistas), Content Manager te ofrecerá descargarlo automáticamente si está disponible en el servidor.
+            </p>
+          </div>
+        </div>
+
+        {/* Block 4: Comunidad */}
+        <div className="flex flex-col space-y-4 h-full">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-gradient-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+                <MessageCircle className="h-6 w-6 text-[#d8552b]" />
+             </div>
+             <h2 className="text-xl font-bold">Comunidad y Soporte</h2>
+          </div>
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex-1 hover:shadow-md transition-shadow flex flex-col justify-between">
+            <p className="text-muted-foreground mb-4">
+              ¿Tienes dudas, sugerencias o problemas para conectar? Únete a nuestra comunidad en WhatsApp.
+            </p>
+            <Button variant="outline" className="w-full gap-2" asChild>
+                <Link href={currentChampionship.links.whatsapp || "#"} target="_blank">
+                    <MessageCircle className="h-4 w-4" />
+                    Unirse al Grupo de WhatsApp
+                </Link>
+            </Button>
+          </div>
+        </div>
+
       </div>
     </div>
   )
