@@ -1,7 +1,7 @@
 "use client"
 import { useMemo, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { Trophy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Timer } from 'lucide-react'
+import { Trophy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import type { DriverRow } from '@/components/DriversTable'
 import type { Session } from '@/types/Session'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'

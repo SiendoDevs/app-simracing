@@ -5,7 +5,7 @@ import { parseSession } from '@/lib/parseSession'
 import fs from 'node:fs'
 import path from 'node:path'
 
-async function loadFromFilesystem(): Promise<Session[]> {
+export async function loadFromFilesystem(): Promise<Session[]> {
   try {
     const sessionsDir = path.join(process.cwd(), 'sessions')
     if (!fs.existsSync(sessionsDir)) return []

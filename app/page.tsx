@@ -213,7 +213,7 @@ export default async function Home() {
     <div className="space-y-6">
       
       <section className="relative rounded-xl overflow-hidden border">
-        <div className="h-56 md:h-72 bg-cover bg-center animate-hero-zoom" style={{ backgroundImage: `url(${currentChampionship.assets.background})` }} />
+        <div className="h-[400px] bg-cover bg-center animate-hero-zoom" style={{ backgroundImage: `url(${currentChampionship.assets.background})` }} />
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/30 to-transparent" />
         <Image
           src={currentChampionship.assets.logo}
