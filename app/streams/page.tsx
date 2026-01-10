@@ -1,8 +1,7 @@
-import { Youtube, PlayCircle, Calendar, Eye, ExternalLink } from "lucide-react";
+import { Youtube, Play, Calendar, Eye, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface Stream {
@@ -68,6 +67,7 @@ async function getStreams(): Promise<Stream[]> {
     // Navegar el JSON para encontrar los items
     const tabs = data.contents?.twoColumnBrowseResultsRenderer?.tabs;
     // Buscamos la pestaña seleccionada (debería ser Streams/En directo)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const streamsTab = tabs?.find((t: any) => t.tabRenderer?.selected);
     
     const contents = streamsTab?.tabRenderer?.content?.richGridRenderer?.contents;
@@ -92,6 +92,7 @@ async function getStreams(): Promise<Stream[]> {
       
       // Detectar si está en vivo (a veces cambia la estructura, pero suele haber un badge)
       const badges = video.badges || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const isLive = badges.some((b: any) => b.metadataBadgeRenderer?.style === 'BADGE_STYLE_TYPE_LIVE_NOW');
       
       if (id && title) {
@@ -127,7 +128,7 @@ export default async function StreamsPage() {
     <div className="flex flex-col min-h-screen py-6 space-y-8">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
-          <PlayCircle className="h-4 w-4 text-[#FF0000] fill-current" />
+          <Play className="h-6 w-6 text-[#d8552b] fill-current" />
           <h1 className="text-3xl font-bold">Streams</h1>
         </div>
         <p className="text-muted-foreground text-lg max-w-2xl">
@@ -179,7 +180,7 @@ export default async function StreamsPage() {
                   )}
                   
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300">
-                    <PlayCircle className="h-12 w-12 text-white drop-shadow-lg transform scale-90 group-hover:scale-100 transition-transform" />
+                    <Play className="h-12 w-12 text-white drop-shadow-lg transform scale-90 group-hover:scale-100 transition-transform" />
                   </div>
                   
                   {stream.isLive && (
