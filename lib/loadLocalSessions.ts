@@ -2,6 +2,34 @@ import type { Session } from '@/types/Session'
 import { headers } from 'next/headers'
 import { Redis } from '@upstash/redis'
 import { parseSession } from '@/lib/parseSession'
+import fs from 'node:fs'
+import path from 'node:path'
+
+async function loadFromFilesystem(): Promise<Session[]> {
+  try {
+    const sessionsDir = path.join(process.cwd(), 'sessions')
+    if (!fs.existsSync(sessionsDir)) return []
+    
+    const files = fs.readdirSync(sessionsDir).filter((f) => f.endsWith('.json'))
+    const sessions: Session[] = []
+    
+    for (const file of files) {
+      try {
+        const fullPath = path.join(sessionsDir, file)
+        const content = fs.readFileSync(fullPath, 'utf-8')
+        const raw = JSON.parse(content)
+        const s = parseSession(raw, file)
+        sessions.push(s)
+      } catch (e) {
+        console.error(`[loadFromFilesystem] Error parsing ${file}`, e)
+      }
+    }
+    return sessions.sort((a, b) => a.id.localeCompare(b.id))
+  } catch (e) {
+    console.error('[loadFromFilesystem] Error reading sessions dir', e)
+    return []
+  }
+}
 
 async function loadRemoteSessions(): Promise<Session[] | null> {
   try {

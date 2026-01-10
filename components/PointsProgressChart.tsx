@@ -7,19 +7,26 @@ export default function PointsProgressChart({ data }: { data: Array<{ label: str
     acc: { label: "Acumulado", color: "#d8552b" },
     pts: { label: "Por sesión", color: "#f29f85" },
   }
+  
   return (
-    <ChartContainer config={config} className="h-[240px] md:h-full w-full">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-        <BarChart accessibilityLayer data={data}>
-          <CartesianGrid vertical={false} />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={10} />
-          <YAxis allowDecimals={false} />
-          <Legend />
-          <Bar dataKey="acc" name="Acumulado" fill="var(--color-acc)" radius={4} />
-          <Bar dataKey="pts" name="Por sesión" fill="var(--color-pts)" radius={4} />
-          <ChartTooltip cursor={{ fill: 'rgba(156, 163, 175, 0.12)' }} content={<ChartTooltipContent />} />
-        </BarChart>
-      </ResponsiveContainer>
-    </ChartContainer>
+    <div className="h-[240px] md:h-full w-full flex flex-col gap-2 min-h-[240px]">
+      <div className="flex-1 min-h-0 relative">
+        <div className="absolute inset-0">
+          <ChartContainer config={config} className="h-full w-full">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <BarChart accessibilityLayer data={data}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={10} />
+                <YAxis allowDecimals={false} />
+                <Legend />
+                <Bar dataKey="acc" name="Acumulado" fill="var(--color-acc)" radius={4} />
+                <Bar dataKey="pts" name="Por sesión" fill="var(--color-pts)" radius={4} />
+                <ChartTooltip cursor={{ fill: 'rgba(156, 163, 175, 0.12)' }} content={<ChartTooltipContent />} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+      </div>
+    </div>
   )
 }

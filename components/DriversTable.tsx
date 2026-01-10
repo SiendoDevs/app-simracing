@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { resolveSkinNumber } from '@/lib/skins'
 import { Trophy } from 'lucide-react'
+import Link from 'next/link'
  
 
 export interface DriverRow {
@@ -12,6 +13,8 @@ export interface DriverRow {
   wins: number
   livery?: string
   team?: string
+  previewUrl?: string
+  numberToken?: string
 }
 
 export default function DriversTable({ data }: { data: DriverRow[] }) {
@@ -41,13 +44,15 @@ export default function DriversTable({ data }: { data: DriverRow[] }) {
                 </span>
               </TableCell>
               <TableCell>
-                <span
-                  className={`font-extrabold text-xl md:text-2xl uppercase italic ${
-                    idx === 0 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e] bg-clip-text text-transparent drop-shadow-sm' : ''
-                  }`}
-                >
-                  {d.name}
-                </span>
+                <Link href={`/driver-profile/${d.driverId}`} className="hover:opacity-80 transition-opacity">
+                  <span
+                    className={`font-extrabold text-xl md:text-2xl uppercase italic ${
+                      idx === 0 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e] bg-clip-text text-transparent drop-shadow-sm' : ''
+                    }`}
+                  >
+                    {d.name}
+                  </span>
+                </Link>
               </TableCell>
               <TableCell>
                 <span className="text-sm md:text-base font-semibold text-[#9ca3af]">{d.team ?? '-'}</span>

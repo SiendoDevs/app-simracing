@@ -4,7 +4,13 @@ import DriverProfileContent from '@/components/DriverProfileContent'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export default async function Page() {
+type Props = {
+  params: Promise<{ id: string }>
+}
+
+export default async function DriverProfilePage({ params }: Props) {
+  const { id } = await params
+  const steamId = decodeURIComponent(id)
   const { table, sessionsWithPoints } = await getProfileData()
 
   if (table.length === 0 && sessionsWithPoints.length === 0) {
@@ -16,5 +22,5 @@ export default async function Page() {
     )
   }
 
-  return <DriverProfileContent table={table} sessions={sessionsWithPoints} />
+  return <DriverProfileContent table={table} sessions={sessionsWithPoints} driverId={steamId} />
 }
