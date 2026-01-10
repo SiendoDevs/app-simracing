@@ -9,6 +9,7 @@ import { ThemeClerkProvider } from "@/components/ThemeClerkProvider";
 import AuthButtons from "@/components/AuthButtons";
 import SteamIdGate from "@/components/SteamIdGate";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
  
 import { Anek_Gurmukhi, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -59,6 +60,7 @@ export default function RootLayout({
             <Toaster theme="system" richColors closeButton />
             {/* Gate que solicita Steam ID al usuario autenticado si falta */}
             <SteamIdGate />
+            <Analytics />
           </ThemeClerkProvider>
         </ThemeProvider>
       </body>
