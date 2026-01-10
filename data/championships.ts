@@ -57,7 +57,7 @@ export const championships: Championship[] = [
     ],
     plannedCounts: [3, 3, 3, 2, 3, 3, 2, 2],
     assets: {
-      background: '/assets/fondo-inicio-2.jpg',
+      background: '/assets/hero-1.jpg',
       logo: '/assets/Assetto_Corsa_Logo.png'
     },
     links: {

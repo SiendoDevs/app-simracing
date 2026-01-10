@@ -62,6 +62,7 @@ export default function SiteNav() {
             <DropdownMenuItem onSelect={() => router.push('/')}>Inicio</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => router.push('/sessions')}>Sesiones</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => router.push('/server-publico')}>Server Publico</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push('/streams')}>Streams</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => router.push('/championship')}>Campeonato</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => router.push('/drivers')}>Pilotos</DropdownMenuItem>
           {isLoaded && isSignedIn ? (
@@ -77,6 +78,7 @@ export default function SiteNav() {
         <NavLink href="/">Inicio</NavLink>
         <NavLink href="/sessions">Sesiones</NavLink>
         <NavLink href="/server-publico">Server Publico</NavLink>
+        <NavLink href="/streams">Streams</NavLink>
         <NavLink href="/championship">Campeonato</NavLink>
         <NavLink href="/drivers">Pilotos</NavLink>
         {isLoaded && isSignedIn ? (
