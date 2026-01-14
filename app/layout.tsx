@@ -10,7 +10,7 @@ import AuthButtons from "@/components/AuthButtons";
 import SteamIdGate from "@/components/SteamIdGate";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
- 
+
 import { Anek_Gurmukhi, Geist_Mono } from "next/font/google";
 import "./globals.css";
 

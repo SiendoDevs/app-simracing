@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
+import ReactCountryFlag from 'react-country-flag'
 
 function HelmetIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -45,6 +46,55 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   )
 }
 
+function LanguageSwitcher() {
+  const pathname = usePathname()
+  const router = useRouter()
+  const currentLang: 'es' | 'en' | 'pt-br' =
+    pathname.startsWith('/en') ? 'en' : pathname.startsWith('/pt-br') ? 'pt-br' : 'es'
+
+  const countryCode = currentLang === 'en' ? 'US' : currentLang === 'pt-br' ? 'BR' : 'AR'
+
+  const goTo = (lang: 'es' | 'en' | 'pt-br') => {
+    if (lang === currentLang) return
+    if (lang === 'es') router.push('/')
+    if (lang === 'en') router.push('/en')
+    if (lang === 'pt-br') router.push('/pt-br')
+  }
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-md border bg-background px-1.5 py-1 hover:bg-accent"
+          aria-label="Seleccionar idioma"
+        >
+          <ReactCountryFlag
+            svg
+            countryCode={countryCode}
+            className="inline-block"
+            style={{ width: '1.25rem', height: '1.25rem' }}
+          />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuItem onSelect={() => goTo('es')} className="flex items-center gap-2">
+          <ReactCountryFlag svg countryCode="AR" style={{ width: '1.25rem', height: '1.25rem' }} />
+          <span className="text-xs">Español</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => goTo('en')} className="flex items-center gap-2">
+          <ReactCountryFlag svg countryCode="US" style={{ width: '1.25rem', height: '1.25rem' }} />
+          <span className="text-xs">English</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => goTo('pt-br')} className="flex items-center gap-2">
+          <ReactCountryFlag svg countryCode="BR" style={{ width: '1.25rem', height: '1.25rem' }} />
+          <span className="text-xs">Português</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 export default function SiteNav() {
   const router = useRouter()
   const { user, isLoaded } = useUser()
@@ -74,22 +124,25 @@ export default function SiteNav() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <nav className="hidden md:flex items-center gap-3">
-        <NavLink href="/">Inicio</NavLink>
-        <NavLink href="/sessions">Sesiones</NavLink>
-        <NavLink href="/server-publico">Server Publico</NavLink>
-        <NavLink href="/streams">Streams</NavLink>
-        <NavLink href="/championship">Campeonato</NavLink>
-        <NavLink href="/drivers">Pilotos</NavLink>
-        {isLoaded && isSignedIn ? (
-          <NavLink href="/driver-profile">
-            <span className="flex items-center gap-2">
-              <HelmetIcon className="h-5 w-5" />
-              Perfil Piloto
-            </span>
-          </NavLink>
-        ) : null}
-      </nav>
+      <div className="hidden md:flex items-center gap-3">
+        <nav className="flex items-center gap-3">
+          <NavLink href="/">Inicio</NavLink>
+          <NavLink href="/sessions">Sesiones</NavLink>
+          <NavLink href="/server-publico">Server Publico</NavLink>
+          <NavLink href="/streams">Streams</NavLink>
+          <NavLink href="/championship">Campeonato</NavLink>
+          <NavLink href="/drivers">Pilotos</NavLink>
+          {isLoaded && isSignedIn ? (
+            <NavLink href="/driver-profile">
+              <span className="flex items-center gap-2">
+                <HelmetIcon className="h-5 w-5" />
+                Perfil Piloto
+              </span>
+            </NavLink>
+          ) : null}
+        </nav>
+        <LanguageSwitcher />
+      </div>
     </>
   )
 }

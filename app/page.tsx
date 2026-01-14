@@ -48,38 +48,6 @@ export default async function Home() {
   )
   const devBypass = process.env.DEV_ALLOW_ANON_UPLOAD === '1' || (process.env.NODE_ENV === 'development' && process.env.DEV_ALLOW_ANON_UPLOAD !== '0')
   const isAdmin = isAdminRaw || devBypass
-  let playersOnline: number | null = null
-  try {
-    const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
-      ? `https://${process.env.VERCEL_URL}`
-      : undefined
-    const fromEnv = process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL.length > 0
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : undefined
-    const origin = fromVercel ?? fromEnv ?? 'http://localhost:3000'
-    const tryServers = async (): Promise<number | null> => {
-      for (const s of [1, 2]) {
-        // Prefer relative route first (works reliably in prod and dev)
-        try {
-          const rRel = await fetch(`/api/live-timing?server=${s}`, { cache: 'no-store', next: { revalidate: 0 } })
-          if (rRel.ok) {
-            const j = await rRel.json()
-            if (typeof j?.playersOnline === 'number') return j.playersOnline as number
-          }
-        } catch {}
-        // Fallback to absolute origin if relative failed
-        try {
-          const rAbs = await fetch(`${origin}/api/live-timing?server=${s}`, { cache: 'no-store', next: { revalidate: 0 } })
-          if (rAbs.ok) {
-            const j = await rAbs.json()
-            if (typeof j?.playersOnline === 'number') return j.playersOnline as number
-          }
-        } catch {}
-      }
-      return null
-    }
-    playersOnline = await tryServers()
-  } catch {}
   const sessionDateKey = (s: { id: string; date?: string }) => {
     if (typeof s.date === 'string') {
       const d = new Date(s.date)
@@ -222,12 +190,6 @@ export default async function Home() {
           width={160}
           className="absolute top-6 right-6 h-10 w-auto md:h-12 opacity-90"
         />
-        {playersOnline !== null ? (
-          <div className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-md border bg-black/80 px-2 py-1 text-xs text-white border-white/10">
-            <Users className="h-4 w-4" />
-            {`${playersOnline} piloto/s en linea`}
-          </div>
-        ) : null}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-md">{currentChampionship.subtitle}</h1>
           <p className="mt-3 mb-3 text-lg md:text-md font-medium text-white/90 drop-shadow-sm">{currentChampionship.description}</p>
