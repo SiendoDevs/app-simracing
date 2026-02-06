@@ -458,7 +458,7 @@ export default async function Home() {
         <Link href="/sessions" className="underline">Ver todas las sesiones</Link>
       </div>
       
-      <section className="rounded-xl border bg-muted/40 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      {/* <section className="rounded-xl border bg-muted/40 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
         <div className="space-y-3">
           <h2 className="text-2xl md:text-3xl font-bold inline-flex items-center gap-3">
             <Globe className="h-8 w-8 text-[#d8552b]" />
@@ -478,7 +478,7 @@ export default async function Home() {
             </Link>
           </Button>
         </div>
-      </section>
+      </section> */}
      
     </div>
   );
