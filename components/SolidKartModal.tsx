@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
@@ -9,10 +9,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 export default function SolidKartModal() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const labelsRef = useRef<HTMLDivElement | null>(null)
-  const [status, setStatus] = useState<"loading" | "ok" | "error">("loading")
 
   useEffect(() => {
     const container = containerRef.current
+    const labelsContainer = labelsRef.current
     if (!container) {
       console.log("SolidKart viewer: container not ready")
       return
@@ -194,13 +194,10 @@ export default function SolidKartModal() {
             hotspots.push({ mesh, localPos, element: el, labelElement: label, active: false, visible: false })
           })
         }
-
-        setStatus("ok")
       },
       undefined,
       (error: unknown) => {
         console.error("Error cargando SOLID.glb", error)
-        setStatus("error")
       }
     )
 
@@ -365,8 +362,8 @@ export default function SolidKartModal() {
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement)
       }
-      if (labelsRef.current) {
-        labelsRef.current.innerHTML = ""
+      if (labelsContainer) {
+        labelsContainer.innerHTML = ""
       }
     }
   }, [])
