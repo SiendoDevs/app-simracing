@@ -117,6 +117,12 @@ export async function getProfileData() {
   }
   const penalties = (penaltiesRemote ?? []).filter(isPen)
 
+  const penaltySecondsByDriver = new Map<string, number>()
+  for (const p of penalties) {
+    const prev = penaltySecondsByDriver.get(p.driverId) ?? 0
+    penaltySecondsByDriver.set(p.driverId, prev + p.seconds)
+  }
+
   const adjusted = sessionsPublished
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
@@ -147,12 +153,29 @@ export async function getProfileData() {
     }
   }
 
+  const driverNumbersRemote = await (async () => {
+    try {
+      const r2 = await fetch(`${origin}/api/driver-numbers`, { cache: 'no-store', next: { revalidate: 0 } })
+      if (r2.ok) {
+        return await r2.json()
+      }
+    } catch {}
+    return null
+  })()
+  const driverNumbers = (driverNumbersRemote as Record<string, string>) || {}
+  const totalRaceSessions = adjusted.filter((s) => (s.type || '').toUpperCase() === 'RACE').length
   const rawTable = calculateChampionship(adjusted, pointsMap)
-  const table = rawTable.map((d) => ({
-    ...d,
-    previewUrl: resolveSkinImageFor(d.livery, d.name),
-    numberToken: resolveSkinNumber(d.livery, d.name),
-  }))
+  const table = rawTable.map((d) => {
+    const customNum = d.driverId ? driverNumbers[d.driverId] : undefined
+    const absences = totalRaceSessions > d.races ? totalRaceSessions - d.races : 0
+    return {
+      ...d,
+      penaltySeconds: penaltySecondsByDriver.get(d.driverId) ?? 0,
+      previewUrl: resolveSkinImageFor(d.livery, d.name),
+      numberToken: customNum ?? resolveSkinNumber(d.livery, d.name),
+      absences,
+    }
+  })
   const sessionsWithPoints = adjusted.map((s) => applySessionPoints(s, pointsMap.get(s.id)))
 
   return { table, sessionsWithPoints }

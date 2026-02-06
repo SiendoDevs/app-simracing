@@ -235,11 +235,29 @@ export default async function HomePortuguese() {
                 <Clock className="h-4 w-4" /> {currentChampionship.rules.schedule}
               </span>
               <span className="inline-flex items-center gap-2">
-                <CalendarDays className="h-4 w-4" /> Começou em{" "}
-                {new Date(currentChampionship.startDate).toLocaleDateString("pt-BR", {
-                  day: "numeric",
-                  month: "long",
-                })}
+                <CalendarDays className="h-4 w-4" />
+                {(() => {
+                  const [, m, d] = currentChampionship.startDate.split("-").map((v) => parseInt(v, 10));
+                  const months = [
+                    "janeiro",
+                    "fevereiro",
+                    "março",
+                    "abril",
+                    "maio",
+                    "junho",
+                    "julho",
+                    "agosto",
+                    "setembro",
+                    "outubro",
+                    "novembro",
+                    "dezembro",
+                  ];
+                  const label =
+                    !Number.isFinite(d) || !Number.isFinite(m) || m < 1 || m > 12
+                      ? currentChampionship.startDate
+                      : `${d} de ${months[m - 1]}`;
+                  return <>Começou em {label}</>;
+                })()}
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

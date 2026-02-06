@@ -1,14 +1,14 @@
 "use client"
 
 import { useUser } from "@clerk/nextjs"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PilotProfileCard from "./PilotProfileCard"
-import PointsProgressChart from "./PointsProgressChart"
 import TrophyCollection from "./TrophyCollection"
+import DriverNumberSelector from "./DriverNumberSelector"
 import type { DriverRow } from "./DriversTable"
 import type { Session } from "@/types/Session"
 
@@ -40,18 +40,26 @@ export default function DriverProfileContent({
   }, [user])
 
   const showBackToMyProfile = isLoaded && user && initialDriverId && loggedInSteamId && initialDriverId !== loggedInSteamId
+  const isMe = loggedInSteamId && steamId === loggedInSteamId
 
   const me = useMemo(() => {
     if (!steamId) return undefined
     return table.find((d) => (d.driverId || '').trim() === steamId)
   }, [table, steamId])
 
+  const [numberDisplay, setNumberDisplay] = useState<string | undefined>(me?.numberToken)
+
+  useEffect(() => {
+    setNumberDisplay(me?.numberToken)
+  }, [me?.numberToken])
+
   const mySessionResults = useMemo(() => {
     if (!sessions || !steamId) return [] as Array<{ id: string; type: string; track?: string; position?: number; dnf?: boolean }>
     const list: Array<{ id: string; type: string; track?: string; position?: number; dnf?: boolean }> = []
     for (const s of sessions) {
       const r = s.results.find((x) => (x.driverId || '').trim() === steamId)
-      list.push({ id: s.id, type: s.type, track: s.track, position: r?.position, dnf: r?.dnf })
+      if (!r) continue
+      list.push({ id: s.id, type: s.type, track: s.track, position: r.position, dnf: r.dnf })
     }
     // "la ultima primero" implies reverse chronological if sessions are chronological
     return list.reverse()
@@ -71,72 +79,88 @@ export default function DriverProfileContent({
     return list
   }, [mySessionResults, steamId])
 
-  const myPointEntries = useMemo(() => {
-    if (!steamId) return []
-    const list: Array<{ label: string; acc: number; pts: number }> = []
-    const sorted = sessions.slice().sort((a, b) => a.id.localeCompare(b.id))
-    let acc = 0
-    for (const s of sorted) {
-      const r = s.results.find((x) => (x.driverId || '').trim() === steamId)
-      if (!r) continue
-      const pts = typeof r.points === 'number' ? (r.points as number) : 0
-      acc += pts
-      const label = s.date
-        ? (() => { try { const d = new Date(s.date as string); return d.toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }) } catch { return s.id.slice(0, 10).replace(/_/g, '-') } })()
-        : s.id.slice(0, 10).replace(/_/g, '-')
-      list.push({ label, acc, pts })
-    }
-    const firstPositiveIdx = list.findIndex((it) => it.acc > 0 || it.pts > 0)
-    return firstPositiveIdx >= 0 ? list.slice(firstPositiveIdx) : list
-  }, [sessions, steamId])
-
   if (!isLoaded) return null
 
   return (
     <div className="py-6 space-y-4">
-      {showBackToMyProfile && (
-        <div className="flex justify-start">
-          <Button variant="ghost" asChild className="pl-0 gap-2 hover:bg-transparent hover:text-[#d8552b]">
-            <Link href="/driver-profile">
-              <ArrowLeft className="h-4 w-4" />
-              Volver a mi perfil
-            </Link>
-          </Button>
-        </div>
-      )}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        {showBackToMyProfile ? (
+          <div className="flex justify-start">
+            <Button variant="ghost" asChild className="pl-0 gap-2 hover:bg-transparent hover:text-[#d8552b]">
+              <Link href="/driver-profile">
+                <ArrowLeft className="h-4 w-4" />
+                Volver a mi perfil
+              </Link>
+            </Button>
+          </div>
+        ) : <div />}
+
+        {isMe && (
+          <div className="w-full md:w-auto flex justify-end">
+            <DriverNumberSelector
+              compact
+              currentNumber={numberDisplay}
+              onFinishChange={(success, newNumber) => {
+                if (success && newNumber) setNumberDisplay(newNumber)
+              }}
+            />
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-        <PilotProfileCard 
-          data={table} 
-          sessions={sessions} 
-          numberToken={me?.numberToken} 
-          driverId={steamId}
-          results={mySessionResults}
-        />
         <div className="flex flex-col gap-4 h-full min-h-0 min-w-0">
-          <div className="rounded-md border p-4 flex items-center justify-center">
+          <PilotProfileCard 
+            data={table} 
+            sessions={sessions} 
+            numberToken={numberDisplay ?? me?.numberToken} 
+            driverId={steamId}
+            results={mySessionResults}
+            showHeader
+            showStats={false}
+            showSessions={false}
+          />
+          <PilotProfileCard 
+            data={table} 
+            sessions={sessions} 
+            numberToken={numberDisplay ?? me?.numberToken} 
+            driverId={steamId}
+            results={mySessionResults}
+            showHeader={false}
+            showStats
+            showSessions={false}
+          />
+        </div>
+        <div className="flex flex-col gap-4 h-full min-h-0 min-w-0">
+          <div className="flex flex-col items-center justify-center gap-4">
             {me?.previewUrl ? (
               <div className="relative w-full aspect-video rounded-md overflow-hidden">
-                <Image 
-                  src={me.previewUrl} 
-                  alt={`Livery de ${me?.name ?? 'piloto'}`} 
-                  fill 
-                  sizes="(min-width: 768px) 50vw, 100vw" 
-                  className="object-cover" 
+                <Image
+                  src={me.previewUrl}
+                  alt={`Livery de ${me?.name ?? 'piloto'}`}
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="object-cover"
                 />
               </div>
             ) : (
               <div className="text-sm text-muted-foreground">Sin preview</div>
             )}
           </div>
-          <div className="rounded-md border p-4 flex-1 min-h-0 min-w-0 flex flex-col">
-            <div className="text-sm font-medium">Progreso de puntos</div>
-            <div className="mt-2 flex-1 min-h-0">
-              <PointsProgressChart data={myPointEntries} />
-            </div>
-          </div>
         </div>
       </div>
-      
+
+      <PilotProfileCard 
+        data={table} 
+        sessions={sessions} 
+        numberToken={numberDisplay ?? me?.numberToken} 
+        driverId={steamId}
+        results={mySessionResults}
+        showHeader={false}
+        showStats={false}
+        showSessions
+      />
+
       <TrophyCollection wins={myWins} />
     </div>
   )

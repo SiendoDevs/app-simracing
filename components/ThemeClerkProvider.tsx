@@ -1,23 +1,11 @@
 "use client"
 
 import { ClerkProvider } from "@clerk/nextjs"
-import { useTheme } from "next-themes"
 import { esES } from "@clerk/localizations"
-import { useEffect, useState } from "react"
 
 export function ThemeClerkProvider({ children }: { children: React.ReactNode }) {
-  const { resolvedTheme } = useTheme()
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // Evitar mismatch de hidratación inicial renderizando con un tema por defecto o null
-  // Sin embargo, ClerkProvider maneja esto internamente si le pasamos variables.
-  // Pero para estar seguros, usaremos los valores por defecto si no está montado.
-  
-  const isDark = isMounted && resolvedTheme === 'dark'
+  // Siempre usamos modo oscuro
+  const isDark = true
 
   return (
     <ClerkProvider

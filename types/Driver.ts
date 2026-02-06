@@ -4,5 +4,7 @@ export interface Driver {
   steamId?: string
   team?: string
   country?: string
+  city?: string
+  age?: number
 }
 

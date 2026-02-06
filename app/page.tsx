@@ -3,9 +3,12 @@ import Image from "next/image";
 import { loadLocalSessions } from "@/lib/loadLocalSessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check, Globe } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check, Globe, ShoppingCart } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { currentChampionship } from "@/data/championships";
+import SolidKartModal from "@/components/SolidKartModal";
+import AcquireModal from "@/components/AcquireModal";
 
 export default async function Home() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
@@ -127,6 +130,14 @@ export default async function Home() {
     const list = byDate.get(sortedKeys[i]) ?? []
     statusByIdx.set(i + 1, list.length >= plannedCounts[i])
   }
+  let nextIdx = schedule.length > 0 ? schedule[0].idx : 1
+  for (let i = 0; i < schedule.length; i++) {
+    const idx = schedule[i].idx
+    if (!statusByIdx.get(idx)) {
+      nextIdx = idx
+      break
+    }
+  }
   const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null
   const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer
   const formatId = (id: string) => {
@@ -181,7 +192,46 @@ export default async function Home() {
     <div className="space-y-6">
       
       <section className="relative rounded-xl overflow-hidden border">
-        <div className="h-[400px] bg-cover bg-center animate-hero-zoom" style={{ backgroundImage: `url(${currentChampionship.assets.background})` }} />
+        <Carousel className="h-[400px]" autoPlayInterval={5000} opts={{}} plugins={[]}>
+          <CarouselContent>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-1.jpg)" }}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-2.jpg)" }}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-3.jpg)" }}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-4.jpg)" }}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-5.jpg)" }}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/home-new-6.jpg)" }}
+              />
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/30 to-transparent" />
         <Image
           src={currentChampionship.assets.logo}
@@ -209,13 +259,88 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      
+      {/* New 2026 Mod Section */}
+      <section 
+        className="solidkart-gradient-animated grid grid-cols-1 md:grid-cols-2 gap-6 items-center rounded-xl border p-4 md:p-6"
+      >
+        <div className="space-y-3 text-center md:text-left">
+          <Badge className="bg-[#d8552b] text-white hover:bg-[#d8552b] uppercase tracking-wide">
+            Nuevo mod 2026
+          </Badge>
+          <h2 className="text-2xl md:text-3xl font-bold">
+            Solid Kart K+ 4T 390cc
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Kart de categoría profesional federada por la CDA. Equipado con motor 390cc, 
+            carburador de competición, admisión y escape modificados. 
+            Un mod pensado para competiciones oficiales con realismo máximo.
+          </p>
+          <ul className="text-sm md:text-base text-muted-foreground grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-2">
+            <li className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-[#d8552b]" />
+              20 bhp / 31 Nm Torque
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-[#d8552b]" />
+              180 kg con Piloto
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-[#d8552b]" />
+              Velocidad máxima ~110km/h
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-[#d8552b]" />
+              Embrague centrífugo, directo
+            </li>
+          </ul>
+          <p className="text-xs md:text-sm text-muted-foreground">
+            Disponible en los campeonatos oficiales de ZN Kart SimRacing.
+          </p>
+          <div className="pt-2">
+            <AcquireModal />
+          </div>
+        </div>
+        <div className="w-full">
+          <SolidKartModal />
+        </div>
+      </section>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-stretch">
         <div className="rounded-lg border p-3 md:p-4 h-full flex flex-col">
           <div className="flex-1 space-y-3">
             <div className="text-xl md:text-2xl font-bold">{currentChampionship.title}</div>
             <div className="text-sm text-muted-foreground inline-flex flex-wrap gap-4">
-              <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4" /> {currentChampionship.rules.schedule}</span>
-              <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Comenzó el {new Date(currentChampionship.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}</span>
+              <span className="inline-flex items-center gap-2">
+                <Clock className="h-4 w-4" /> {currentChampionship.rules.schedule}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays className="h-4 w-4" />
+                {(() => {
+                  const [, m, d] = currentChampionship.startDate.split("-").map((v) => parseInt(v, 10));
+                  const months = [
+                    "enero",
+                    "febrero",
+                    "marzo",
+                    "abril",
+                    "mayo",
+                    "junio",
+                    "julio",
+                    "agosto",
+                    "septiembre",
+                    "octubre",
+                    "noviembre",
+                    "diciembre",
+                  ];
+                  const label =
+                    !Number.isFinite(d) || !Number.isFinite(m) || m < 1 || m > 12
+                      ? currentChampionship.startDate
+                      : `${d} de ${months[m - 1]}`;
+                  const startDate = new Date(currentChampionship.startDate);
+                  const today = new Date();
+                  const started = !isNaN(startDate.getTime()) && today >= startDate;
+                  return <>{started ? "Comenzó el " : "Comienza el "}{label}</>;
+                })()}
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -250,12 +375,12 @@ export default async function Home() {
         <div className="rounded-lg border h-full flex flex-col">
           <div className="px-3 md:px-4 py-2 text-sm md:text-base font-semibold border-b">Fechas del campeonato</div>
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
-            {schedule.map((f, index) => {
-              const isLast = index === schedule.length - 1
+            {schedule.map((f) => {
+              const isNext = f.idx === nextIdx
               return (
                 <li key={f.idx} className="group relative flex items-center justify-start rounded-md border p-2 shadow-sm overflow-hidden">
                   <div className={`absolute inset-0 transition-colors ${
-                    isLast 
+                    isNext 
                       ? "bg-linear-to-r from-[#d8552b]/20 via-[#d8552b]/40 to-[#d8552b]/20 animate-pulse"
                       : "bg-[#d8552b]/10 group-hover:bg-[#d8552b]/20"
                   }`} />
@@ -291,7 +416,7 @@ export default async function Home() {
       </div>
       <ul className="rounded-lg border divide-y">
         {sessionsRecent.length === 0 && (
-          <li className="p-4 text-sm text-muted-foreground">No se encontraron archivos JSON de sesiones.</li>
+          <li className="p-4 text-sm text-muted-foreground">Aún no se han registrado sesiones recientes.</li>
         )}
         {sessionsRecent
           .slice()

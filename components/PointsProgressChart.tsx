@@ -4,8 +4,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 
 export default function PointsProgressChart({ data }: { data: Array<{ label: string; acc: number; pts: number }> }) {
   const config = {
-    acc: { label: "Acumulado", color: "#d8552b" },
-    pts: { label: "Por sesión", color: "#f29f85" },
+    pts: { label: "Puntos por carrera", color: "#d8552b" },
   }
   
   return (
@@ -19,8 +18,7 @@ export default function PointsProgressChart({ data }: { data: Array<{ label: str
                 <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={10} />
                 <YAxis allowDecimals={false} />
                 <Legend />
-                <Bar dataKey="acc" name="Acumulado" fill="var(--color-acc)" radius={4} />
-                <Bar dataKey="pts" name="Por sesión" fill="var(--color-pts)" radius={4} />
+                <Bar dataKey="pts" name="Puntos por carrera" fill="var(--color-pts)" radius={4} />
                 <ChartTooltip cursor={{ fill: 'rgba(156, 163, 175, 0.12)' }} content={<ChartTooltipContent />} />
               </BarChart>
             </ResponsiveContainer>

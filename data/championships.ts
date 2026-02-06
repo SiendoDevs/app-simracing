@@ -42,9 +42,9 @@ export const championships: Championship[] = [
     title: 'Edición #2 · Kart KZ 125cc',
     subtitle: 'Liga de Karting | Asseto Corsa',
     description: 'Noticias, resultados, sesiones y campeonatos.',
-    status: 'active',
-    startDate: '2024-11-26', // "Comenzó el 26 de Noviembre"
-    // endDate no definido aún porque está en curso
+    status: 'completed',
+    startDate: '2025-11-26',
+    endDate: '2026-01-14',
     schedule: [
       { idx: 1, label: 'Zárate 1' },
       { idx: 2, label: 'Baradero' },
@@ -68,13 +68,54 @@ export const championships: Championship[] = [
       whatsapp: 'https://chat.whatsapp.com/FYY7DU9mPchIUAYl1FAuzP'
     },
     rules: {
-      requirements: 'PC, Asseto Corsa, Content Manager, CSP, Real Penalty.',
+      requirements: 'PC, Assetto Corsa, Content Manager, CSP, Jotracks Race Director (App).',
       tracks: 'Jotracks (Modder Oficial)',
       inscription: 'Gratis (incluye mod y pistas para todo el campeonato).',
       quota: 'Máximo 35 pilotos.',
       schedule: 'Miércoles 21:30 hs.'
     }
+  },
+  {
+    id: 'season-3',
+    title: 'Edición #3 · Kart Solid K+ 390cc',
+    subtitle: 'Karting Simracing | Assetto Corsa',
+    description: 'La primer Liga de Karting Simracing Argentina.',
+    status: 'upcoming',
+    startDate: '2026-03-17',
+    endDate: '2026-05-31',
+    schedule: [
+      { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true },
+      { idx: 2, label: 'Trenque Lauquen', extra: 'Pretemporada – 2', nuevo: true },
+      { idx: 3, label: 'Zárate #4' },
+      { idx: 4, label: 'Ciudad Evita' },
+      { idx: 5, label: 'Buenos Aires #1', extra: 'Especial – 40 vueltas', nuevo: true },
+      { idx: 6, label: 'Baradero' },
+      { idx: 7, label: 'Mar del Plata', extra: 'Especial – 40 vueltas', nuevo: true },
+      { idx: 8, label: 'Zárate #1' }
+    ],
+    plannedCounts: [2, 2, 2, 2],
+    assets: {
+      background: '/assets/hero-1.jpg',
+      logo: '/assets/Assetto_Corsa_Logo.png'
+    },
+    links: {
+      liveTiming: 'https://siendostudio.com/timing',
+      serverPublic: '/server-publico',
+      championship: '/championship',
+      inscriptions: 'https://docs.google.com/forms/d/e/1FAIpQLScjoch5V5d-BjkwS_wq7jDCCAu9r_KyU5QyJ_1MwsK_7HTLcw/viewform?usp=header',
+      whatsapp: 'https://chat.whatsapp.com/FYY7DU9mPchIUAYl1FAuzP'
+    },
+    rules: {
+      requirements: 'PC, Assetto Corsa, Content Manager, CSP, Jotracks Race Director (App).',
+      tracks: 'Jotracks (Modder Oficial)',
+      inscription: '$25.000 Incluye Mod y Pistas',
+      quota: 'Máximo 50 pilotos.',
+      schedule: 'Martes 20:00 hs.'
+    }
   }
 ]
 
-export const currentChampionship = championships.find(c => c.status === 'active') || championships[0]
+export const currentChampionship =
+  championships.find((c) => c.status === 'active') ||
+  championships.find((c) => c.status === 'upcoming') ||
+  championships[0]
