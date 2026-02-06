@@ -4,7 +4,7 @@ import { loadLocalSessions } from "@/lib/loadLocalSessions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check, Globe, ShoppingCart } from "lucide-react";
+import { CalendarDays, Eye, Users, Timer, Trophy, Clock, MessageCircle, UserPlus, Check } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { currentChampionship } from "@/data/championships";
 import SolidKartModal from "@/components/SolidKartModal";
