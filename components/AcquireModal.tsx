@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { ShoppingCart, CreditCard, Gift } from "lucide-react"
+import { ShoppingCart, Gift } from "lucide-react"
 import Link from "next/link"
 import { currentChampionship } from "@/data/championships"
 
@@ -29,7 +29,7 @@ export default function AcquireModal() {
             Selecciona el plan que mejor se adapte a lo que buscas.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+        <div className="grid grid-cols-1 gap-4 pt-4">
           {/* Option 1: Premium/Bundle */}
           <div className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow hover:border-[#d8552b] hover:shadow-lg transition-all cursor-pointer p-6 flex flex-col gap-4">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -54,7 +54,7 @@ export default function AcquireModal() {
           </div>
 
           {/* Option 2: Basic/Individual */}
-          <div className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow hover:border-[#d8552b] hover:shadow-lg transition-all cursor-pointer p-6 flex flex-col gap-4">
+          {/* <div className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow hover:border-[#d8552b] hover:shadow-lg transition-all cursor-pointer p-6 flex flex-col gap-4">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
               <CreditCard className="h-24 w-24 text-[#d8552b]" />
             </div>
@@ -74,7 +74,7 @@ export default function AcquireModal() {
                 <Link href="https://www.patreon.com/jotracks" target="_blank" rel="noopener noreferrer">Ir a Patreon</Link>
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>
