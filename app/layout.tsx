@@ -10,17 +10,22 @@ import SteamIdGate from "@/components/SteamIdGate";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 
-import { Anek_Gurmukhi, Geist_Mono } from "next/font/google";
+import { Chakra_Petch, Geist_Mono, Saira } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Anek_Gurmukhi({
+const racingSans = Chakra_Petch({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: "variable",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const saira = Saira({
+  variable: "--font-saira",
   subsets: ["latin"],
 });
 
@@ -37,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${racingSans.variable} ${geistMono.variable} ${saira.variable} antialiased font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
           <ThemeClerkProvider>
             <header className="border-b bg-background">

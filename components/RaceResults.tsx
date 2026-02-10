@@ -424,7 +424,7 @@ export default function RaceResults({ session, exclusions }: { session: Session;
                 </TableCell>
                 <TableCell>
                   <span
-                    className={`font-extrabold text-xl md:text-2xl uppercase italic ${
+                    className={`font-(family-name:--font-saira) font-black text-xl md:text-2xl uppercase italic ${
                       r.position === 1 ? 'bg-linear-to-r from-[#e6c463] via-[#d4b24c] to-[#b9902e] bg-clip-text text-transparent drop-shadow-sm' : ''
                     }`}
                   >

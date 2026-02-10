@@ -109,7 +109,7 @@ export default function DriverProfileContent({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-        <div className="flex flex-col gap-4 h-full min-h-0 min-w-0">
+        <div className="flex flex-col gap-4 min-h-0 min-w-0">
           <PilotProfileCard 
             data={table} 
             sessions={sessions} 

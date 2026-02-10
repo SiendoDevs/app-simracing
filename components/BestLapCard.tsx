@@ -20,7 +20,7 @@ export default function BestLapCard({ session }: { session: Session }) {
       <CardContent>
         {best ? (
           <div className="space-y-1">
-            <div className="font-extrabold text-xl md:text-2xl uppercase italic text-[#d8552b]">{name}</div>
+            <div className="font-[family-name:var(--font-saira)] font-black text-xl md:text-2xl uppercase italic text-[#d8552b]">{name}</div>
             <div className="text-3xl md:text-4xl font-bold text-foreground tracking-tighter">{(best.bestLapMs! / 1000).toFixed(3)}s</div>
           </div>
         ) : (

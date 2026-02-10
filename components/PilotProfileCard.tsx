@@ -168,11 +168,11 @@ export default function PilotProfileCard({
   const headerOnly = showHeader && !showStats && !showSessions
 
   return (
-    <div className="flex flex-col gap-4 h-full min-h-0">
+    <div className="flex flex-col gap-4 min-h-0">
       {showHeader && (
         <div
           className={`rounded-md p-4 ${licenseBlockClass} ${
-            headerOnly ? 'h-full flex flex-col' : ''
+            headerOnly ? 'flex flex-col' : ''
           }`}
           style={{ backgroundImage: licenseGradient }}
         >
@@ -184,7 +184,7 @@ export default function PilotProfileCard({
             </span>
             <div className="flex-1">
               <div className="flex items-baseline gap-2">
-                <span className="font-extrabold text-2xl uppercase italic">{me.name}</span>
+                <span className="font-(family-name:--font-saira) font-black text-2xl uppercase italic">{me.name}</span>
               </div>
               <div className="text-sm md:text-base font-semibold text-[#9ca3af]">{me.team ?? '-'}</div>
               <div className="mt-1">
@@ -357,7 +357,7 @@ export default function PilotProfileCard({
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-muted-foreground min-w-[4rem] text-center">
+              <span className="text-sm text-muted-foreground min-w-16 text-center">
                 {page} / {totalPages}
               </span>
               <Button

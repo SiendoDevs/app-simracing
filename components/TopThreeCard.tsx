@@ -71,8 +71,8 @@ export default function TopThreeCard({
       ) : null}
       <div className="absolute bottom-0 left-0 z-10 p-4">
         {textGradient
-          ? <span className={`font-extrabold text-md md:text-lg uppercase italic ${textGradient}`}>{name}</span>
-          : <span className="font-extrabold text-white text-md md:text-lg uppercase italic">{name}</span>
+          ? <span className={`font-[family-name:var(--font-saira)] font-black text-md md:text-lg uppercase italic ${textGradient}`}>{name}</span>
+          : <span className="font-[family-name:var(--font-saira)] font-black text-white text-md md:text-lg uppercase italic">{name}</span>
         }
       </div>
     </Card>

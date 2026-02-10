@@ -211,7 +211,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           </div>
           {winnerName ? (
             <div className="absolute bottom-0 left-0 z-10 p-4">
-              <span className="font-extrabold text-white text-md md:text-lg uppercase italic">
+              <span className="font-(family-name:--font-saira) font-black text-white text-md md:text-lg uppercase italic">
                 {winnerName}
               </span>
             </div>
