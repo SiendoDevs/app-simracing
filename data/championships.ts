@@ -81,7 +81,7 @@ export const championships: Championship[] = [
     subtitle: 'Karting Simracing | Assetto Corsa',
     description: 'La primer Liga de Karting Simracing Argentina.',
     status: 'upcoming',
-    startDate: '2026-02-17',
+    startDate: '2026-03-03',
     endDate: '2026-05-31',
     schedule: [
       { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true },
