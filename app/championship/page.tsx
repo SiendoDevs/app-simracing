@@ -11,6 +11,7 @@ import TopThreeChampionship from '@/components/TopThreeChampionship'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Palette } from 'lucide-react'
+import { currentChampionship } from '@/data/championships'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -223,7 +224,7 @@ export default async function Page() {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
   })
-  const plannedCounts = [3, 3, 3, 2, 3, 3, 2, 2]
+  const plannedCounts = currentChampionship.plannedCounts
   const totalFechas = plannedCounts.length
   let remaining = relevant.length
   let fechasCompletas = 0

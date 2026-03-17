@@ -126,9 +126,10 @@ export default async function Home() {
   }
   const sortedKeys = Array.from(byDate.keys()).sort((a, b) => a.localeCompare(b))
   const statusByIdx = new Map<number, boolean>()
-  for (let i = 0; i < plannedCounts.length; i++) {
-    const list = byDate.get(sortedKeys[i]) ?? []
-    statusByIdx.set(i + 1, list.length >= plannedCounts[i])
+  for (let i = 0; i < plannedCounts.length && i < schedule.length; i++) {
+    const dateKey = sortedKeys[i]
+    const list = typeof dateKey === 'string' ? (byDate.get(dateKey) ?? []) : []
+    statusByIdx.set(schedule[i].idx, list.length >= plannedCounts[i])
   }
   let nextIdx = schedule.length > 0 ? schedule[0].idx : 1
   for (let i = 0; i < schedule.length; i++) {
@@ -138,6 +139,7 @@ export default async function Home() {
       break
     }
   }
+  const highlightIdx = typeof currentChampionship.currentIdx === 'number' ? currentChampionship.currentIdx : nextIdx
   const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null
   const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer
   const formatId = (id: string) => {
@@ -376,7 +378,10 @@ export default async function Home() {
           <div className="px-3 md:px-4 py-2 text-sm md:text-base font-semibold border-b">Fechas del campeonato</div>
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
             {schedule.map((f) => {
-              const isNext = f.idx === nextIdx
+              const isNext = f.idx === highlightIdx
+              const isCompleted =
+                (typeof currentChampionship.currentIdx === 'number' && f.idx < currentChampionship.currentIdx) ||
+                !!statusByIdx.get(f.idx)
               return (
                 <li key={f.idx} className="group relative flex items-center justify-start rounded-md border p-2 shadow-sm overflow-hidden">
                   <div className={`absolute inset-0 transition-colors ${
@@ -388,7 +393,7 @@ export default async function Home() {
                     <span className="inline-flex items-center justify-center h-9 w-12 rounded-md font-bold shrink-0 bg-[#d8552b] text-white">{String(f.idx).padStart(2, '0')}</span>
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium inline-flex items-center gap-2">
-                        {statusByIdx.get(f.idx) ? (
+                        {isCompleted ? (
                           <span className="flex items-center justify-center h-5 w-5 rounded-full border border-[#9ca3af] text-[#9ca3af]">
                             <Check className="h-3 w-3" />
                           </span>

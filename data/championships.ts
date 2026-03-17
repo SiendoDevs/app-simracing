@@ -12,6 +12,7 @@ export interface Championship {
   subtitle?: string
   description?: string
   status: 'active' | 'completed' | 'upcoming'
+  currentIdx?: number
   startDate: string // ISO date string YYYY-MM-DD
   endDate?: string // ISO date string YYYY-MM-DD
   schedule: RaceEvent[]
@@ -80,12 +81,13 @@ export const championships: Championship[] = [
     title: 'Edición #3 · Kart Solid K+ 390cc',
     subtitle: 'Karting Simracing | Assetto Corsa',
     description: 'La primer Liga de Karting Simracing Argentina.',
-    status: 'upcoming',
+    status: 'active',
+    currentIdx: 3,
     startDate: '2026-03-03',
-    endDate: '2026-05-31',
+    endDate: '2026-04-21',
     schedule: [
       { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true },
-      { idx: 2, label: 'Trenque Lauquen', extra: 'Pretemporada – 2', nuevo: true },
+      { idx: 2, label: 'Zárate #2', extra: 'Pretemporada – 2' },
       { idx: 3, label: 'Zárate #4' },
       { idx: 4, label: 'Ciudad Evita' },
       { idx: 5, label: 'Buenos Aires #1', extra: 'Especial – 40 vueltas', nuevo: true },
@@ -93,7 +95,7 @@ export const championships: Championship[] = [
       { idx: 7, label: 'Mar del Plata', extra: 'Especial – 40 vueltas', nuevo: true },
       { idx: 8, label: 'Zárate #1' }
     ],
-    plannedCounts: [2, 2, 2, 2],
+    plannedCounts: [2, 2, 2, 2, 2, 2, 2, 2],
     assets: {
       background: '/assets/hero-1.jpg',
       logo: '/assets/Assetto_Corsa_Logo.png'
@@ -110,7 +112,7 @@ export const championships: Championship[] = [
       tracks: 'Jotracks (Modder Oficial)',
       inscription: '$25.000 Incluye Mod y Pistas',
       quota: 'Máximo 50 pilotos.',
-      schedule: 'Martes 20:00 hs.'
+      schedule: 'Martes 21:00 hs.'
     }
   }
 ]

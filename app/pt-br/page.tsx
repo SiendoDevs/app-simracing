@@ -134,10 +134,17 @@ export default async function HomePortuguese() {
   }
   const sortedKeys = Array.from(byDate.keys()).sort((a, b) => a.localeCompare(b));
   const statusByIdx = new Map<number, boolean>();
-  for (let i = 0; i < plannedCounts.length; i++) {
-    const list = byDate.get(sortedKeys[i]) ?? [];
-    statusByIdx.set(i + 1, list.length >= plannedCounts[i]);
+  for (let i = 0; i < plannedCounts.length && i < schedule.length; i++) {
+    const dateKey = sortedKeys[i];
+    const list = typeof dateKey === "string" ? (byDate.get(dateKey) ?? []) : [];
+    statusByIdx.set(schedule[i].idx, list.length >= plannedCounts[i]);
   }
+  const highlightIdx =
+    typeof currentChampionship.currentIdx === "number"
+      ? currentChampionship.currentIdx
+      : schedule.length > 0
+        ? schedule[schedule.length - 1].idx
+        : 1;
   const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null;
   const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer;
   const formatId = (id: string) => {
@@ -295,8 +302,11 @@ export default async function HomePortuguese() {
             Datas do campeonato
           </div>
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
-            {schedule.map((f, index) => {
-              const isLast = index === schedule.length - 1;
+            {schedule.map((f) => {
+              const isHighlight = f.idx === highlightIdx;
+              const isCompleted =
+                (typeof currentChampionship.currentIdx === "number" && f.idx < currentChampionship.currentIdx) ||
+                !!statusByIdx.get(f.idx);
               return (
                 <li
                   key={f.idx}
@@ -304,7 +314,7 @@ export default async function HomePortuguese() {
                 >
                   <div
                     className={`absolute inset-0 transition-colors ${
-                      isLast
+                      isHighlight
                         ? "bg-linear-to-r from-[#d8552b]/20 via-[#d8552b]/40 to-[#d8552b]/20 animate-pulse"
                         : "bg-[#d8552b]/10 group-hover:bg-[#d8552b]/20"
                     }`}
@@ -315,7 +325,7 @@ export default async function HomePortuguese() {
                     </span>
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium inline-flex items-center gap-2">
-                        {statusByIdx.get(f.idx) ? (
+                        {isCompleted ? (
                           <span className="flex items-center justify-center h-5 w-5 rounded-full border border-[#9ca3af] text-[#9ca3af]">
                             <Check className="h-3 w-3" />
                           </span>
