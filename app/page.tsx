@@ -112,7 +112,10 @@ export default async function Home() {
     }
   }
   const schedule = currentChampionship.schedule
-  const plannedCounts = currentChampionship.plannedCounts
+  const plannedCountsAll = currentChampionship.plannedCounts
+  const officialIndices = schedule
+    .map((ev, i) => ({ ev, i }))
+    .filter(({ ev, i }) => ev.official !== false && (plannedCountsAll[i] ?? 0) > 0)
   const relevant = sessionsForViewer.filter((s) => {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
@@ -126,20 +129,30 @@ export default async function Home() {
   }
   const sortedKeys = Array.from(byDate.keys()).sort((a, b) => a.localeCompare(b))
   const statusByIdx = new Map<number, boolean>()
-  for (let i = 0; i < plannedCounts.length && i < schedule.length; i++) {
-    const dateKey = sortedKeys[i]
-    const list = typeof dateKey === 'string' ? (byDate.get(dateKey) ?? []) : []
-    statusByIdx.set(schedule[i].idx, list.length >= plannedCounts[i])
-  }
-  let nextIdx = schedule.length > 0 ? schedule[0].idx : 1
+  let datePtr = 0
   for (let i = 0; i < schedule.length; i++) {
-    const idx = schedule[i].idx
-    if (!statusByIdx.get(idx)) {
-      nextIdx = idx
+    const ev = schedule[i]
+    if (ev.official === false) continue
+    const need = plannedCountsAll[i] ?? 0
+    if (need <= 0) continue
+    const dateKey = sortedKeys[datePtr]
+    const list = typeof dateKey === 'string' ? (byDate.get(dateKey) ?? []) : []
+    const done = list.length >= need
+    statusByIdx.set(ev.idx, done)
+    if (!done) break
+    datePtr++
+  }
+  const firstOfficialIdx = (officialIndices[0]?.ev.idx ?? (schedule[0]?.idx ?? 1))
+  let nextOfficialIdx = firstOfficialIdx
+  for (const { ev } of officialIndices) {
+    if (!statusByIdx.get(ev.idx)) {
+      nextOfficialIdx = ev.idx
       break
     }
+    nextOfficialIdx = ev.idx
   }
-  const highlightIdx = typeof currentChampionship.currentIdx === 'number' ? currentChampionship.currentIdx : nextIdx
+  const highlightIdx = typeof currentChampionship.currentIdx === 'number' ? currentChampionship.currentIdx : nextOfficialIdx
+  const seasonStarted = sortedKeys.length > 0
   const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null
   const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer
   const formatId = (id: string) => {
@@ -379,9 +392,11 @@ export default async function Home() {
           <ul className="p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
             {schedule.map((f) => {
               const isNext = f.idx === highlightIdx
+              const isOfficial = f.official !== false
               const isCompleted =
-                (typeof currentChampionship.currentIdx === 'number' && f.idx < currentChampionship.currentIdx) ||
-                !!statusByIdx.get(f.idx)
+                !!statusByIdx.get(f.idx) ||
+                (isOfficial && typeof currentChampionship.currentIdx === 'number' && f.idx < currentChampionship.currentIdx) ||
+                (!isOfficial && seasonStarted)
               return (
                 <li key={f.idx} className="group relative flex items-center justify-start rounded-md border p-2 shadow-sm overflow-hidden">
                   <div className={`absolute inset-0 transition-colors ${

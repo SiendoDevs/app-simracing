@@ -8,7 +8,7 @@ import { CalendarDays, Eye, Users } from 'lucide-react'
 import path from 'node:path'
 import { headers } from 'next/headers'
 import { Redis } from '@upstash/redis'
-import { championships, currentChampionship } from '@/data/championships'
+import { championships } from '@/data/championships'
 import { loadPenalties } from '@/lib/penalties'
 import { Button } from '@/components/ui/button'
 
@@ -17,7 +17,17 @@ export const dynamic = 'force-dynamic'
 export default async function Page() {
   if (process.env.NODE_ENV === 'development') await new Promise((r) => setTimeout(r, 600))
   const sessions = await loadLocalSessions()
-  
+
+  const champ = championships.find((c) => c.id === 'season-2')
+  if (!champ) {
+    return (
+      <div className="space-y-4 py-6">
+        <h1 className="text-xl md:text-2xl font-bold">Sesiones</h1>
+        <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">No se encontró el campeonato solicitado.</div>
+      </div>
+    )
+  }
+
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
     ? `https://${process.env.VERCEL_URL}`
     : undefined
@@ -84,7 +94,9 @@ export default async function Page() {
     const [, y, mo, d, h, mi, t] = m
     return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
   }
-  const publishedSet = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
+  const publishedSet = new Set(
+    pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)),
+  )
 
   const penaltiesRemote = await (async () => {
     try {
@@ -187,7 +199,6 @@ export default async function Page() {
     if (!raw) return ''
     let t = raw.replace(/[_-]+/g, ' ').trim()
     t = t.replace(/^jotracks\s*/i, '')
-    // Common collapsed names
     t = t.replace(/\bciudadevita\b/i, 'ciudad evita')
     t = t.replace(/\bbuenosaires\b/i, 'buenos aires')
     t = t.replace(/\bmardelplata\b/i, 'mar del plata')
@@ -203,35 +214,39 @@ export default async function Page() {
     }
     return words.map(map).join(' ')
   }
+
   const sessionsForViewer = sessions.filter((s) => {
     const key = sessionDateKey(s)
     if (!key || key === 'Sin-fecha') return false
-    if (key < currentChampionship.startDate) return false
-    if (currentChampionship.endDate && key > currentChampionship.endDate) return false
+    if (key < champ.startDate) return false
+    if (champ.endDate && key > champ.endDate) return false
     return true
   })
-
-  const season2 = championships.find((c) => c.id === 'season-2')
-  const season2Title = season2?.title ?? 'Temporada 2'
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Sesiones</h1>
+        {(() => {
+          const existing = sessions.map((s) => path.basename(s.sourceFilePath))
+          return <SessionsToolbar existing={existing} />
+        })()}
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-base md:text-lg font-bold">{champ.title}</div>
         <div className="inline-flex items-center gap-2">
           <Button asChild variant="secondary" size="sm">
-            <Link href="/sessions/season-2">{`Ver sesiones · ${season2Title}`}</Link>
+            <Link href="/sessions">Ver sesiones actuales</Link>
           </Button>
-          {(() => {
-            const existing = sessions.map((s) => path.basename(s.sourceFilePath))
-            return <SessionsToolbar existing={existing} />
-          })()}
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/championship/season-2">{`Ver campeonato · ${champ.title}`}</Link>
+          </Button>
         </div>
       </div>
+
       {sessionsForViewer.length === 0 && (
-        <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">
-          Aún no se han registrado sesiones recientes.
-        </div>
+        <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">Aún no se han registrado sesiones.</div>
       )}
       {(() => {
         const grouped = new Map<string, typeof sessionsForViewer>()
@@ -249,111 +264,109 @@ export default async function Page() {
           return b.localeCompare(a)
         })
 
-        return (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="text-base md:text-lg font-bold">{currentChampionship.title}</div>
-              <span className="text-xs uppercase tracking-wide text-muted-foreground">Campeonato activo</span>
+        return order.map((key) => {
+          const list = grouped.get(key) ?? []
+          if (list.length === 0) return null
+          const races = list
+            .filter((x) => x.type.toUpperCase() === 'RACE')
+            .sort((a, b) => a.id.localeCompare(b.id))
+          const raceIndexMap = new Map<string, number>()
+          for (let i = 0; i < races.length; i++) raceIndexMap.set(races[i].id, i + 1)
+          const totalPenalties = list.reduce((acc, s) => acc + (penaltiesCountBySessionId.get(s.id) ?? 0), 0)
+          return (
+            <div key={key} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-sm md:text-base font-semibold">{formatGroupLabel(key)}</div>
+                {totalPenalties > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    {totalPenalties} penalización{totalPenalties !== 1 ? 'es' : ''} (carrera/clasificación)
+                  </span>
+                )}
+              </div>
+              <ul className="rounded-lg border divide-y">
+                {list
+                  .slice()
+                  .sort((a, b) => {
+                    const pa = publishedSet.has(canonicalId(a.id)) ? 1 : 0
+                    const pb = publishedSet.has(canonicalId(b.id)) ? 1 : 0
+                    if (pa !== pb) return pb - pa
+                    return b.id.localeCompare(a.id)
+                  })
+                  .map((s) => (
+                    <li key={s.id} className="p-3 md:p-4 flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                          <Badge
+                            className={
+                              s.type === 'RACE'
+                                ? 'text-sm md:text-base px-3 py-0.5 bg-[#d8552b] text-white'
+                                : s.type === 'QUALIFY'
+                                ? 'text-sm md:text-base px-3 py-0.5'
+                                : 'text-xs px-3 py-0.5'
+                            }
+                            variant={
+                              s.type === 'RACE'
+                                ? 'default'
+                                : s.type === 'QUALIFY'
+                                ? 'secondary'
+                                : 'outline'
+                            }
+                          >
+                            {s.type.toUpperCase() === 'RACE' ? `Carrera ${raceIndexMap.get(s.id) ?? 1}` : labelType(s.type)}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {countById.get(s.id) ?? s.results.length}
+                          </span>
+                          <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                            <CalendarDays className="h-3 w-3" />
+                            {formatDate(s.date, s.id)}
+                            {' • '}
+                            <span className="font-medium text-xs md:text-sm">{niceTrack(s.track)}</span>
+                          </span>
+                          {publishedSet.has(canonicalId(s.id)) ? (
+                            <Badge className="text-xs px-2 py-0.5 bg-[#2b855d] text-white" variant="default">
+                              Resultado oficial
+                            </Badge>
+                          ) : (
+                            <Badge className="text-xs px-2 py-0.5" variant="outline">
+                              Resultado provisorio
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="inline-flex items-center gap-3">
+                        <Link
+                          href={`/sessions/${s.id}`}
+                          aria-label="Ver sesión"
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </Link>
+                        <PublishSessionButton id={s.id} />
+                        <DeleteSessionButton id={s.id} label={`${labelType(s.type)} | ${niceTrack(s.track)} | ${formatDate(s.date, s.id)}`} />
+                      </div>
+                    </li>
+                  ))}
+              </ul>
             </div>
-            {order.map((key) => {
-              const list = grouped.get(key) ?? []
-              const forViewer = list
-              if (forViewer.length === 0) return null
-              const races = list
-                .filter((x) => x.type.toUpperCase() === 'RACE')
-                .sort((a, b) => a.id.localeCompare(b.id))
-              const raceIndexMap = new Map<string, number>()
-              for (let i = 0; i < races.length; i++) raceIndexMap.set(races[i].id, i + 1)
-              const totalPenalties = list.reduce((acc, s) => acc + (penaltiesCountBySessionId.get(s.id) ?? 0), 0)
-              return (
-                <div key={key} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm md:text-base font-semibold">{formatGroupLabel(key)}</div>
-                    {totalPenalties > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {totalPenalties} penalización{totalPenalties !== 1 ? 'es' : ''} (carrera/clasificación)
-                      </span>
-                    )}
-                  </div>
-                  <ul className="rounded-lg border divide-y">
-                    {forViewer
-                      .slice()
-                      .sort((a, b) => {
-                        const pa = publishedSet.has(canonicalId(a.id)) ? 1 : 0
-                        const pb = publishedSet.has(canonicalId(b.id)) ? 1 : 0
-                        if (pa !== pb) return pb - pa
-                        return b.id.localeCompare(a.id)
-                      })
-                      .map((s) => (
-                        <li key={s.id} className="p-3 md:p-4 flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                              <Badge
-                                className={
-                                  s.type === 'RACE'
-                                    ? 'text-sm md:text-base px-3 py-0.5 bg-[#d8552b] text-white'
-                                    : s.type === 'QUALIFY'
-                                    ? 'text-sm md:text-base px-3 py-0.5'
-                                    : 'text-xs px-3 py-0.5'
-                                }
-                                variant={
-                                  s.type === 'RACE'
-                                    ? 'default'
-                                    : s.type === 'QUALIFY'
-                                    ? 'secondary'
-                                    : 'outline'
-                                }
-                              >
-                                {s.type.toUpperCase() === 'RACE'
-                                  ? `Carrera ${raceIndexMap.get(s.id) ?? 1}`
-                                  : labelType(s.type)}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                <Users className="h-3 w-3" />
-                                {countById.get(s.id) ?? s.results.length}
-                              </span>
-                              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                <CalendarDays className="h-3 w-3" />
-                                {formatDate(s.date, s.id)}
-                                {' • '}
-                                <span className="font-medium text-xs md:text-sm">
-                                  {niceTrack(s.track)}
-                                </span>
-                              </span>
-                              {publishedSet.has(canonicalId(s.id)) ? (
-                                <Badge className="text-xs px-2 py-0.5 bg-[#2b855d] text-white" variant="default">
-                                  Resultado oficial
-                                </Badge>
-                              ) : (
-                                <Badge className="text-xs px-2 py-0.5" variant="outline">
-                                  Resultado provisorio
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <div className="inline-flex items-center gap-3">
-                            <Link
-                              href={`/sessions/${s.id}`}
-                              aria-label="Ver sesión"
-                              className="text-muted-foreground hover:text-foreground"
-                            >
-                              <Eye className="h-5 w-5" />
-                            </Link>
-                            <PublishSessionButton id={s.id} />
-                            <DeleteSessionButton
-                              id={s.id}
-                              label={`${labelType(s.type)} | ${niceTrack(s.track)} | ${formatDate(s.date, s.id)}`}
-                            />
-                          </div>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )
-            })}
-          </div>
-        )
+          )
+        })
       })()}
+
+      <div className="text-sm">
+        <Link href={`/championship/season-2`} className="underline">
+          {`Ver campeonato · ${champ.title}`}
+        </Link>
+        <span className="text-muted-foreground">{' • '}</span>
+        <Link href={`/championship`} className="underline">
+          Ver campeonato actual
+        </Link>
+        <span className="text-muted-foreground">{' • '}</span>
+        <Link href={`/sessions`} className="underline">
+          Ver sesiones actuales
+        </Link>
+      </div>
     </div>
   )
 }

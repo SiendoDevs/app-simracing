@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { currentChampionship } from '@/data/championships'
 
 const SKINS_ROOT_FS = path.join(process.cwd(), 'public', 'assets', 'skins')
 
@@ -26,11 +27,12 @@ export function resolveSkinFolder(skin?: string): string | undefined {
   const exact = folders.find((f) => f === cleaned)
   if (exact) return exact
   // Case-insensitive/normalized match
-  const byNorm = folders.find((f) => normalize(f) === nTarget || normalize(f).includes(nTarget) || nTarget.includes(normalize(f)))
+  const byNorm = folders.find((f) => normalize(f) === nTarget)
   return byNorm
 }
 
 export function resolveSkinImage(skin?: string): string | undefined {
+  if (currentChampionship.skinsEnabled === false) return undefined
   const folder = resolveSkinFolder(skin)
   if (!folder) return undefined
   const base = path.join(SKINS_ROOT_FS, folder)

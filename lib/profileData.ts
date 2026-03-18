@@ -4,7 +4,7 @@ import { calculateChampionship, applySessionPoints } from '@/lib/calculatePoints
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
-import { resolveSkinImageFor, resolveSkinNumber } from '@/lib/skins'
+import { resolveSkinImage, resolveSkinNumber } from '@/lib/skins'
 
 export async function getProfileData() {
   const sessions = await loadLocalSessions()
@@ -171,7 +171,7 @@ export async function getProfileData() {
     return {
       ...d,
       penaltySeconds: penaltySecondsByDriver.get(d.driverId) ?? 0,
-      previewUrl: resolveSkinImageFor(d.livery, d.name),
+      previewUrl: resolveSkinImage(d.livery),
       numberToken: customNum ?? resolveSkinNumber(d.livery, d.name),
       absences,
     }

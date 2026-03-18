@@ -6,12 +6,23 @@ import DriverCompare from '@/components/DriverCompare'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
- 
+import { championships, currentChampionship } from '@/data/championships'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export default async function Page() {
+type SearchParams = { champ?: string | string[] }
+
+export default async function Page({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const sp = (await searchParams?.catch(() => ({} as SearchParams))) ?? ({} as SearchParams)
+  const champRaw = sp.champ
+  const champParam = typeof champRaw === 'string' ? champRaw : Array.isArray(champRaw) ? champRaw[0] : undefined
+  const selectedChampionship = (champParam ? championships.find((c) => c.id === champParam) : undefined) ?? currentChampionship
+  const season2 = championships.find((c) => c.id === 'season-2')
+  const season2Title = season2?.title ?? 'Temporada 2'
+
   const sessions = await loadLocalSessions()
   const fromHeaders = await (async () => { try { const h = await (await import('next/headers')).headers(); const host = h.get('x-forwarded-host') || h.get('host') || ''; const proto = h.get('x-forwarded-proto') || 'https'; return host ? `${proto}://${host}` : null } catch { return null } })()
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
@@ -82,8 +93,30 @@ export default async function Page() {
     const [, y, mo, d, h, mi, t] = m
     return `${y}_${mo}_${d}_${h}_${Number(mi)}_${t.toUpperCase()}`
   }
+  const sessionDateKey = (s: { id: string; date?: string }) => {
+    if (typeof s.date === 'string') {
+      const d = new Date(s.date)
+      if (!isNaN(d.getTime())) {
+        const yy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yy}-${mm}-${dd}`
+      }
+    }
+    const m = s.id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`
+    return 'Sin-fecha'
+  }
   const published = new Set(pubEntries.filter((p) => toBool((p as { published?: unknown }).published)).map((p) => canonicalId((p as { sessionId: string }).sessionId)))
   const sessionsPublished = sessions.filter((s) => published.has(canonicalId(s.id)))
+  const sessionsInChampionshipRange = sessionsPublished.filter((s) => {
+    const key = sessionDateKey(s)
+    if (key === 'Sin-fecha') return false
+    if (key < selectedChampionship.startDate) return false
+    if (selectedChampionship.endDate && key > selectedChampionship.endDate) return false
+    const t = (s.type || '').toUpperCase()
+    return t === 'RACE' || t === 'QUALIFY'
+  })
   try { console.log('[drivers/page] sessionsPublished count', sessionsPublished.length, sessionsPublished.slice(0, 3).map((s) => s.id)) } catch {}
   try { console.log('[drivers/page] publishedSet values', Array.from(published).slice(0, 5)) } catch {}
   const exclusionsRemote = await (async () => {
@@ -139,7 +172,7 @@ export default async function Page() {
     return typeof o.driverId === 'string' && typeof o.sessionId === 'string' && typeof o.seconds === 'number'
   }
   const penalties = (penaltiesRemote ?? []).filter(isPen)
-  const adjusted = sessionsPublished
+  const adjusted = sessionsInChampionshipRange
     .map((s) => applyDnfByLaps(s))
     .map((s) => applyPenaltiesToSession(s, penalties))
     .map((s) => stripExcluded(s, exclusions))
@@ -148,10 +181,23 @@ export default async function Page() {
     const sample = qual.slice(0, 2).map((s) => ({ id: s.id, top: s.results.slice(0, 3).map((r) => ({ driverId: r.driverId, pos: r.position })) }))
     console.log('[drivers/page] sample qual sessions', sample)
   } catch {}
-  if (sessionsPublished.length === 0) {
+  if (sessionsInChampionshipRange.length === 0) {
     return (
       <div className="py-6 space-y-4">
-        <h1 className="text-2xl font-bold">Pilotos</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{`Pilotos · ${selectedChampionship.title}`}</h1>
+          <div className="inline-flex items-center gap-2 text-sm">
+            {selectedChampionship.id !== currentChampionship.id ? (
+              <Button asChild variant="secondary">
+                <Link href="/drivers">Ver campeonato actual</Link>
+              </Button>
+            ) : season2 ? (
+              <Button asChild variant="secondary">
+                <Link href={`/drivers?champ=${encodeURIComponent(season2.id)}`}>{`Ver ${season2Title}`}</Link>
+              </Button>
+            ) : null}
+          </div>
+        </div>
         <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">No hay resultados oficiales publicados aún.</div>
       </div>
     )
@@ -190,7 +236,20 @@ export default async function Page() {
   const table = calculateChampionship(adjusted, pointsMap)
   return (
     <div className="py-6 space-y-4">
-      <h1 className="text-2xl font-bold">Pilotos</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{`Pilotos · ${selectedChampionship.title}`}</h1>
+        <div className="inline-flex items-center gap-2 text-sm">
+          {selectedChampionship.id !== currentChampionship.id ? (
+            <Button asChild variant="secondary">
+              <Link href="/drivers">Ver campeonato actual</Link>
+            </Button>
+          ) : season2 ? (
+            <Button asChild variant="secondary">
+              <Link href={`/drivers?champ=${encodeURIComponent(season2.id)}`}>{`Ver ${season2Title}`}</Link>
+            </Button>
+          ) : null}
+        </div>
+      </div>
       <DriversTable data={table} />
       <DriverCompare />
     </div>

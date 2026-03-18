@@ -4,6 +4,7 @@ export interface RaceEvent {
   label: string
   extra?: string
   nuevo?: boolean
+  official?: boolean
 }
 
 export interface Championship {
@@ -15,6 +16,7 @@ export interface Championship {
   currentIdx?: number
   startDate: string // ISO date string YYYY-MM-DD
   endDate?: string // ISO date string YYYY-MM-DD
+  skinsEnabled?: boolean
   schedule: RaceEvent[]
   plannedCounts: number[] // Cantidad de carreras esperadas por fecha
   assets: {
@@ -45,7 +47,8 @@ export const championships: Championship[] = [
     description: 'Noticias, resultados, sesiones y campeonatos.',
     status: 'completed',
     startDate: '2025-11-26',
-    endDate: '2026-01-14',
+    endDate: '2026-01-15',
+    skinsEnabled: true,
     schedule: [
       { idx: 1, label: 'Zárate 1' },
       { idx: 2, label: 'Baradero' },
@@ -85,9 +88,10 @@ export const championships: Championship[] = [
     currentIdx: 3,
     startDate: '2026-03-03',
     endDate: '2026-04-21',
+    skinsEnabled: false,
     schedule: [
-      { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true },
-      { idx: 2, label: 'Zárate #2', extra: 'Pretemporada – 2' },
+      { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true, official: false },
+      { idx: 2, label: 'Zárate #2', extra: 'Pretemporada – 2', official: false },
       { idx: 3, label: 'Zárate #4' },
       { idx: 4, label: 'Ciudad Evita' },
       { idx: 5, label: 'Buenos Aires #1', extra: 'Especial – 40 vueltas', nuevo: true },

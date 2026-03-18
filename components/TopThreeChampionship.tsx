@@ -1,4 +1,4 @@
-import { resolveSkinImageFor } from '@/lib/skins'
+import { resolveSkinImage } from '@/lib/skins'
 import type { ChampionshipRow } from '@/components/ChampionshipTable'
 import TopThreeCard from '@/components/TopThreeCard'
 
@@ -7,7 +7,7 @@ export default function TopThreeChampionship({ data }: { data: ChampionshipRow[]
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
       {top3.map((row, idx) => {
-        const previewUrl = resolveSkinImageFor(row.livery, row.name)
+        const previewUrl = resolveSkinImage(row.livery)
         return (
           <TopThreeCard
             key={row.driverId}

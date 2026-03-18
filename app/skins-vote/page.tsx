@@ -3,13 +3,14 @@ import { calculateChampionship } from '@/lib/calculatePoints'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
-import { resolveSkinImageFor } from '@/lib/skins'
+import { resolveSkinImage } from '@/lib/skins'
 import VoteSkinCard from '@/components/VoteSkinCard'
 import TopThreeCard from '@/components/TopThreeCard'
 import { Card } from '@/components/ui/card'
 import { currentUser } from '@clerk/nextjs/server'
 import { Redis } from '@upstash/redis'
 import Link from 'next/link'
+import { currentChampionship } from '@/data/championships'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -42,14 +43,39 @@ function createRedis(): Redis {
 
 export default async function Page() {
   const sessions = await loadLocalSessions()
-  const adjusted = sessions.map((s) => applyDnfByLaps(s)).map((s) => applyPenaltiesToSession(s, [])).map((s) => stripExcluded(s, []))
+  const sessionDateKey = (s: { id: string; date?: string }) => {
+    if (typeof s.date === 'string') {
+      const d = new Date(s.date)
+      if (!isNaN(d.getTime())) {
+        const yy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yy}-${mm}-${dd}`
+      }
+    }
+    const m = s.id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`
+    return 'Sin-fecha'
+  }
+  const sessionsInRange = sessions.filter((s) => {
+    const key = sessionDateKey(s)
+    if (key === 'Sin-fecha') return false
+    if (key < currentChampionship.startDate) return false
+    if (currentChampionship.endDate && key > currentChampionship.endDate) return false
+    return true
+  })
+  const adjusted = sessionsInRange
+    .map((s) => applyDnfByLaps(s))
+    .map((s) => applyPenaltiesToSession(s, []))
+    .map((s) => stripExcluded(s, []))
   const table = calculateChampionship(adjusted)
   const user = await currentUser().catch(() => null)
   const redis = createRedis()
+  const key = `skin_votes:${currentChampionship.id}`
   let votes: Record<string, number> = {}
   let mySelection: string | null = null
   try {
-    const j = await redis.json.get('skin_votes')
+    const j = await redis.json.get(key)
     if (j && typeof j === 'object') {
       const obj = j as Record<string, unknown>
       const counts = obj['counts']
@@ -60,7 +86,7 @@ export default async function Page() {
         mySelection = m[user.id] ?? null
       }
     } else {
-      const s = await redis.get('skin_votes')
+      const s = await redis.get(key)
       if (typeof s === 'string') {
         const parsed = JSON.parse(s) as Record<string, unknown>
         const counts = parsed['counts']
@@ -94,7 +120,7 @@ export default async function Page() {
             const item = topWithVotes[idx]
             const borderClass = idx === 0 ? 'border-[#b9902e]' : idx === 1 ? 'border-[#a9b0b8]' : 'border-[#8c5a2d]'
             if (item) {
-              const previewUrl = resolveSkinImageFor(item.row.livery, item.row.name)
+              const previewUrl = resolveSkinImage(item.row.livery)
               return (
                 <TopThreeCard
                   key={item.row.driverId}
@@ -114,7 +140,7 @@ export default async function Page() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         {table.map((row) => {
-          const previewUrl = resolveSkinImageFor(row.livery, row.name)
+          const previewUrl = resolveSkinImage(row.livery)
           const count = Math.max(0, Math.floor(votes[row.driverId] ?? 0))
           const disabled = !!mySelection
           return (

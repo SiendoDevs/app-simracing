@@ -6,6 +6,7 @@ import { calculateChampionship } from '@/lib/calculatePoints'
 import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
+import { currentChampionship } from '@/data/championships'
 
 export const runtime = 'nodejs'
 
@@ -47,9 +48,10 @@ type VoteBody = {
 export async function GET() {
   try {
     const redis = createRedis()
+    const key = `skin_votes:${currentChampionship.id}`
     let votes: Record<string, number> = {}
     try {
-      const j = await redis.json.get('skin_votes')
+      const j = await redis.json.get(key)
       if (j && typeof j === 'object') {
         const obj = j as Record<string, unknown>
         const counts = obj['counts']
@@ -59,7 +61,7 @@ export async function GET() {
           votes = obj as Record<string, number>
         }
       } else {
-        const s = await redis.get('skin_votes')
+        const s = await redis.get(key)
         if (typeof s === 'string') {
           const parsed = JSON.parse(s) as Record<string, unknown>
           const counts = (parsed as Record<string, unknown>)['counts']
@@ -83,7 +85,31 @@ export async function POST(req: Request) {
 
     // Validate driverId exists in championship table
     const sessions = await loadLocalSessions()
-    const adjusted = sessions.map((s) => applyDnfByLaps(s)).map((s) => applyPenaltiesToSession(s, [])).map((s) => stripExcluded(s, []))
+    const sessionDateKey = (s: { id: string; date?: string }) => {
+      if (typeof s.date === 'string') {
+        const d = new Date(s.date)
+        if (!isNaN(d.getTime())) {
+          const yy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          return `${yy}-${mm}-${dd}`
+        }
+      }
+      const m = s.id.match(/^(\d{4})_(\d{2})_(\d{2})/)
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`
+      return 'Sin-fecha'
+    }
+    const sessionsInRange = sessions.filter((s) => {
+      const k = sessionDateKey(s)
+      if (k === 'Sin-fecha') return false
+      if (k < currentChampionship.startDate) return false
+      if (currentChampionship.endDate && k > currentChampionship.endDate) return false
+      return true
+    })
+    const adjusted = sessionsInRange
+      .map((s) => applyDnfByLaps(s))
+      .map((s) => applyPenaltiesToSession(s, []))
+      .map((s) => stripExcluded(s, []))
     const table = calculateChampionship(adjusted)
     const known = new Set(table.map((r) => (r.driverId || '').trim()))
     if (!known.has(driverId)) return NextResponse.json({ error: 'unknown_driver' }, { status: 404 })
@@ -107,9 +133,10 @@ export async function POST(req: Request) {
       }, { status: 500 })
     }
     const redis = createRedis()
+    const key = `skin_votes:${currentChampionship.id}`
     let doc: { counts: Record<string, number>; users: Record<string, string> } = { counts: {}, users: {} }
     try {
-      const j = await redis.json.get('skin_votes')
+      const j = await redis.json.get(key)
       if (j && typeof j === 'object') {
         const obj = j as Record<string, unknown>
         const counts = obj['counts']
@@ -119,7 +146,7 @@ export async function POST(req: Request) {
           users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
         }
       } else {
-        const s = await redis.get('skin_votes')
+        const s = await redis.get(key)
         if (typeof s === 'string') {
           const parsed = JSON.parse(s) as Record<string, unknown>
           const counts = parsed['counts']
@@ -139,9 +166,9 @@ export async function POST(req: Request) {
     doc.users[user.id] = driverId
     // Persist
     try {
-      await redis.json.set('skin_votes', '$', doc as unknown as Record<string, unknown>)
+      await redis.json.set(key, '$', doc as unknown as Record<string, unknown>)
     } catch {
-      await redis.set('skin_votes', JSON.stringify(doc))
+      await redis.set(key, JSON.stringify(doc))
     }
     return NextResponse.json({ ok: true, votes: doc.counts })
   } catch (e) {

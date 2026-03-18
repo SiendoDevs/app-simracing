@@ -11,13 +11,22 @@ import TopThreeChampionship from '@/components/TopThreeChampionship'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Palette } from 'lucide-react'
-import { championships, currentChampionship } from '@/data/championships'
+import { championships } from '@/data/championships'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-
 export default async function Page() {
+  const championship = championships.find((c) => c.id === 'season-2')
+  if (!championship) {
+    return (
+      <div className="py-6 space-y-4">
+        <h1 className="text-2xl font-bold">Campeonato</h1>
+        <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">No se encontró el campeonato solicitado.</div>
+      </div>
+    )
+  }
+
   const sessions = await loadLocalSessions()
   const fromHeaders = await (async () => { try { const h = await (await import('next/headers')).headers(); const host = h.get('x-forwarded-host') || h.get('host') || ''; const proto = h.get('x-forwarded-proto') || 'https'; return host ? `${proto}://${host}` : null } catch { return null } })()
   const fromVercel = process.env.VERCEL_URL && process.env.VERCEL_URL.length > 0
@@ -102,8 +111,8 @@ export default async function Page() {
   const sessionsInChampionshipRange = sessions.filter((s) => {
     const key = sessionDateKey(s)
     if (key === 'Sin-fecha') return false
-    if (key < currentChampionship.startDate) return false
-    if (currentChampionship.endDate && key > currentChampionship.endDate) return false
+    if (key < championship.startDate) return false
+    if (championship.endDate && key > championship.endDate) return false
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
   })
@@ -114,8 +123,8 @@ export default async function Page() {
     .filter((s) => {
       const key = sessionDateKey(s)
       if (key === 'Sin-fecha') return false
-      if (key < currentChampionship.startDate) return false
-      if (currentChampionship.endDate && key > currentChampionship.endDate) return false
+      if (key < championship.startDate) return false
+      if (championship.endDate && key > championship.endDate) return false
       return true
     })
   const exclusionsRemote = await (async () => {
@@ -180,13 +189,17 @@ export default async function Page() {
   if (sessionsPublished.length === 0) {
     return (
       <div className="py-6 space-y-4">
-        <h1 className="text-2xl font-bold">Campeonato</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{championship.title}</h1>
+          <Button asChild variant="secondary">
+            <Link href="/championship">Ver campeonato actual</Link>
+          </Button>
+        </div>
         <div className="rounded-lg border p-3 md:p-4 text-sm text-muted-foreground">No hay resultados oficiales publicados aún.</div>
       </div>
     )
   }
   const pointsRemote = await (async () => {
-    // Intento 1: Leer directo de Redis (Prioridad en Server Component)
     try {
       const candidates = [
         process.env.UPSTASH_REDIS_REST_URL,
@@ -215,8 +228,6 @@ export default async function Page() {
         if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>)
       }
     } catch {}
-
-    // Intento 2: API interna
     try {
       const r1 = await fetch('/api/points', { cache: 'no-store' })
       if (r1.ok) {
@@ -225,8 +236,6 @@ export default async function Page() {
         if (j && typeof j === 'object') return Object.values(j as Record<string, unknown>)
       }
     } catch {}
-
-    // Intento 3: API absoluta
     try {
       const r2 = await fetch(`${origin}/api/points`, { cache: 'no-store' })
       if (r2.ok) {
@@ -255,8 +264,8 @@ export default async function Page() {
     const t = s.type.toUpperCase()
     return t === 'RACE' || t === 'QUALIFY'
   })
-  const scheduleAll = currentChampionship.schedule
-  const plannedCountsAll = currentChampionship.plannedCounts
+  const scheduleAll = championship.schedule
+  const plannedCountsAll = championship.plannedCounts
   const officialIndices = scheduleAll
     .map((ev, i) => ({ ev, i }))
     .filter(({ ev, i }) => ev.official !== false && (plannedCountsAll[i] ?? 0) > 0)
@@ -286,15 +295,13 @@ export default async function Page() {
     }
   }
   const progressValue = totalFechas > 0 ? Math.round(((fechasCompletas + parcial) / totalFechas) * 100) : 0
-  const season2 = championships.find((c) => c.id === 'season-2')
-  const season2Title = season2?.title ?? 'Temporada 2'
   return (
     <div className="py-6 space-y-12">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{currentChampionship.title}</h1>
+        <h1 className="text-2xl font-bold">{championship.title}</h1>
         <div className="inline-flex items-center gap-2 text-sm">
           <Button asChild variant="secondary">
-            <Link href="/championship/season-2">{`Ver ${season2Title}`}</Link>
+            <Link href="/championship">Ver campeonato actual</Link>
           </Button>
           <Button
             asChild

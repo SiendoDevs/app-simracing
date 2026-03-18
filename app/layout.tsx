@@ -42,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${racingSans.variable} ${geistMono.variable} ${saira.variable} antialiased font-sans`}>
+      <body className={`${racingSans.variable} ${geistMono.variable} ${saira.variable} antialiased font-sans min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
           <ThemeClerkProvider>
             <header className="border-b bg-background">
@@ -55,7 +55,7 @@ export default function RootLayout({
                 <AuthButtons />
               </div>
             </header>
-            <main className="mx-auto max-w-7xl px-4 md:px-4 py-4 md:py-6">
+            <main className="mx-auto w-full max-w-7xl px-4 md:px-4 py-4 md:py-6 flex-1">
               {children}
             </main>
             <Footer />

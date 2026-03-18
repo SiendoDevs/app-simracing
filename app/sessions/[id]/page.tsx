@@ -12,7 +12,7 @@ import PublishSessionButton from '@/components/PublishSessionButton'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Trophy } from 'lucide-react'
-import { resolveSkinImageFor } from '@/lib/skins'
+import { resolveSkinImage } from '@/lib/skins'
 import CheckeredFlagIcon from '@/components/CheckeredFlagIcon'
 
 export const dynamic = 'force-dynamic'
@@ -172,7 +172,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   }
   const winner = session.results.find((r) => r.position === 1) ?? session.results[0]
   const winnerName = winner ? (session.drivers.find((d) => d.id === winner.driverId)?.name ?? winner.driverId) : undefined
-  const winnerPreview = winner ? resolveSkinImageFor(winner.skin, winnerName) : undefined
+  const winnerPreview = winner ? resolveSkinImage(winner.skin) : undefined
   return (
     <div className="p-4 md:p-6 space-y-3 md:space-y-4">
       <div className="text-sm">
