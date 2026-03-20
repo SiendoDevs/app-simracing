@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { Redis } from '@upstash/redis'
 import { currentUser } from '@clerk/nextjs/server'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { calculateChampionship } from '@/lib/calculatePoints'
@@ -7,39 +6,9 @@ import { stripExcluded } from '@/lib/exclusions'
 import { applyDnfByLaps } from '@/lib/utils'
 import { applyPenaltiesToSession } from '@/lib/penalties'
 import { currentChampionship } from '@/data/championships'
+import { createRedis, upstashConfigured } from '@/lib/redis'
 
 export const runtime = 'nodejs'
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function upstashConfigured() {
-  const { url, token } = resolveUpstashEnv()
-  return !!(url && token)
-}
-
-function createRedis(): Redis {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 type VoteBody = {
   driverId?: string

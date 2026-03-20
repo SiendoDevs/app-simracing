@@ -7,10 +7,10 @@ import SessionsToolbar from '@/components/SessionsToolbar'
 import { CalendarDays, Eye, Users } from 'lucide-react'
 import path from 'node:path'
 import { headers } from 'next/headers'
-import { Redis } from '@upstash/redis'
 import { championships, currentChampionship } from '@/data/championships'
 import { loadPenalties } from '@/lib/penalties'
 import { Button } from '@/components/ui/button'
+import { readRedisItems, upstashConfigured } from '@/lib/redis'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,32 +44,9 @@ export default async function Page() {
       }
     } catch {}
     try {
-      const candidates = [
-        process.env.UPSTASH_REDIS_REST_URL,
-        process.env.UPSTASH_REDIS_REST_REDIS_URL,
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-        process.env.UPSTASH_REDIS_REST_KV_URL,
-        process.env.UPSTASH_REDIS_URL,
-      ].filter(Boolean) as string[]
-      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-      const token = (
-        process.env.UPSTASH_REDIS_REST_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-        process.env.UPSTASH_REDIS_TOKEN ||
-        ''
-      )
-      if (url && token) {
-        const redis = new Redis({ url, token })
-        let curr: unknown = null
-        try { curr = await redis.json.get('published') } catch {}
-        if (!Array.isArray(curr)) {
-          try { const s = await redis.get('published'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-        }
-        if (Array.isArray(curr)) return curr
-        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>)
-      }
+      if (!upstashConfigured()) return null
+      const items = await readRedisItems('published')
+      return items
     } catch {}
     return null
   })()
@@ -216,10 +193,10 @@ export default async function Page() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl md:text-2xl font-bold">Sesiones</h1>
-        <div className="inline-flex items-center gap-2">
-          <Button asChild variant="secondary" size="sm">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap sm:justify-end">
+          <Button asChild variant="secondary" size="sm" className="w-full sm:w-auto">
             <Link href="/sessions/season-2">{`Ver sesiones · ${season2Title}`}</Link>
           </Button>
           {(() => {
@@ -251,7 +228,7 @@ export default async function Page() {
 
         return (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-base md:text-lg font-bold">{currentChampionship.title}</div>
               <span className="text-xs uppercase tracking-wide text-muted-foreground">Campeonato activo</span>
             </div>
@@ -267,7 +244,7 @@ export default async function Page() {
               const totalPenalties = list.reduce((acc, s) => acc + (penaltiesCountBySessionId.get(s.id) ?? 0), 0)
               return (
                 <div key={key} className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <div className="text-sm md:text-base font-semibold">{formatGroupLabel(key)}</div>
                     {totalPenalties > 0 && (
                       <span className="text-xs text-muted-foreground">
@@ -275,7 +252,7 @@ export default async function Page() {
                       </span>
                     )}
                   </div>
-                  <ul className="rounded-lg border divide-y">
+                  <ul className="space-y-2 sm:space-y-0 sm:rounded-lg sm:border sm:divide-y">
                     {forViewer
                       .slice()
                       .sort((a, b) => {
@@ -285,65 +262,70 @@ export default async function Page() {
                         return b.id.localeCompare(a.id)
                       })
                       .map((s) => (
-                        <li key={s.id} className="p-3 md:p-4 flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                              <Badge
-                                className={
-                                  s.type === 'RACE'
-                                    ? 'text-sm md:text-base px-3 py-0.5 bg-[#d8552b] text-white'
-                                    : s.type === 'QUALIFY'
-                                    ? 'text-sm md:text-base px-3 py-0.5'
-                                    : 'text-xs px-3 py-0.5'
-                                }
-                                variant={
-                                  s.type === 'RACE'
-                                    ? 'default'
-                                    : s.type === 'QUALIFY'
-                                    ? 'secondary'
-                                    : 'outline'
-                                }
-                              >
-                                {s.type.toUpperCase() === 'RACE'
-                                  ? `Carrera ${raceIndexMap.get(s.id) ?? 1}`
-                                  : labelType(s.type)}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                <Users className="h-3 w-3" />
-                                {countById.get(s.id) ?? s.results.length}
-                              </span>
-                              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                <CalendarDays className="h-3 w-3" />
-                                {formatDate(s.date, s.id)}
-                                {' • '}
-                                <span className="font-medium text-xs md:text-sm">
-                                  {niceTrack(s.track)}
-                                </span>
-                              </span>
-                              {publishedSet.has(canonicalId(s.id)) ? (
-                                <Badge className="text-xs px-2 py-0.5 bg-[#2b855d] text-white" variant="default">
-                                  Resultado oficial
-                                </Badge>
-                              ) : (
-                                <Badge className="text-xs px-2 py-0.5" variant="outline">
-                                  Resultado provisorio
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <div className="inline-flex items-center gap-3">
-                            <Link
-                              href={`/sessions/${s.id}`}
-                              aria-label="Ver sesión"
-                              className="text-muted-foreground hover:text-foreground"
-                            >
-                              <Eye className="h-5 w-5" />
+                        <li
+                          key={s.id}
+                          className="relative rounded-lg border bg-background/40 p-3 shadow-xs sm:rounded-none sm:border-0 sm:bg-transparent sm:p-4 sm:shadow-none"
+                        >
+                          <Button asChild variant="outline" size="icon" className="absolute right-3 top-3 sm:hidden">
+                            <Link href={`/sessions/${s.id}`} aria-label="Ver sesión">
+                              <Eye className="size-4" />
                             </Link>
-                            <PublishSessionButton id={s.id} />
-                            <DeleteSessionButton
-                              id={s.id}
-                              label={`${labelType(s.type)} | ${niceTrack(s.track)} | ${formatDate(s.date, s.id)}`}
-                            />
+                          </Button>
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="min-w-0 pr-12 sm:pr-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge
+                                  className={
+                                    s.type === 'RACE'
+                                      ? 'text-xs sm:text-sm px-2.5 py-0.5 bg-[#d8552b] text-white'
+                                      : s.type === 'QUALIFY'
+                                      ? 'text-xs sm:text-sm px-2.5 py-0.5'
+                                      : 'text-xs px-2.5 py-0.5'
+                                  }
+                                  variant={s.type === 'RACE' ? 'default' : s.type === 'QUALIFY' ? 'secondary' : 'outline'}
+                                >
+                                  {s.type.toUpperCase() === 'RACE'
+                                    ? `Carrera ${raceIndexMap.get(s.id) ?? 1}`
+                                    : labelType(s.type)}
+                                </Badge>
+                                {publishedSet.has(canonicalId(s.id)) ? (
+                                  <Badge className="text-xs px-2 py-0.5 bg-[#2b855d] text-white" variant="default">
+                                    Resultado oficial
+                                  </Badge>
+                                ) : (
+                                  <Badge className="text-xs px-2 py-0.5" variant="outline">
+                                    Resultado provisorio
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1 rounded-md bg-muted/40 px-2 py-0.5">
+                                  <Users className="h-3 w-3" />
+                                  {countById.get(s.id) ?? s.results.length}
+                                </span>
+                              </div>
+                              <div className="mt-6 flex flex-col sm:mt-1 sm:flex-row sm:items-center sm:gap-2">
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                                  <CalendarDays className="h-3 w-3" />
+                                  {formatDate(s.date, s.id)}
+                                </span>
+                                {niceTrack(s.track) ? (
+                                  <span className="mt-1 text-sm font-semibold leading-tight wrap-break-word min-w-0 sm:mt-0 sm:text-sm md:text-base">
+                                    {niceTrack(s.track)}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                            <div className="inline-flex items-center gap-2 w-full justify-end sm:w-auto sm:justify-start shrink-0">
+                              <Button asChild variant="outline" size="icon" className="hidden sm:inline-flex">
+                                <Link href={`/sessions/${s.id}`} aria-label="Ver sesión">
+                                  <Eye className="size-4" />
+                                </Link>
+                              </Button>
+                              <PublishSessionButton id={s.id} />
+                              <DeleteSessionButton
+                                id={s.id}
+                                label={`${labelType(s.type)} | ${niceTrack(s.track)} | ${formatDate(s.date, s.id)}`}
+                              />
+                            </div>
                           </div>
                         </li>
                       ))}

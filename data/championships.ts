@@ -17,6 +17,7 @@ export interface Championship {
   startDate: string // ISO date string YYYY-MM-DD
   endDate?: string // ISO date string YYYY-MM-DD
   skinsEnabled?: boolean
+  skinsFolder?: string
   schedule: RaceEvent[]
   plannedCounts: number[] // Cantidad de carreras esperadas por fecha
   assets: {
@@ -65,7 +66,7 @@ export const championships: Championship[] = [
       logo: '/assets/Assetto_Corsa_Logo.png'
     },
     links: {
-      liveTiming: 'https://siendostudio.com/timing',
+      liveTiming: 'https://s04.assettoserver.com.ar/live-timing',
       serverPublic: '/server-publico',
       championship: '/championship',
       inscriptions: 'https://docs.google.com/forms/d/e/1FAIpQLScjoch5V5d-BjkwS_wq7jDCCAu9r_KyU5QyJ_1MwsK_7HTLcw/viewform?usp=header',
@@ -88,7 +89,8 @@ export const championships: Championship[] = [
     currentIdx: 3,
     startDate: '2026-03-03',
     endDate: '2026-04-21',
-    skinsEnabled: false,
+    skinsEnabled: true,
+    skinsFolder: 'skins-kp',
     schedule: [
       { idx: 1, label: 'Baradero', extra: 'Pretemporada – 1', nuevo: true, official: false },
       { idx: 2, label: 'Zárate #2', extra: 'Pretemporada – 2', official: false },
@@ -105,7 +107,7 @@ export const championships: Championship[] = [
       logo: '/assets/Assetto_Corsa_Logo.png'
     },
     links: {
-      liveTiming: 'https://siendostudio.com/timing',
+      liveTiming: 'https://s04.assettoserver.com.ar/live-timing',
       serverPublic: '/server-publico',
       championship: '/championship',
       inscriptions: 'https://docs.google.com/forms/d/e/1FAIpQLScjoch5V5d-BjkwS_wq7jDCCAu9r_KyU5QyJ_1MwsK_7HTLcw/viewform?usp=header',
@@ -115,7 +117,7 @@ export const championships: Championship[] = [
       requirements: 'PC, Assetto Corsa, Content Manager, CSP, Jotracks Race Director (App).',
       tracks: 'Jotracks (Modder Oficial)',
       inscription: '$25.000 Incluye Mod y Pistas',
-      quota: 'Máximo 50 pilotos.',
+      quota: 'Máximo 35 pilotos.',
       schedule: 'Martes 21:00 hs.'
     }
   }

@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 export default function Loading() {
   return (
     <div className="mx-auto max-w-7xl px-4 md:px-4 py-4 md:py-6 space-y-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <Skeleton className="h-6 w-24" />
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-6 w-20" />
@@ -17,9 +17,9 @@ export default function Loading() {
         <div className="rounded-lg border divide-y">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="p-3 md:p-4">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-10" />
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <Skeleton className="h-4 w-56 max-w-[75%] sm:max-w-none sm:w-48" />
+                <Skeleton className="h-4 w-16" />
               </div>
             </div>
           ))}

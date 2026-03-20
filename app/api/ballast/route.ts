@@ -1,41 +1,8 @@
 import { NextResponse } from 'next/server'
-import { Redis } from '@upstash/redis'
 import { currentUser } from '@clerk/nextjs/server'
+import { readRedisItems, upstashConfigured, writeRedisCollection } from '@/lib/redis'
 
 export const runtime = 'nodejs'
-
-// removed Vercel KV; using Upstash Redis only
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function upstashConfigured() {
-  const { url, token } = resolveUpstashEnv()
-  return !!(url && token)
-}
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 function isValidBallast(x: unknown): x is { driverId: string; sessionId: string; kg: number } {
   if (!x || typeof x !== 'object') return false
@@ -46,21 +13,8 @@ function isValidBallast(x: unknown): x is { driverId: string; sessionId: string;
 export async function GET() {
   try {
     if (!upstashConfigured()) return NextResponse.json([])
-    const redis = createRedis()
-    try {
-      const data = await redis.json.get('ballast')
-      if (Array.isArray(data)) return NextResponse.json(data.filter(isValidBallast))
-      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>).filter(isValidBallast))
-    } catch {}
-    try {
-      const s = await redis.get('ballast')
-      if (typeof s === 'string') {
-        const parsed = JSON.parse(s)
-        if (Array.isArray(parsed)) return NextResponse.json(parsed.filter(isValidBallast))
-        if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed as Record<string, unknown>).filter(isValidBallast))
-      }
-    } catch {}
-    return NextResponse.json([])
+    const items = await readRedisItems('ballast')
+    return NextResponse.json(items.filter(isValidBallast))
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
   }
@@ -95,15 +49,8 @@ export async function POST(req: Request) {
     if (!body || typeof body !== 'object') return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
     const { driverId, sessionId, kg } = body
     if (!driverId || !sessionId || typeof kg !== 'number') return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
-    const redis = createRedis()
-    let curr: unknown = null
-    try { curr = await redis.json.get('ballast') } catch {}
-    if (!Array.isArray(curr)) {
-      try { const s = await redis.get('ballast'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-    }
-    const list: Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }> = Array.isArray(curr)
-      ? (curr as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>)
-      : []
+    const items = await readRedisItems('ballast')
+    const list: Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }> = items.filter((x) => x && typeof x === 'object') as Array<{ driverId: string; sessionId: string; kg: number; confirmed?: boolean }>
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
     const confirmed = body.confirmed === true
     const weight: number = kg as number
@@ -119,14 +66,8 @@ export async function POST(req: Request) {
       else list.push({ driverId, sessionId, kg: weight, confirmed })
     
     }
-    const redis2 = createRedis()
-    let writeOk = false
-    let lastError: unknown = null
-    try { await redis2.json.set('ballast', '$', list); writeOk = true } catch (e) { lastError = e }
-    if (!writeOk) {
-      try { await redis2.set('ballast', JSON.stringify(list)); writeOk = true } catch (e) { lastError = e }
-    }
-    if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
+    const wr = await writeRedisCollection('ballast', list)
+    if (!wr.ok) return NextResponse.json({ error: 'write_failed', detail: wr.error ?? '' }, { status: 500 })
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })

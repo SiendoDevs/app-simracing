@@ -2,51 +2,15 @@ import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { parseSession } from '@/lib/parseSession'
 import path from 'node:path'
-import { Redis } from '@upstash/redis'
+import { readRedisItems, writeRedisCollection } from '@/lib/redis'
 
 export const runtime = 'nodejs'
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 export async function GET() {
   try {
     const sessions: ReturnType<typeof parseSession>[] = []
     try {
-      const redis = createRedis()
-      let curr: unknown = null
-      try { curr = await redis.json.get('sessions') } catch {}
-      if (!Array.isArray(curr) && (!curr || typeof curr !== 'object')) {
-        try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-      }
-      const items: unknown[] = Array.isArray(curr)
-        ? (curr as unknown[])
-        : curr && typeof curr === 'object'
-          ? Object.values(curr as Record<string, unknown>)
-          : []
+      const items = await readRedisItems('sessions')
       try { console.log('[api/sessions] GET items count', items.length) } catch {}
       for (const it of items) {
         const R = typeof it === 'string' ? (() => { try { return JSON.parse(it as string) } catch { return null } })() : (it as Record<string, unknown>)
@@ -96,26 +60,20 @@ export async function POST(req: Request) {
     const baseNameRaw = headerName ? path.basename(headerName) : 'session.json'
     const baseName = baseNameRaw.toLowerCase().endsWith('.json') ? baseNameRaw : `${baseNameRaw}.json`
     try {
-      const redis = createRedis()
       const rawWithPath = { ...(body as Record<string, unknown>), sourceFilePath: `upstash:${baseName}` }
-      let curr: unknown = null
-      try { curr = await redis.json.get('sessions') } catch {}
-      if (!Array.isArray(curr)) {
-        try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-      }
-      const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
+      const listU = await readRedisItems('sessions')
       const idNew = parseSession(rawWithPath as Record<string, unknown>, `upstash:${baseName}`).id
       const exists = listU.some((x) => {
-        const raw = x as Record<string, unknown>
+        const raw = typeof x === 'string' ? (() => { try { return JSON.parse(x) } catch { return null } })() : (x as Record<string, unknown>)
+        if (!raw || typeof raw !== 'object') return false
         const fp = typeof raw.sourceFilePath === 'string' ? (raw.sourceFilePath as string) : 'upstash:session.json'
         const sid = parseSession(raw, fp).id
         return sid === idNew
       })
       if (exists) return NextResponse.json({ error: 'duplicate', detail: idNew }, { status: 409 })
       const next = [...listU, rawWithPath]
-      try { await redis.json.set('sessions', '$', next) } catch {
-        await redis.set('sessions', JSON.stringify(next))
-      }
+      const wr = await writeRedisCollection('sessions', next)
+      if (!wr.ok) return NextResponse.json({ error: 'kv_write_failed', detail: wr.error ?? '' }, { status: 500 })
       return NextResponse.json({ ok: true, pathname: `upstash:${baseName}` })
     } catch (e) {
       return NextResponse.json({ error: 'kv_write_failed', detail: String(e) }, { status: 500 })

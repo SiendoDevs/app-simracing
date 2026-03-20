@@ -1,37 +1,11 @@
 import { NextResponse } from 'next/server'
-import { Redis } from '@upstash/redis'
 import { currentUser } from '@clerk/nextjs/server'
+import { createRedis } from '@/lib/redis'
 
 export const runtime = 'nodejs'
 
 type DriverNumberEntry = { steamId: string; number: string; name: string }
 type DriverNumberDoc = { bySteamId: Record<string, DriverNumberEntry>; byNumber: Record<string, DriverNumberEntry> }
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 function normalizeDoc(raw: unknown): DriverNumberDoc {
   const empty: DriverNumberDoc = { bySteamId: {}, byNumber: {} }

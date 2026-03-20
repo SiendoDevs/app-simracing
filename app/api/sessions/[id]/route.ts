@@ -3,69 +3,22 @@ import { currentUser } from '@clerk/nextjs/server'
 import fs from 'node:fs'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { parseSession } from '@/lib/parseSession'
-import { Redis } from '@upstash/redis'
+import { readRedisCollection, readRedisItems, writeRedisCollection } from '@/lib/redis'
 
 export const runtime = 'nodejs'
 
-// removed kv configuration; using Upstash Redis only
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
-
 async function loadLinked(key: 'penalties' | 'exclusions' | 'ballast' | 'points') {
-  try {
-    const redis = createRedis()
-    let curr: unknown = null
-    try { curr = await redis.json.get(key) } catch {}
-    if (!Array.isArray(curr)) {
-      try {
-        const s = await redis.get(key)
-        if (typeof s === 'string') curr = JSON.parse(s)
-      } catch {}
-    }
-    if (Array.isArray(curr)) return curr as Array<Record<string, unknown>>
-    if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>) as Array<Record<string, unknown>>
-  } catch {}
-  return []
+  return await readRedisCollection(key)
 }
 
 async function saveLinked(key: 'penalties' | 'exclusions' | 'ballast' | 'points', list: Record<string, unknown>[]) {
   try {
-    const redis = createRedis()
-    try {
-      const payload = list.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
-      await redis.json.set(key, '$', payload)
-      return true
-    } catch {}
-    try {
-      await redis.set(key, JSON.stringify(list))
-      return true
-    } catch {}
-  } catch {}
-  return false
+    const payload = list.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
+    const wr = await writeRedisCollection(key, payload)
+    return wr.ok
+  } catch {
+    return false
+  }
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -125,15 +78,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     try {
       if (filePath && filePath.startsWith('upstash:')) {
         try {
-          const redis = createRedis()
-          let curr: unknown = null
-          try { curr = await redis.json.get('sessions') } catch {}
-          if (!Array.isArray(curr)) {
-            try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-          }
-          const listU = Array.isArray(curr) ? (curr as Array<Record<string, unknown>>) : []
+          const listU = await readRedisItems('sessions')
           const kept = listU.filter((x) => {
-            const raw = x as Record<string, unknown>
+            const raw = typeof x === 'string' ? (() => { try { return JSON.parse(x) } catch { return null } })() : (x as Record<string, unknown>)
+            if (!raw || typeof raw !== 'object') return true
             const fp = typeof raw.sourceFilePath === 'string' ? (raw.sourceFilePath as string) : 'upstash:session.json'
             try {
               const s = parseSession(raw, fp)
@@ -142,9 +90,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
               return true
             }
           })
-          try { await redis.json.set('sessions', '$', kept) } catch {
-            await redis.set('sessions', JSON.stringify(kept))
-          }
+          const wr = await writeRedisCollection('sessions', kept)
+          if (!wr.ok) return NextResponse.json({ error: 'kv_unlink_failed', detail: wr.error ?? '' }, { status: 500 })
         } catch (e) {
           return NextResponse.json({ error: 'kv_unlink_failed', detail: String(e) }, { status: 500 })
         }

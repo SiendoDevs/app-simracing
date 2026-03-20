@@ -42,7 +42,7 @@ export default function ServerPublicoPage() {
               className="bg-[#d8552b] hover:bg-[#b04220] text-white font-semibold"
               size="lg"
             >
-              <Link href="https://br2.assettohosting.com:10251/live-timing" target="_blank">
+              <Link href="https://s04.assettoserver.com.ar/live-timing" target="_blank">
                 <Timer className="mr-2 h-5 w-5" />
                 Livetiming Server
               </Link>

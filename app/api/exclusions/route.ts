@@ -1,62 +1,17 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 // no local fallback
-import { Redis } from '@upstash/redis'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
+import { readRedisItems, writeRedisCollection } from '@/lib/redis'
 
 export const runtime = 'nodejs'
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-// no explicit gating; createRedis already handles env resolution
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 export async function GET() {
   try {
     try { console.log('[api/exclusions] GET start') } catch {}
-    const redis = createRedis()
-    let data: unknown = null
-    try {
-      data = await redis.json.get('exclusions')
-      try { console.log('[api/exclusions] json.get count', Array.isArray(data) ? data.length : (data ? Object.keys(data as Record<string, unknown>).length : 0)) } catch {}
-    } catch {}
-    if (Array.isArray(data)) return NextResponse.json(data)
-    if (data && typeof data === 'object') {
-      const values = Object.values(data as Record<string, unknown>)
-      try { console.log('[api/exclusions] json.get values count', values.length) } catch {}
-      if (values.length > 0) return NextResponse.json(values)
-    }
-    try {
-      const s = await redis.get('exclusions')
-      if (typeof s === 'string') {
-        const parsed = JSON.parse(s)
-        try { console.log('[api/exclusions] get count', Array.isArray(parsed) ? parsed.length : (parsed ? Object.keys(parsed as Record<string, unknown>).length : 0)) } catch {}
-        if (Array.isArray(parsed)) return NextResponse.json(parsed)
-        if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
-      }
-    } catch {}
-    return NextResponse.json([])
+    const items = await readRedisItems('exclusions')
+    try { console.log('[api/exclusions] count', items.length) } catch {}
+    return NextResponse.json(items)
   } catch {}
   return NextResponse.json([])
 }
@@ -97,38 +52,13 @@ export async function POST(req: Request) {
       }
     } catch {}
     try {
-      const redis = createRedis()
-      let curr: unknown = null
-      try {
-        curr = await redis.json.get('exclusions')
-      } catch {}
-      if (!Array.isArray(curr)) {
-        try {
-          const s = await redis.get('exclusions')
-          if (typeof s === 'string') curr = JSON.parse(s)
-        } catch {}
-      }
-      const list = Array.isArray(curr) ? (curr as Array<{ driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }>) : []
+      const items = await readRedisItems('exclusions')
+      const list = items.filter((x) => x && typeof x === 'object') as Array<{ driverId: string; sessionId: string; exclude: boolean; confirmed?: boolean }>
       const idx = list.findIndex((x) => x.driverId === body.driverId && x.sessionId === body.sessionId)
       if (idx >= 0) list[idx] = { driverId: body.driverId, sessionId: body.sessionId, exclude, confirmed }
       else list.push({ driverId: body.driverId, sessionId: body.sessionId, exclude, confirmed })
-      let writeOk = false
-      let lastError: unknown = null
-      try {
-        await redis.json.set('exclusions', '$', list)
-        writeOk = true
-      } catch (e) {
-        lastError = e
-      }
-      if (!writeOk) {
-        try {
-          await redis.set('exclusions', JSON.stringify(list))
-          writeOk = true
-        } catch (e) {
-          lastError = e
-        }
-      }
-      if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
+      const wr = await writeRedisCollection('exclusions', list)
+      if (!wr.ok) return NextResponse.json({ error: 'write_failed', detail: wr.error ?? '' }, { status: 500 })
       return NextResponse.json({ ok: true })
     } catch (e) {
       return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })

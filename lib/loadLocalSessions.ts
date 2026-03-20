@@ -1,7 +1,7 @@
 import type { Session } from '@/types/Session'
 import { headers } from 'next/headers'
-import { Redis } from '@upstash/redis'
 import { parseSession } from '@/lib/parseSession'
+import { readRedisItems, resolveUpstashEnv } from '@/lib/redis'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -72,34 +72,9 @@ export async function loadLocalSessions(): Promise<Session[]> {
   const remote = await loadRemoteSessions()
   if (remote) return remote
   try {
-    const candidates = [
-      process.env.UPSTASH_REDIS_REST_URL,
-      process.env.UPSTASH_REDIS_REST_REDIS_URL,
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-      process.env.UPSTASH_REDIS_REST_KV_URL,
-      process.env.UPSTASH_REDIS_URL,
-    ].filter(Boolean) as string[]
-    const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-    const token = (
-      process.env.UPSTASH_REDIS_REST_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-      process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-      process.env.UPSTASH_REDIS_TOKEN ||
-      ''
-    )
+    const { url, token } = resolveUpstashEnv()
     try { console.log('[loadLocalSessions] source', 'redis_sdk', { urlPresent: !!url, tokenPresent: !!token }) } catch {}
-    const redis = url && token ? new Redis({ url, token }) : Redis.fromEnv()
-    let curr: unknown = null
-    try { curr = await redis.json.get('sessions') } catch {}
-    if (!Array.isArray(curr) && (!curr || typeof curr !== 'object')) {
-      try { const s = await redis.get('sessions'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-    }
-    const items: unknown[] = Array.isArray(curr)
-      ? (curr as unknown[])
-      : curr && typeof curr === 'object'
-        ? Object.values(curr as Record<string, unknown>)
-        : []
+    const items = await readRedisItems('sessions')
     const result: Session[] = []
     for (const it of items) {
       const R = typeof it === 'string' ? (() => { try { return JSON.parse(it as string) } catch { return null } })() : (it as Record<string, unknown>)

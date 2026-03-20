@@ -8,38 +8,12 @@ import VoteSkinCard from '@/components/VoteSkinCard'
 import TopThreeCard from '@/components/TopThreeCard'
 import { Card } from '@/components/ui/card'
 import { currentUser } from '@clerk/nextjs/server'
-import { Redis } from '@upstash/redis'
 import Link from 'next/link'
 import { currentChampionship } from '@/data/championships'
+import { createRedis } from '@/lib/redis'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-    process.env.UPSTASH_REDIS_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    process.env.UPSTASH_REDIS_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function createRedis(): Redis {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 export default async function Page() {
   const sessions = await loadLocalSessions()

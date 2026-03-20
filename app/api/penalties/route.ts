@@ -1,60 +1,16 @@
 import { NextResponse } from 'next/server'
-import { Redis } from '@upstash/redis'
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
 import { currentUser } from '@clerk/nextjs/server'
+import { readRedisItems, upstashConfigured, writeRedisCollection } from '@/lib/redis'
 
 export const runtime = 'nodejs'
-
-// removed Vercel KV; using Upstash Redis only
-
-function resolveUpstashEnv() {
-  const candidates = [
-    process.env.UPSTASH_REDIS_REST_URL,
-    process.env.UPSTASH_REDIS_REST_REDIS_URL,
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-    process.env.UPSTASH_REDIS_REST_KV_URL,
-  ].filter(Boolean) as string[]
-  const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-  const token = (
-    process.env.UPSTASH_REDIS_REST_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-    ''
-  )
-  return { url, token }
-}
-
-function upstashConfigured() {
-  const { url, token } = resolveUpstashEnv()
-  return !!(url && token)
-}
-
-function createRedis() {
-  const { url, token } = resolveUpstashEnv()
-  if (url && token) return new Redis({ url, token })
-  return Redis.fromEnv()
-}
 
 export async function GET() {
   try {
     try { console.log('[api/penalties] GET start') } catch {}
-    const redis = createRedis()
-    try {
-      const data = await redis.json.get('penalties')
-      try { console.log('[api/penalties] json.get count', Array.isArray(data) ? data.length : (data ? Object.keys(data as Record<string, unknown>).length : 0)) } catch {}
-      if (Array.isArray(data)) return NextResponse.json(data)
-      if (data && typeof data === 'object') return NextResponse.json(Object.values(data as Record<string, unknown>))
-    } catch {}
-    try {
-      const s = await redis.get('penalties')
-      if (typeof s === 'string') {
-        const parsed = JSON.parse(s)
-        try { console.log('[api/penalties] get count', Array.isArray(parsed) ? parsed.length : (parsed ? Object.keys(parsed as Record<string, unknown>).length : 0)) } catch {}
-        if (Array.isArray(parsed)) return NextResponse.json(parsed)
-        if (parsed && typeof parsed === 'object') return NextResponse.json(Object.values(parsed))
-      }
-    } catch {}
+    const items = await readRedisItems('penalties')
+    try { console.log('[api/penalties] count', items.length) } catch {}
+    return NextResponse.json(items)
   } catch {}
   return NextResponse.json([])
 }
@@ -95,20 +51,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'qualify_penalties_not_allowed' }, { status: 400 })
       }
     } catch {}
-    const redis = createRedis()
-    let curr: unknown = null
-    try {
-      curr = await redis.json.get('penalties')
-    } catch {}
-    if (!Array.isArray(curr)) {
-      try {
-        const s = await redis.get('penalties')
-        if (typeof s === 'string') curr = JSON.parse(s)
-      } catch {}
-    }
-    const list: Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }> = Array.isArray(curr)
-      ? (curr as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>)
-      : []
+    const items = await readRedisItems('penalties')
+    const list: Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }> = items.filter((x) => x && typeof x === 'object') as Array<{ driverId: string; sessionId: string; seconds: number; confirmed?: boolean }>
     const idx = list.findIndex((x) => x.driverId === driverId && x.sessionId === sessionId)
     const confirmed = body.confirmed === true
     const secs: number = seconds as number
@@ -124,24 +68,8 @@ export async function POST(req: Request) {
       else list.push({ driverId, sessionId, seconds: secs, confirmed })
     
     }
-    const redis2 = createRedis()
-    let writeOk = false
-    let lastError: unknown = null
-    try {
-      await redis2.json.set('penalties', '$', list)
-      writeOk = true
-    } catch (e) {
-      lastError = e
-    }
-    if (!writeOk) {
-      try {
-        await redis2.set('penalties', JSON.stringify(list))
-        writeOk = true
-      } catch (e) {
-        lastError = e
-      }
-    }
-    if (!writeOk) return NextResponse.json({ error: 'write_failed', detail: String(lastError ?? '') }, { status: 500 })
+    const wr = await writeRedisCollection('penalties', list)
+    if (!wr.ok) return NextResponse.json({ error: 'write_failed', detail: wr.error ?? '' }, { status: 500 })
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })

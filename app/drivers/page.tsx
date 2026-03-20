@@ -1,5 +1,4 @@
 import { loadLocalSessions } from '@/lib/loadLocalSessions'
-import { Redis } from '@upstash/redis'
 import { calculateChampionship } from '@/lib/calculatePoints'
 import DriversTable from '@/components/DriversTable'
 import DriverCompare from '@/components/DriverCompare'
@@ -9,6 +8,7 @@ import { applyPenaltiesToSession } from '@/lib/penalties'
 import { championships, currentChampionship } from '@/data/championships'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { readRedisItems, upstashConfigured } from '@/lib/redis'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -51,32 +51,9 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Se
       }
     } catch {}
     try {
-      const candidates = [
-        process.env.UPSTASH_REDIS_REST_URL,
-        process.env.UPSTASH_REDIS_REST_REDIS_URL,
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_URL,
-        process.env.UPSTASH_REDIS_REST_KV_URL,
-        process.env.UPSTASH_REDIS_URL,
-      ].filter(Boolean) as string[]
-      const url = candidates.find((u) => typeof u === 'string' && u.startsWith('https://')) || ''
-      const token = (
-        process.env.UPSTASH_REDIS_REST_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READ_TOKEN ||
-        process.env.UPSTASH_REDIS_REST_KV_REST_API_READONLY_TOKEN ||
-        process.env.UPSTASH_REDIS_TOKEN ||
-        ''
-      )
-      if (url && token) {
-        const redis = new Redis({ url, token })
-        let curr: unknown = null
-        try { curr = await redis.json.get('published') } catch {}
-        if (!Array.isArray(curr)) {
-          try { const s = await redis.get('published'); if (typeof s === 'string') curr = JSON.parse(s) } catch {}
-        }
-        if (Array.isArray(curr)) return curr
-        if (curr && typeof curr === 'object') return Object.values(curr as Record<string, unknown>)
-      }
+      if (!upstashConfigured()) return null
+      const items = await readRedisItems('published')
+      return items
     } catch {}
     return null
   })()
