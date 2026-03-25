@@ -121,48 +121,118 @@ export default async function HomePortuguese() {
   }
   const schedule = currentChampionship.schedule;
   const plannedCountsAll = currentChampionship.plannedCounts;
-  const officialIndices = schedule
-    .map((ev, i) => ({ ev, i }))
-    .filter(({ ev, i }) => ev.official !== false && (plannedCountsAll[i] ?? 0) > 0);
-  const relevant = sessionsForViewer.filter((s) => {
+  const normalizeKey = (v: string) => {
+    const base = v
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+    if (!base) return "";
+    return base
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((p) => (/^\d+$/.test(p) ? String(parseInt(p, 10)) : p))
+      .join(" ");
+  };
+  const trackKeyFromRaw = (raw?: string) => {
+    if (!raw) return "";
+    let t = raw.replace(/[_-]+/g, " ").trim();
+    t = t.replace(/^jotracks\s*/i, "");
+    t = t.replace(/\bkartodromo\b/i, "").trim();
+    t = t.replace(/\bciudadevita\b/i, "ciudad evita");
+    t = t.replace(/\bbuenosaires\b/i, "buenos aires");
+    t = t.replace(/\bmardelplata\b/i, "mar del plata");
+    t = t.replace(/\bmdq\b/i, "mar del plata");
+    t = t.replace(/\breg\s*baires\s*kart\b/i, "buenos aires");
+    t = t.replace(/\bbaires\b/i, "buenos aires");
+    return normalizeKey(t);
+  };
+  const byTrackDate = new Map<string, Map<string, { races: number; quals: number }>>();
+  for (const s of sessionsForViewer) {
     const t = s.type.toUpperCase();
-    return t === "RACE" || t === "QUALIFY";
-  });
-  const byDate = new Map<string, typeof relevant>();
-  for (const s of relevant) {
-    const k = sessionDateKey(s);
-    const arr = byDate.get(k) ?? [];
-    arr.push(s);
-    byDate.set(k, arr);
+    if (t !== "RACE" && t !== "QUALIFY") continue;
+    const trackKey = trackKeyFromRaw(s.track);
+    if (!trackKey) continue;
+    const dateKey = sessionDateKey(s);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) continue;
+    const byDate = byTrackDate.get(trackKey) ?? new Map<string, { races: number; quals: number }>();
+    const cur = byDate.get(dateKey) ?? { races: 0, quals: 0 };
+    if (t === "RACE") cur.races++;
+    else cur.quals++;
+    byDate.set(dateKey, cur);
+    byTrackDate.set(trackKey, byDate);
   }
-  const sortedKeys = Array.from(byDate.keys()).sort((a, b) => a.localeCompare(b));
+  const groupsByTrack = new Map<string, { dateKey: string; races: number; quals: number }[]>();
+  for (const [trackKey, byDate] of byTrackDate) {
+    const arr = Array.from(byDate.entries())
+      .map(([dateKey, v]) => ({ dateKey, races: v.races, quals: v.quals }))
+      .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+    groupsByTrack.set(trackKey, arr);
+  }
+  const resolveTrackKey = (labelKey: string) => {
+    if (groupsByTrack.has(labelKey)) return labelKey;
+    const compact = labelKey.replace(/\s+/g, "");
+    for (const k of groupsByTrack.keys()) {
+      if (k.replace(/\s+/g, "") === compact) return k;
+    }
+    for (const k of groupsByTrack.keys()) {
+      if (k.includes(labelKey) || labelKey.includes(k)) return k;
+    }
+    return labelKey;
+  };
+  const manualIdx = typeof currentChampionship.currentIdx === "number" ? currentChampionship.currentIdx : undefined;
+  const todayKey = (() => {
+    const d = new Date();
+    const yy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  })();
+  const seasonStartedByDate = todayKey >= currentChampionship.startDate;
+  const firstOfficialIdx = (() => {
+    for (let i = 0; i < schedule.length; i++) {
+      if (schedule[i]?.official !== false && (plannedCountsAll[i] ?? 0) > 0) return schedule[i]!.idx;
+    }
+    return schedule[0]?.idx ?? 1;
+  })();
+  const trackPtr = new Map<string, number>();
   const statusByIdx = new Map<number, boolean>();
-  let datePtr = 0;
+  const preDoneByIdx = new Map<number, boolean>();
   for (let i = 0; i < schedule.length; i++) {
     const ev = schedule[i];
-    if (ev.official === false) continue;
     const need = plannedCountsAll[i] ?? 0;
     if (need <= 0) continue;
-    const dateKey = sortedKeys[datePtr];
-    const list = typeof dateKey === "string" ? (byDate.get(dateKey) ?? []) : [];
-    const done = list.length >= need;
+    if (ev.official === false) {
+      const preDone = (seasonStartedByDate && ev.idx < firstOfficialIdx) || (typeof manualIdx === "number" && manualIdx > ev.idx);
+      preDoneByIdx.set(ev.idx, preDone);
+      continue;
+    }
+    const labelKey = normalizeKey(ev.label);
+    const trackKey = resolveTrackKey(labelKey);
+    const list = groupsByTrack.get(trackKey) ?? [];
+    const ptr = trackPtr.get(trackKey) ?? 0;
+    const g = list[ptr];
+    if (g) trackPtr.set(trackKey, ptr + 1);
+    const done = !!g && (g.races + g.quals) >= need;
     statusByIdx.set(ev.idx, done);
-    if (!done) break;
-    datePtr++;
   }
-  const firstOfficialIdx = (officialIndices[0]?.ev.idx ?? (schedule[0]?.idx ?? 1));
-  let nextOfficialIdx = firstOfficialIdx;
-  for (const { ev } of officialIndices) {
+  const officialEvents = schedule
+    .map((ev, i) => ({ ev, i, need: plannedCountsAll[i] ?? 0 }))
+    .filter(({ ev, need }) => ev.official !== false && need > 0);
+  let nextOfficialIdx = (officialEvents[0]?.ev.idx ?? (schedule[0]?.idx ?? 1));
+  for (const { ev } of officialEvents) {
     if (!statusByIdx.get(ev.idx)) {
       nextOfficialIdx = ev.idx;
       break;
     }
     nextOfficialIdx = ev.idx;
   }
-  const highlightIdx =
-    typeof currentChampionship.currentIdx === "number" ? currentChampionship.currentIdx : nextOfficialIdx;
-  const seasonStarted = sortedKeys.length > 0;
-  const latestDateKey = sortedKeys.length > 0 ? sortedKeys[sortedKeys.length - 1] : null;
+  const highlightIdx = typeof manualIdx === "number" && manualIdx > nextOfficialIdx ? manualIdx : nextOfficialIdx;
+  const allDateKeys = Array.from(
+    new Set(sessionsForViewer.map((s) => sessionDateKey(s)).filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(k))),
+  ).sort((a, b) => a.localeCompare(b));
+  const latestDateKey = allDateKeys.length > 0 ? allDateKeys[allDateKeys.length - 1] : null;
   const sessionsRecent = latestDateKey ? sessionsForViewer.filter((s) => sessionDateKey(s) === latestDateKey) : sessionsForViewer;
   const formatId = (id: string) => {
     const m = id.match(/^(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})/);
@@ -322,10 +392,10 @@ export default async function HomePortuguese() {
             {schedule.map((f) => {
               const isHighlight = f.idx === highlightIdx;
               const isOfficial = f.official !== false;
+              const manualCompleted =
+                isOfficial && typeof manualIdx === "number" && manualIdx > nextOfficialIdx && f.idx < manualIdx;
               const isCompleted =
-                !!statusByIdx.get(f.idx) ||
-                (isOfficial && typeof currentChampionship.currentIdx === "number" && f.idx < currentChampionship.currentIdx) ||
-                (!isOfficial && seasonStarted);
+                isOfficial ? (!!statusByIdx.get(f.idx) || manualCompleted) : !!preDoneByIdx.get(f.idx);
               return (
                 <li
                   key={f.idx}

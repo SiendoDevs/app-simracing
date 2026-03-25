@@ -45,31 +45,50 @@ export default async function Page() {
   const table = calculateChampionship(adjusted)
   const user = await currentUser().catch(() => null)
   const redis = createRedis()
-  const key = `skin_votes:${currentChampionship.id}`
+  const key = `skin_votes_counts:${currentChampionship.id}`
   let votes: Record<string, number> = {}
   let mySelection: string | null = null
   try {
-    const j = await redis.json.get(key)
-    if (j && typeof j === 'object') {
-      const obj = j as Record<string, unknown>
-      const counts = obj['counts']
-      const users = obj['users']
-      votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>)
-      if (user?.id && users && typeof users === 'object') {
-        const m = users as Record<string, string>
-        mySelection = m[user.id] ?? null
+    const raw = await redis.hgetall<Record<string, unknown>>(key)
+    if (raw && typeof raw === 'object') {
+      for (const [k, v] of Object.entries(raw)) {
+        votes[k] = Math.max(0, Math.floor(Number(v ?? 0)))
       }
-    } else {
-      const s = await redis.get(key)
-      if (typeof s === 'string') {
-        const parsed = JSON.parse(s) as Record<string, unknown>
-        const counts = parsed['counts']
-        const users = parsed['users']
-        votes = (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>)
-        if (user?.id && users && typeof users === 'object') {
-          const m = users as Record<string, string>
-          mySelection = m[user.id] ?? null
+    }
+    if (user?.id) {
+      const sel = await redis.get<string>(`skin_vote_user:${currentChampionship.id}:${user.id}`)
+      mySelection = typeof sel === 'string' && sel.length > 0 ? sel : null
+    }
+
+    if (Object.keys(votes).length === 0 || (user?.id && !mySelection)) {
+      const legacyKey = `skin_votes:${currentChampionship.id}`
+      let legacyDoc: { counts: Record<string, number>; users: Record<string, string> } | null = null
+      try {
+        const j = await redis.json.get(legacyKey)
+        if (j && typeof j === 'object') {
+          const obj = j as Record<string, unknown>
+          const counts = obj['counts']
+          const users = obj['users']
+          legacyDoc = {
+            counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>),
+            users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
+          }
+        } else {
+          const s = await redis.get(legacyKey)
+          if (typeof s === 'string') {
+            const parsed = JSON.parse(s) as Record<string, unknown>
+            const counts = parsed['counts']
+            const users = parsed['users']
+            legacyDoc = {
+              counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>),
+              users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
+            }
+          }
         }
+      } catch {}
+      if (legacyDoc) {
+        if (Object.keys(votes).length === 0) votes = legacyDoc.counts ?? {}
+        if (user?.id && !mySelection) mySelection = legacyDoc.users?.[user.id] ?? null
       }
     }
   } catch {}

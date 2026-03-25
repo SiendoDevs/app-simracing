@@ -14,30 +14,106 @@ type VoteBody = {
   driverId?: string
 }
 
+async function migrateIfNeeded(redis: ReturnType<typeof createRedis>) {
+  const migratedKey = `skin_votes_migrated:${currentChampionship.id}`
+  const migrated = await redis.get(migratedKey).catch(() => null)
+  if (migrated) return
+
+  const lockKey = `skin_votes_migrate_lock:${currentChampionship.id}`
+  const lockOk = await redis.setnx(lockKey, String(Date.now())).catch(() => 0)
+  if (lockOk !== 1) return
+
+  const oldKey = `skin_votes:${currentChampionship.id}`
+  const countsKey = `skin_votes_counts:${currentChampionship.id}`
+  const userPrefix = `skin_vote_user:${currentChampionship.id}:`
+
+  let doc: { counts: Record<string, number>; users: Record<string, string> } | null = null
+  try {
+    const j = await redis.json.get(oldKey)
+    if (j && typeof j === 'object') {
+      const obj = j as Record<string, unknown>
+      const counts = obj['counts']
+      const users = obj['users']
+      doc = {
+        counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>),
+        users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
+      }
+    } else {
+      const s = await redis.get(oldKey)
+      if (typeof s === 'string') {
+        const parsed = JSON.parse(s) as Record<string, unknown>
+        const counts = parsed['counts']
+        const users = parsed['users']
+        doc = {
+          counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>),
+          users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
+        }
+      }
+    }
+  } catch {}
+
+  if (doc) {
+    const existingCounts = await redis.hgetall<Record<string, unknown>>(countsKey).catch(() => null)
+    const hasCounts = !!existingCounts && Object.keys(existingCounts).length > 0
+    if (!hasCounts) {
+      const kv: Record<string, number> = {}
+      for (const [k, v] of Object.entries(doc.counts ?? {})) {
+        const n = Math.max(0, Math.floor(Number(v ?? 0)))
+        if (k && n > 0) kv[k] = n
+      }
+      if (Object.keys(kv).length > 0) {
+        await redis.hset(countsKey, kv).catch(() => null)
+      }
+    }
+
+    for (const [uid, sel] of Object.entries(doc.users ?? {})) {
+      if (!uid || !sel) continue
+      await redis.setnx(`${userPrefix}${uid}`, sel).catch(() => 0)
+    }
+  }
+
+  await redis.set(migratedKey, '1').catch(() => null)
+}
+
+async function readLegacySelection(redis: ReturnType<typeof createRedis>, userId: string) {
+  const oldKey = `skin_votes:${currentChampionship.id}`
+  try {
+    const j = await redis.json.get(oldKey)
+    if (j && typeof j === 'object') {
+      const obj = j as Record<string, unknown>
+      const users = obj['users']
+      if (users && typeof users === 'object') {
+        const m = users as Record<string, string>
+        return m[userId] ?? null
+      }
+      return null
+    }
+    const s = await redis.get(oldKey)
+    if (typeof s === 'string') {
+      const parsed = JSON.parse(s) as Record<string, unknown>
+      const users = parsed['users']
+      if (users && typeof users === 'object') {
+        const m = users as Record<string, string>
+        return m[userId] ?? null
+      }
+    }
+  } catch {}
+  return null
+}
+
 export async function GET() {
   try {
     const redis = createRedis()
-    const key = `skin_votes:${currentChampionship.id}`
-    let votes: Record<string, number> = {}
-    try {
-      const j = await redis.json.get(key)
-      if (j && typeof j === 'object') {
-        const obj = j as Record<string, unknown>
-        const counts = obj['counts']
-        if (counts && typeof counts === 'object') {
-          votes = counts as Record<string, number>
-        } else {
-          votes = obj as Record<string, number>
-        }
-      } else {
-        const s = await redis.get(key)
-        if (typeof s === 'string') {
-          const parsed = JSON.parse(s) as Record<string, unknown>
-          const counts = (parsed as Record<string, unknown>)['counts']
-          votes = counts && typeof counts === 'object' ? (counts as Record<string, number>) : (parsed as Record<string, number>)
-        }
+    await migrateIfNeeded(redis)
+    const countsKey = `skin_votes_counts:${currentChampionship.id}`
+    const raw = await redis.hgetall<Record<string, unknown>>(countsKey).catch(() => null)
+    const votes: Record<string, number> = {}
+    if (raw && typeof raw === 'object') {
+      for (const [k, v] of Object.entries(raw)) {
+        const n = Math.max(0, Math.floor(Number(v ?? 0)))
+        votes[k] = n
       }
-    } catch {}
+    }
     return NextResponse.json(votes)
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
@@ -102,44 +178,51 @@ export async function POST(req: Request) {
       }, { status: 500 })
     }
     const redis = createRedis()
-    const key = `skin_votes:${currentChampionship.id}`
-    let doc: { counts: Record<string, number>; users: Record<string, string> } = { counts: {}, users: {} }
-    try {
-      const j = await redis.json.get(key)
-      if (j && typeof j === 'object') {
-        const obj = j as Record<string, unknown>
-        const counts = obj['counts']
-        const users = obj['users']
-        doc = {
-          counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (obj as Record<string, number>),
-          users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
-        }
-      } else {
-        const s = await redis.get(key)
-        if (typeof s === 'string') {
-          const parsed = JSON.parse(s) as Record<string, unknown>
-          const counts = parsed['counts']
-          const users = parsed['users']
-          doc = {
-            counts: (counts && typeof counts === 'object') ? (counts as Record<string, number>) : (parsed as Record<string, number>),
-            users: (users && typeof users === 'object') ? (users as Record<string, string>) : {}
-          }
-        }
+    await migrateIfNeeded(redis)
+    const countsKey = `skin_votes_counts:${currentChampionship.id}`
+    const userKey = `skin_vote_user:${currentChampionship.id}:${user.id}`
+    const migrated = await redis.get(`skin_votes_migrated:${currentChampionship.id}`).catch(() => null)
+    if (!migrated) {
+      const legacySel = await readLegacySelection(redis, user.id)
+      if (typeof legacySel === 'string' && legacySel.length > 0) {
+        return NextResponse.json({ error: 'already_voted', selection: legacySel }, { status: 409 })
       }
-    } catch {}
-    const prevSel = doc.users[user.id]
-    if (prevSel && prevSel.length > 0) {
-      return NextResponse.json({ error: 'already_voted', selection: prevSel }, { status: 409 })
     }
-    doc.counts[driverId] = Math.max(0, Math.floor(doc.counts[driverId] ?? 0)) + 1
-    doc.users[user.id] = driverId
-    // Persist
-    try {
-      await redis.json.set(key, '$', doc as unknown as Record<string, unknown>)
-    } catch {
-      await redis.set(key, JSON.stringify(doc))
+
+    const prev = await redis.get<string>(userKey).catch(() => null)
+    if (typeof prev === 'string' && prev.length > 0) {
+      return NextResponse.json({ error: 'already_voted', selection: prev }, { status: 409 })
     }
-    return NextResponse.json({ ok: true, votes: doc.counts })
+
+    const script = `
+local userKey = KEYS[1]
+local countsKey = KEYS[2]
+local driverId = ARGV[1]
+if redis.call('EXISTS', userKey) == 1 then
+  return {0, redis.call('GET', userKey)}
+end
+redis.call('SET', userKey, driverId)
+local newCount = redis.call('HINCRBY', countsKey, driverId, 1)
+return {1, newCount}
+`.trim()
+    const result = await redis.eval<[string], [number, unknown]>(script, [userKey, countsKey], [driverId]).catch(() => null)
+    if (!result || !Array.isArray(result) || result.length < 1) {
+      return NextResponse.json({ error: 'server_error', detail: 'vote_script_failed' }, { status: 500 })
+    }
+    const okFlag = Number(result[0] ?? 0)
+    if (okFlag !== 1) {
+      const sel = typeof result[1] === 'string' ? (result[1] as string) : null
+      return NextResponse.json({ error: 'already_voted', selection: sel }, { status: 409 })
+    }
+
+    const raw = await redis.hgetall<Record<string, unknown>>(countsKey).catch(() => null)
+    const votes: Record<string, number> = {}
+    if (raw && typeof raw === 'object') {
+      for (const [k, v] of Object.entries(raw)) {
+        votes[k] = Math.max(0, Math.floor(Number(v ?? 0)))
+      }
+    }
+    return NextResponse.json({ ok: true, votes })
   } catch (e) {
     return NextResponse.json({ error: 'server_error', detail: String(e) }, { status: 500 })
   }

@@ -117,7 +117,7 @@ export default function ServerPublicoPage() {
         {/* Block 3: Requisitos */}
         <div className="flex flex-col space-y-4 h-full">
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-gradient-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+             <div className="p-2 bg-linear-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
                 <Cpu className="h-6 w-6 text-[#d8552b]" />
              </div>
              <h2 className="text-xl font-bold">Requisitos Técnicos</h2>
@@ -135,7 +135,7 @@ export default function ServerPublicoPage() {
         {/* Block 4: Comunidad */}
         <div className="flex flex-col space-y-4 h-full">
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-gradient-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
+             <div className="p-2 bg-linear-to-br from-[#d8552b]/30 to-[#d8552b]/10 border border-[#d8552b]/20 rounded-lg shadow-[0_0_15px_rgba(216,85,43,0.15)]">
                 <MessageCircle className="h-6 w-6 text-[#d8552b]" />
              </div>
              <h2 className="text-xl font-bold">Comunidad y Soporte</h2>
